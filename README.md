@@ -9,7 +9,8 @@ Repository for Mobile Device Programming course, winter semester of 2026-2027
 ## Table of Contents
 * [assignments]() - The course's assignments _(coming soon)_
 * [outline]() - The course's outline _(coming soon)_
+* [preparation](./preparation/) - Applications developed while preparing the course
 
 ## Lectures
-* [live on Twitch](https://www.twitch.tv/paulo_pereira)
+* [Live on Twitch](https://www.twitch.tv/paulo_pereira)
 * [Playlist on YouTube](https://www.youtube.com/@ProfPauloPereira)
