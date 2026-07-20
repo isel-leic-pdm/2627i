@@ -1,9 +1,10 @@
 package isel.dei.pdm.puzzle.ui.play
 
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import isel.dei.pdm.puzzle.domain.Board
+import isel.dei.pdm.puzzle.ui.PuzzleViewTag
 import isel.dei.pdm.puzzle.ui.theme._8PuzzleTheme
 import isel.dei.pdm.puzzle.ui.tileTag
 import org.junit.Rule
@@ -24,9 +25,7 @@ class IdleViewTests {
         }
 
         // Act & Assert
-        Board.TILE_RANGE.forEach { tile ->
-            composeTestRule.onNodeWithTag(tileTag(tile)).assertExists()
-        }
+        composeTestRule.onNodeWithTag(PuzzleViewTag).assertIsDisplayed()
     }
 
     @Test

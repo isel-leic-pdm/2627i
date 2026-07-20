@@ -37,3 +37,11 @@ fun MainActivityPreview() {
         PlayScreen()
     }
 }
+
+@Preview(showBackground = true, widthDp = 800, heightDp = 400)
+@Composable
+fun MainActivityLandscapePreview() {
+    _8PuzzleTheme {
+        PlayScreen()
+    }
+}

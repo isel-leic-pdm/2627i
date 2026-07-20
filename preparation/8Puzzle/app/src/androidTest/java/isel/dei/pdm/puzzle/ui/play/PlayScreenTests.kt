@@ -45,6 +45,8 @@ class PlayScreenTests {
 
         // Act: Reset the game
         composeTestRule.onNodeWithTag(ResetButtonTag).performClick()
+        // Confirm reset in the dialog
+        composeTestRule.onNodeWithTag(ResetDialogConfirmTag).performClick()
 
         // Assert: We are back in Idle
         composeTestRule.onNodeWithTag(StartButtonTag).assertIsDisplayed()

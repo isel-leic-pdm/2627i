@@ -8,7 +8,7 @@ import isel.dei.pdm.puzzle.domain.Board.Coordinate
 class CoordinateTests {
 
     @Test
-    fun coordinate_isAdjacentTo_returnsTrueForAdjacentCells() {
+    fun `coordinate isAdjacentTo returns true for adjacent cells`() {
         val center = Coordinate(1, 1)
         assertTrue(center.isAdjacentTo(Coordinate(0, 1))) // Top
         assertTrue(center.isAdjacentTo(Coordinate(2, 1))) // Bottom
@@ -17,7 +17,7 @@ class CoordinateTests {
     }
 
     @Test
-    fun coordinate_isAdjacentTo_returnsFalseForNonAdjacentCells() {
+    fun `coordinate isAdjacentTo returns false for non-adjacent cells`() {
         val center = Coordinate(1, 1)
         assertFalse(center.isAdjacentTo(Coordinate(1, 1))) // Same
         assertFalse(center.isAdjacentTo(Coordinate(0, 0))) // Diagonal
@@ -27,12 +27,12 @@ class CoordinateTests {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun coordinate_init_throwsForInvalidRow() {
+    fun `coordinate init throws for invalid row`() {
         Coordinate(Board.BOARD_SIDE, 1)
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun coordinate_init_throwsForInvalidCol() {
+    fun `coordinate init throws for invalid col`() {
         Coordinate(1, -1)
     }
 }

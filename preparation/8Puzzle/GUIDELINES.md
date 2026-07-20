@@ -6,29 +6,32 @@ This document defines the coding standards and architectural boundaries for the 
 * **Verification is non-negotiable.** No feature or logic change should be submitted without accompanying tests.
 * **Unit Tests**: Required for all domain logic, math, and state transformations.
 * **UI Tests**: Required for user interactions and critical UI states.
-* **Naming Convention**: Use `action_whenPrecondition_expectedOutcome` (e.g., `login_whenCredentialsAreValid_returnsSuccess()board_should_detect_win_condition`).
+* **Naming Convention**:
+    * **Unit Tests**: Use backticks with spaces to describe the scenario and outcome (e.g., `` `action when precondition expected outcome` ``).
+    * **Instrumented Tests**: Use underscores (e.g., `action_whenPrecondition_expectedOutcome`) because Android's DEX format (prior to version 040) does not support spaces in method names.
 * **Structure**: Tests follow the Arrange-Act-Assert pattern.  
 
-## 2. Current Architectural Phase: Iteration 0 (Foundations)
+## 2. Current Architectural Phase: Iteration 1 (ViewModels)
 To preserve the pedagogical value of this project, **do not introduce advanced patterns** until explicitly moved to the next iteration.
 
 ### Allowed Patterns:
 * Standard Kotlin classes and basic functions.
 * Simple Jetpack Compose @Composables.
-* Local state management within Composables using `remember` and `mutableStateOf`.
+* State management using `androidx.lifecycle.ViewModel` for **Application State** (Screen UI State).
+* The ViewModel hosts the screen's state machine and exposes the current state as a `mutableStateOf` property.
+* State management using plain classes or `remember` for **Presentation State** (UI Element State).
 * The application contains a single Activity.
 * Clear separation of concerns between UI and business logic.
 
 ### Prohibited Patterns (Do NOT use yet):
-* **No ViewModels**: Logic should remain in pure Kotlin classes or hoisted in Composables for now.
-* **No Dependency Injection (Hilt/Koin)**: Use manual instantiation.
+* **No Dependency Injection (Hilt/Koin)**: Use manual instantiation or basic factories.
 * **No Data Persistence (Room)**: Use in-memory collections.
 * **No Advanced Navigation**: Use simple conditional rendering for screen switching.
 
 ## 3. Coding Style
 * Prefer functional transformations (`map`, `filter`) over imperative loops.
 * Prefer immutable data structures over mutable ones.
-* Compose: Use state hoisting to keep UI components "dumb" and testable.
+* Compose: Use state hoisting to keep UI components simple and testable.
 * All public-facing functions must have KDoc explaining their purpose.
 * Use Kotlin coding conventions. 
 

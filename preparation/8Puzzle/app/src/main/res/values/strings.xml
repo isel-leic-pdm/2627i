@@ -2,5 +2,9 @@
     <string name="app_name">8 Puzzle</string>
     <string name="play_screen_start_button">Start</string>
     <string name="play_screen_reset_button">Reset</string>
+    <string name="play_screen_reset_dialog_title">Reset Game</string>
+    <string name="play_screen_reset_dialog_text">Are you sure you want to reset the game and lose your progress?</string>
+    <string name="play_screen_reset_dialog_confirm">Yes, Reset</string>
+    <string name="play_screen_reset_dialog_dismiss">Cancel</string>
     <string name="play_screen_congratulations">Congratulations! You solved it!</string>
 </resources>

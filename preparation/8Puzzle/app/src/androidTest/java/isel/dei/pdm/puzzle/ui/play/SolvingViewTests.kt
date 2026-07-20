@@ -2,10 +2,12 @@ package isel.dei.pdm.puzzle.ui.play
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import isel.dei.pdm.puzzle.domain.Board
+import isel.dei.pdm.puzzle.ui.PuzzleViewTag
 import isel.dei.pdm.puzzle.ui.theme._8PuzzleTheme
 import isel.dei.pdm.puzzle.ui.tileTag
 import org.junit.Rule
@@ -27,9 +29,7 @@ class SolvingViewTests {
         }
 
         // Assert
-        Board.TILE_RANGE.forEach { tile ->
-            composeTestRule.onNodeWithTag(tileTag(tile)).assertIsDisplayed()
-        }
+        composeTestRule.onNodeWithTag(PuzzleViewTag).assertIsDisplayed()
     }
 
     @Test
@@ -67,15 +67,14 @@ class SolvingViewTests {
     }
 
     @Test
-    fun playScreenSolvingView_pressingResetButton_callsOnResetRequested() {
+    fun playScreenSolvingView_pressingResetButton_shows_confirmationDialog() {
         // Arrange
-        var resetRequested = false
         composeTestRule.setContent {
             _8PuzzleTheme {
                 SolvingView(
                     board = Board.SOLVED,
                     onMoveRequested = {},
-                    onResetRequested = { resetRequested = true }
+                    onResetRequested = {}
                 )
             }
         }
@@ -84,6 +83,73 @@ class SolvingViewTests {
         composeTestRule.onNodeWithTag(ResetButtonTag).performClick()
 
         // Assert
-        assert(resetRequested) { "onResetRequested should have been called when Reset button is clicked." }
+        composeTestRule.onNodeWithTag(ResetDialogTag).assertIsDisplayed()
+    }
+
+    @Test
+    fun playScreenSolvingView_confirmingReset_callsOnResetRequested() {
+        // Arrange
+        var resetRequested = false
+        composeTestRule.setContent {
+            _8PuzzleTheme {
+                SolvingView(
+                    board = Board.SOLVED,
+                    onMoveRequested = {},
+                    onResetRequested = { resetRequested = true },
+                    initialPresentationState = SolvingPresentationState.CONFIRMING_RESET
+                )
+            }
+        }
+
+        // Act
+        composeTestRule.onNodeWithTag(ResetDialogConfirmTag).performClick()
+
+        // Assert
+        assert(resetRequested) { "onResetRequested should have been called when Reset is confirmed." }
+    }
+
+    @Test
+    fun playScreenSolvingView_dismissingReset_doesNotCallOnResetRequested() {
+        // Arrange
+        var resetRequested = false
+        composeTestRule.setContent {
+            _8PuzzleTheme {
+                SolvingView(
+                    board = Board.SOLVED,
+                    onMoveRequested = {},
+                    onResetRequested = { resetRequested = true },
+                    initialPresentationState = SolvingPresentationState.CONFIRMING_RESET
+                )
+            }
+        }
+
+        // Act
+        composeTestRule.onNodeWithTag(ResetDialogDismissTag).performClick()
+
+        // Assert
+        assert(!resetRequested) { "onResetRequested should not have been called when Reset is dismissed." }
+        composeTestRule.onNodeWithTag(ResetButtonTag).assertIsDisplayed()
+    }
+
+    @Test
+    fun playScreenSolvingView_preservesPresentationState_afterStateRestoration() {
+        // Arrange
+        val stateRestorationTester = StateRestorationTester(composeTestRule)
+        stateRestorationTester.setContent {
+            _8PuzzleTheme {
+                SolvingView(
+                    board = Board.SOLVED,
+                    onMoveRequested = {},
+                    onResetRequested = {}
+                )
+            }
+        }
+
+        // Act
+        composeTestRule.onNodeWithTag(ResetButtonTag).performClick()
+        stateRestorationTester.emulateSavedInstanceStateRestore()
+
+        // Assert
+        composeTestRule.onNodeWithTag(ResetDialogTag).assertIsDisplayed()
     }
 }

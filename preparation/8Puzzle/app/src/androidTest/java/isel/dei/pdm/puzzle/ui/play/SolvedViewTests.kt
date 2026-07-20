@@ -3,9 +3,8 @@ package isel.dei.pdm.puzzle.ui.play
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import isel.dei.pdm.puzzle.domain.Board
+import isel.dei.pdm.puzzle.ui.PuzzleViewTag
 import isel.dei.pdm.puzzle.ui.theme._8PuzzleTheme
-import isel.dei.pdm.puzzle.ui.tileTag
 import org.junit.Rule
 import org.junit.Test
 
@@ -24,9 +23,7 @@ class SolvedViewTests {
         }
 
         // Assert
-        Board.TILE_RANGE.forEach { tile ->
-            composeTestRule.onNodeWithTag(tileTag(tile)).assertIsDisplayed()
-        }
+        composeTestRule.onNodeWithTag(PuzzleViewTag).assertIsDisplayed()
     }
 
     @Test

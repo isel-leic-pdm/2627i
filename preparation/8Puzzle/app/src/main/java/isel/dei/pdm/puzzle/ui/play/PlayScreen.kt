@@ -1,50 +1,39 @@
 package isel.dei.pdm.puzzle.ui.play
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import isel.dei.pdm.puzzle.domain.Board
-import kotlinx.coroutines.delay
-import kotlin.time.Duration.Companion.milliseconds
-
-const val SOLVED_TIMEOUT_MS = 3000L
-
-/**
- * The possible states of the play screen.
- */
-sealed interface PlayScreenState {
-    data object Idle : PlayScreenState
-    data class Solving(val board: Board) : PlayScreenState
-    data object Solved : PlayScreenState
-}
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import isel.dei.pdm.puzzle.ui.theme._8PuzzleTheme
 
 /**
  * The main gameplay screen for the 8-puzzle.
+ * @param viewModel the ViewModel for the screen.
  */
 @Composable
-fun PlayScreen() {
-    var state by remember { mutableStateOf<PlayScreenState>(PlayScreenState.Idle) }
-
-    LaunchedEffect(state) {
-        if (state is PlayScreenState.Solved) {
-            delay(SOLVED_TIMEOUT_MS.milliseconds)
-            state = PlayScreenState.Idle
-        }
-    }
-
-    when (val currentState = state) {
-        is PlayScreenState.Idle -> IdleView(onStartRequested = { state = PlayScreenState.Solving(Board.createRandom()) })
+fun PlayScreen(viewModel: PlayScreenViewModel = viewModel(factory = PlayScreenViewModel.Factory)) {
+    when (val currentState = viewModel.state) {
+        is PlayScreenState.Idle -> IdleView(onStartRequested = viewModel::start)
         is PlayScreenState.Solving -> SolvingView(
             board = currentState.board,
-            onMoveRequested = { tile ->
-                val nextBoard = currentState.board.move(tile)
-                state = if (nextBoard.isSolved) PlayScreenState.Solved else PlayScreenState.Solving(nextBoard)
-            },
-            onResetRequested = { state = PlayScreenState.Idle }
+            onMoveRequested = viewModel::move,
+            onResetRequested = viewModel::reset
         )
         is PlayScreenState.Solved -> SolvedView()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PlayScreenPreview() {
+    _8PuzzleTheme {
+        PlayScreen()
+    }
+}
+
+@Preview(showBackground = true, widthDp = 800, heightDp = 400)
+@Composable
+fun PlayScreenLandscapePreview() {
+    _8PuzzleTheme {
+        PlayScreen()
     }
 }

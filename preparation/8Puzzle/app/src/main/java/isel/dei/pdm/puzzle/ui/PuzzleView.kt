@@ -22,7 +22,21 @@ import isel.dei.pdm.puzzle.domain.Board
 import isel.dei.pdm.puzzle.ui.theme._8PuzzleTheme
 
 const val PuzzleViewTag = "PuzzleView"
+
+/**
+ * Function that returns the test tag for a specific tile.
+ * @param tile the tile value.
+ * @return the test tag.
+ */
 fun tileTag(tile: Int) = "tile-$tile"
+
+/**
+ * Function that returns the test tag for a specific cell.
+ * @param row the row index.
+ * @param col the column index.
+ * @return the test tag.
+ */
+fun cellTag(row: Int, col: Int) = "cell-$row-$col"
 
 /**
  * A Composable that displays the 8-puzzle board.
@@ -35,8 +49,8 @@ fun tileTag(tile: Int) = "tile-$tile"
 @Composable
 fun PuzzleView(
     board: Board,
+    modifier: Modifier = Modifier,
     onTileClick: ((Int) -> Unit)? = null,
-    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
@@ -50,15 +64,20 @@ fun PuzzleView(
             Row(modifier = Modifier.weight(1f)) {
                 for (col in 0 until Board.BOARD_SIDE) {
                     val tile = board.getTileAt(Board.Coordinate(row, col))
-                    TileView(
-                        tile = tile,
-                        onClick = if (tile != null && onTileClick != null) {
-                            { onTileClick(tile) }
-                        } else null,
+                    Box(
                         modifier = Modifier
                             .weight(1f)
-                            .then(if (tile != null) Modifier.testTag(tileTag(tile)) else Modifier)
-                    )
+                            .testTag(cellTag(row, col))
+                    ) {
+                        TileView(
+                            tile = tile,
+                            onClick = if (tile != null && onTileClick != null) {
+                                { onTileClick(tile) }
+                            } else null,
+                            modifier = Modifier
+                                .then(if (tile != null) Modifier.testTag(tileTag(tile)) else Modifier)
+                        )
+                    }
                 }
             }
         }
