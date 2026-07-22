@@ -1,4 +1,4 @@
-package isel.dei.pdm.puzzle.ui
+package isel.dei.pdm.puzzle.play.views
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
@@ -26,14 +26,15 @@ import androidx.compose.ui.unit.dp
  * @param controls the content for the controls/messages.
  */
 @Composable
-fun AdaptivePlayLayout(
+internal fun AdaptivePlayLayout(
+    modifier: Modifier = Modifier,
     puzzle: @Composable () -> Unit,
     controls: @Composable () -> Unit
 ) {
     val configuration = LocalConfiguration.current
     if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -59,7 +60,7 @@ fun AdaptivePlayLayout(
         }
     } else {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

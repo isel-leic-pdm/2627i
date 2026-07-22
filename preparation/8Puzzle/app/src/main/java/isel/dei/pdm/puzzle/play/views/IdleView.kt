@@ -1,4 +1,4 @@
-package isel.dei.pdm.puzzle.ui.play
+package isel.dei.pdm.puzzle.play.views
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -10,19 +10,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import isel.dei.pdm.puzzle.R
 import isel.dei.pdm.puzzle.domain.Board
-import isel.dei.pdm.puzzle.ui.AdaptivePlayLayout
-import isel.dei.pdm.puzzle.ui.PuzzleView
-import isel.dei.pdm.puzzle.ui.theme._8PuzzleTheme
+import isel.dei.pdm.puzzle.ui.theme.Demo8PuzzleTheme
 
-const val StartButtonTag = "StartButton"
+internal const val StartButtonTag = "StartButton"
 
 /**
  * View displayed when the game is in the Idle state.
  * @param onStartRequested callback to start the game.
+ * @param modifier the modifier to be applied to the layout.
  */
 @Composable
-fun IdleView(onStartRequested: () -> Unit) {
+internal fun IdleView(onStartRequested: () -> Unit, modifier: Modifier = Modifier) {
     AdaptivePlayLayout(
+        modifier = modifier,
         puzzle = {
             PuzzleView(board = Board.SOLVED, onTileClick = null)
         },
@@ -42,16 +42,16 @@ fun IdleView(onStartRequested: () -> Unit) {
 
 @Preview(showBackground = true)
 @Composable
-fun IdleViewPreview() {
-    _8PuzzleTheme {
+internal fun IdleViewPreview() {
+    Demo8PuzzleTheme {
         IdleView(onStartRequested = {})
     }
 }
 
 @Preview(showBackground = true, widthDp = 800, heightDp = 400)
 @Composable
-fun IdleViewLandscapePreview() {
-    _8PuzzleTheme {
+internal fun IdleViewLandscapePreview() {
+    Demo8PuzzleTheme {
         IdleView(onStartRequested = {})
     }
 }

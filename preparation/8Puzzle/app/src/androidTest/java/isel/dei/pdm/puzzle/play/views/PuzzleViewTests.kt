@@ -1,4 +1,4 @@
-package isel.dei.pdm.puzzle.ui
+package isel.dei.pdm.puzzle.play.views
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyDescendant
@@ -7,7 +7,7 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import isel.dei.pdm.puzzle.domain.Board
-import isel.dei.pdm.puzzle.ui.theme._8PuzzleTheme
+import isel.dei.pdm.puzzle.ui.theme.Demo8PuzzleTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -24,7 +24,7 @@ class PuzzleViewTests {
         // Arrange
         // Act
         composeTestRule.setContent {
-            _8PuzzleTheme {
+            Demo8PuzzleTheme {
                 PuzzleView(board = testBoard, onTileClick = {})
             }
         }
@@ -62,7 +62,7 @@ class PuzzleViewTests {
         val expectedTile = 1
 
         composeTestRule.setContent {
-            _8PuzzleTheme {
+            Demo8PuzzleTheme {
                 PuzzleView(
                     board = testBoard,
                     onTileClick = { clickedTile = it }

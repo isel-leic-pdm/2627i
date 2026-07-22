@@ -1,4 +1,4 @@
-package isel.dei.pdm.puzzle.ui.play
+package isel.dei.pdm.puzzle.play
 
 import isel.dei.pdm.puzzle.domain.Board
 import kotlinx.coroutines.Dispatchers
@@ -6,11 +6,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlin.time.Duration.Companion.milliseconds
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlayScreenViewModelTests {
@@ -75,7 +75,8 @@ class PlayScreenViewModelTests {
         // Arrange
         // [1, 2, 3, 4, 5, 6, 7, 0, 8] is almost solved.
         val almostSolvedBoard = Board.SOLVED.move(8)
-        val viewModel = PlayScreenViewModel(initialState = PlayScreenState.Solving(almostSolvedBoard))
+        val viewModel =
+            PlayScreenViewModel(initialState = PlayScreenState.Solving(almostSolvedBoard))
         
         // Act
         viewModel.move(8)

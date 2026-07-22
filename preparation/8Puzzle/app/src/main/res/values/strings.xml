@@ -1,10 +1,19 @@
 <resources>
     <string name="app_name">8 Puzzle</string>
     <string name="play_screen_start_button">Start</string>
+    <string name="start_screen_touch_to_play">Touch to play</string>
     <string name="play_screen_reset_button">Reset</string>
     <string name="play_screen_reset_dialog_title">Reset Game</string>
     <string name="play_screen_reset_dialog_text">Are you sure you want to reset the game and lose your progress?</string>
     <string name="play_screen_reset_dialog_confirm">Yes, Reset</string>
     <string name="play_screen_reset_dialog_dismiss">Cancel</string>
     <string name="play_screen_congratulations">Congratulations! You solved it!</string>
+    <string name="play_screen_top_bar_info">About</string>
+    <string name="play_screen_exit_dialog_title">Exit Game</string>
+    <string name="play_screen_exit_dialog_text">Are you sure you want to exit the game?</string>
+    <string name="play_screen_exit_dialog_confirm">Yes, Exit</string>
+    <string name="play_screen_exit_dialog_dismiss">Cancel</string>
+    <string name="about_screen_title">About 8-Puzzle</string>
+    <string name="about_screen_content">This is a pedagogical demo application for PDM.</string>
+    <string name="about_screen_on_github">on GitHub</string>
 </resources>

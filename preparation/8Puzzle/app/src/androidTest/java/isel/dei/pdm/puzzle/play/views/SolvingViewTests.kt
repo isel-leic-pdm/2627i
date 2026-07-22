@@ -1,4 +1,4 @@
-package isel.dei.pdm.puzzle.ui.play
+package isel.dei.pdm.puzzle.play.views
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
@@ -7,9 +7,7 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import isel.dei.pdm.puzzle.domain.Board
-import isel.dei.pdm.puzzle.ui.PuzzleViewTag
-import isel.dei.pdm.puzzle.ui.theme._8PuzzleTheme
-import isel.dei.pdm.puzzle.ui.tileTag
+import isel.dei.pdm.puzzle.ui.theme.Demo8PuzzleTheme
 import org.junit.Rule
 import org.junit.Test
 
@@ -23,7 +21,7 @@ class SolvingViewTests {
         // Arrange
         val board = Board.SOLVED // Solved board for simplicity
         composeTestRule.setContent {
-            _8PuzzleTheme {
+            Demo8PuzzleTheme {
                 SolvingView(board = board, onMoveRequested = {}, onResetRequested = {})
             }
         }
@@ -36,7 +34,7 @@ class SolvingViewTests {
     fun playScreenSolvingView_shows_resetButtonEnabled() {
         // Arrange
         composeTestRule.setContent {
-            _8PuzzleTheme {
+            Demo8PuzzleTheme {
                 SolvingView(board = Board.SOLVED, onMoveRequested = {}, onResetRequested = {})
             }
         }
@@ -50,7 +48,7 @@ class SolvingViewTests {
         // Arrange
         var moveRequestedTile: Int? = null
         composeTestRule.setContent {
-            _8PuzzleTheme {
+            Demo8PuzzleTheme {
                 SolvingView(
                     board = Board.SOLVED,
                     onMoveRequested = { moveRequestedTile = it },
@@ -70,7 +68,7 @@ class SolvingViewTests {
     fun playScreenSolvingView_pressingResetButton_shows_confirmationDialog() {
         // Arrange
         composeTestRule.setContent {
-            _8PuzzleTheme {
+            Demo8PuzzleTheme {
                 SolvingView(
                     board = Board.SOLVED,
                     onMoveRequested = {},
@@ -91,7 +89,7 @@ class SolvingViewTests {
         // Arrange
         var resetRequested = false
         composeTestRule.setContent {
-            _8PuzzleTheme {
+            Demo8PuzzleTheme {
                 SolvingView(
                     board = Board.SOLVED,
                     onMoveRequested = {},
@@ -113,7 +111,7 @@ class SolvingViewTests {
         // Arrange
         var resetRequested = false
         composeTestRule.setContent {
-            _8PuzzleTheme {
+            Demo8PuzzleTheme {
                 SolvingView(
                     board = Board.SOLVED,
                     onMoveRequested = {},
@@ -136,7 +134,7 @@ class SolvingViewTests {
         // Arrange
         val stateRestorationTester = StateRestorationTester(composeTestRule)
         stateRestorationTester.setContent {
-            _8PuzzleTheme {
+            Demo8PuzzleTheme {
                 SolvingView(
                     board = Board.SOLVED,
                     onMoveRequested = {},

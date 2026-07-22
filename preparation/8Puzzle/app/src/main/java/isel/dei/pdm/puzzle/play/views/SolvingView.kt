@@ -1,11 +1,5 @@
-package isel.dei.pdm.puzzle.ui.play
+package isel.dei.pdm.puzzle.play.views
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -16,27 +10,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import isel.dei.pdm.puzzle.R
 import isel.dei.pdm.puzzle.domain.Board
-import isel.dei.pdm.puzzle.ui.AdaptivePlayLayout
-import isel.dei.pdm.puzzle.ui.PuzzleView
-import isel.dei.pdm.puzzle.ui.theme._8PuzzleTheme
+import isel.dei.pdm.puzzle.ui.theme.Demo8PuzzleTheme
 
-const val ResetButtonTag = "ResetButton"
-const val ResetDialogTag = "ResetDialog"
-const val ResetDialogConfirmTag = "ResetDialogConfirm"
-const val ResetDialogDismissTag = "ResetDialogDismiss"
+internal const val ResetButtonTag = "ResetButton"
+internal const val ResetDialogTag = "ResetDialog"
+internal const val ResetDialogConfirmTag = "ResetDialogConfirm"
+internal const val ResetDialogDismissTag = "ResetDialogDismiss"
 
 /**
  * The possible presentation states of the [SolvingView].
  */
-enum class SolvingPresentationState {
+internal enum class SolvingPresentationState {
     IDLE,
     CONFIRMING_RESET
 }
@@ -46,18 +36,21 @@ enum class SolvingPresentationState {
  * @param board current board state.
  * @param onMoveRequested callback when a tile is clicked.
  * @param onResetRequested callback to reset the game.
+ * @param modifier the modifier to be applied to the layout.
  * @param initialPresentationState the initial presentation state of the view (mostly for testing).
  */
 @Composable
-fun SolvingView(
+internal fun SolvingView(
     board: Board,
     onMoveRequested: (Int) -> Unit,
     onResetRequested: () -> Unit,
+    modifier: Modifier = Modifier,
     initialPresentationState: SolvingPresentationState = SolvingPresentationState.IDLE
 ) {
     var presentationState by rememberSaveable { mutableStateOf(initialPresentationState) }
 
     AdaptivePlayLayout(
+        modifier = modifier,
         puzzle = {
             PuzzleView(board = board, onTileClick = onMoveRequested)
         },
@@ -89,7 +82,7 @@ fun SolvingView(
  * Dialog to confirm game reset.
  */
 @Composable
-fun ResetConfirmationDialog(
+private fun ResetConfirmationDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -119,8 +112,8 @@ fun ResetConfirmationDialog(
 
 @Preview(showBackground = true)
 @Composable
-fun SolvingViewPreview() {
-    _8PuzzleTheme {
+internal fun SolvingViewPreview() {
+    Demo8PuzzleTheme {
         SolvingView(
             board = Board.createRandom(),
             onMoveRequested = {},
@@ -131,8 +124,8 @@ fun SolvingViewPreview() {
 
 @Preview(showBackground = true, widthDp = 800, heightDp = 400)
 @Composable
-fun SolvingViewLandscapePreview() {
-    _8PuzzleTheme {
+internal fun SolvingViewLandscapePreview() {
+    Demo8PuzzleTheme {
         SolvingView(
             board = Board.createRandom(),
             onMoveRequested = {},
@@ -143,8 +136,8 @@ fun SolvingViewLandscapePreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun SolvingViewConfirmingResetPreview() {
-    _8PuzzleTheme {
+internal fun SolvingViewConfirmingResetPreview() {
+    Demo8PuzzleTheme {
         SolvingView(
             board = Board.createRandom(),
             onMoveRequested = {},
@@ -156,8 +149,8 @@ fun SolvingViewConfirmingResetPreview() {
 
 @Preview(showBackground = true, widthDp = 800, heightDp = 400)
 @Composable
-fun SolvingViewConfirmingResetLandscapePreview() {
-    _8PuzzleTheme {
+internal fun SolvingViewConfirmingResetLandscapePreview() {
+    Demo8PuzzleTheme {
         SolvingView(
             board = Board.createRandom(),
             onMoveRequested = {},
@@ -169,8 +162,8 @@ fun SolvingViewConfirmingResetLandscapePreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun ResetConfirmationDialogPreview() {
-    _8PuzzleTheme {
+internal fun ResetConfirmationDialogPreview() {
+    Demo8PuzzleTheme {
         ResetConfirmationDialog(
             onConfirm = {},
             onDismiss = {}

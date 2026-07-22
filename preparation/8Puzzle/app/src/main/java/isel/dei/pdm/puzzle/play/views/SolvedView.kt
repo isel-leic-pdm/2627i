@@ -1,4 +1,4 @@
-package isel.dei.pdm.puzzle.ui.play
+package isel.dei.pdm.puzzle.play.views
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -9,18 +9,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import isel.dei.pdm.puzzle.R
 import isel.dei.pdm.puzzle.domain.Board
-import isel.dei.pdm.puzzle.ui.AdaptivePlayLayout
-import isel.dei.pdm.puzzle.ui.PuzzleView
-import isel.dei.pdm.puzzle.ui.theme._8PuzzleTheme
+import isel.dei.pdm.puzzle.ui.theme.Demo8PuzzleTheme
 
-const val SuccessMessageTag = "SuccessMessage"
+internal const val SuccessMessageTag = "SuccessMessage"
 
 /**
  * View displayed when the puzzle is solved.
+ * @param modifier the modifier to be applied to the layout.
  */
 @Composable
-fun SolvedView() {
+internal fun SolvedView(modifier: Modifier = Modifier) {
     AdaptivePlayLayout(
+        modifier = modifier,
         puzzle = {
             PuzzleView(board = Board.SOLVED, onTileClick = null)
         },
@@ -37,16 +37,16 @@ fun SolvedView() {
 
 @Preview(showBackground = true)
 @Composable
-fun SolvedViewPreview() {
-    _8PuzzleTheme {
+internal fun SolvedViewPreview() {
+    Demo8PuzzleTheme {
         SolvedView()
     }
 }
 
 @Preview(showBackground = true, widthDp = 800, heightDp = 400)
 @Composable
-fun SolvedViewLandscapePreview() {
-    _8PuzzleTheme {
+internal fun SolvedViewLandscapePreview() {
+    Demo8PuzzleTheme {
         SolvedView()
     }
 }

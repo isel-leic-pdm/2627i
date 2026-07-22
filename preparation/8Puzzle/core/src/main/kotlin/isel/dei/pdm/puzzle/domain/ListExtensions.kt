@@ -8,7 +8,7 @@ package isel.dei.pdm.puzzle.domain
  *
  * @return The total number of inversions.
  */
-fun List<Int>.countInversions(): Int {
+internal fun List<Int>.countInversions(): Int {
     var inversions = 0
     for (i in indices) {
         for (j in i + 1 until size) {
@@ -25,7 +25,7 @@ fun List<Int>.countInversions(): Int {
  * @param index2 The index of the second element.
  * @return A new list with the elements at index1 and index2 swapped.
  */
-fun <T> List<T>.swap(index1: Int, index2: Int): List<T> {
+internal fun <T> List<T>.swap(index1: Int, index2: Int): List<T> {
     if (index1 == index2) return this
     val result = toMutableList()
     val tmp = result[index1]

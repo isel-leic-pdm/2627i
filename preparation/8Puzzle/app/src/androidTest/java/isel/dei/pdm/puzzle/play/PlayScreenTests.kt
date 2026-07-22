@@ -1,10 +1,13 @@
-package isel.dei.pdm.puzzle.ui.play
+package isel.dei.pdm.puzzle.play
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import isel.dei.pdm.puzzle.ui.theme._8PuzzleTheme
+import isel.dei.pdm.puzzle.play.views.ResetButtonTag
+import isel.dei.pdm.puzzle.play.views.ResetDialogConfirmTag
+import isel.dei.pdm.puzzle.play.views.StartButtonTag
+import isel.dei.pdm.puzzle.ui.theme.Demo8PuzzleTheme
 import org.junit.Rule
 import org.junit.Test
 
@@ -17,8 +20,8 @@ class PlayScreenTests {
     fun playScreen_starts_in_Idle_and_can_transition_to_Solving() {
         // Arrange
         composeTestRule.setContent {
-            _8PuzzleTheme {
-                PlayScreen()
+            Demo8PuzzleTheme {
+                PlayScreen(onInfoRequested = {})
             }
         }
 
@@ -36,8 +39,8 @@ class PlayScreenTests {
     fun playScreen_can_transition_from_Solving_back_to_Idle_via_Reset() {
         // Arrange
         composeTestRule.setContent {
-            _8PuzzleTheme {
-                PlayScreen()
+            Demo8PuzzleTheme {
+                PlayScreen(onInfoRequested = {})
             }
         }
         // Transition to Solving

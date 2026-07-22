@@ -20,7 +20,11 @@ To preserve the pedagogical value of this project, **do not introduce advanced p
 * State management using `androidx.lifecycle.ViewModel` for **Application State** (Screen UI State).
 * The ViewModel hosts the screen's state machine and exposes the current state as a `mutableStateOf` property.
 * State management using plain classes or `remember` for **Presentation State** (UI Element State).
-* The application contains a single Activity.
+* The application comprises several Activities, one per-screen.
+  * Each screen is composed of: 
+    * an activity; 
+    * a viewmodel used to host the screen's state machine, if one exists;
+    * at last one composable function that represents the screen's UI
 * Clear separation of concerns between UI and business logic.
 
 ### Prohibited Patterns (Do NOT use yet):
@@ -41,3 +45,9 @@ To preserve the pedagogical value of this project, **do not introduce advanced p
     * Use nested classes and scoping to tie related concepts together (e.g., `Board.Coordinate`).
     * Use `init` blocks to enforce invariants at construction time.
     * Prefer returning existing valid states over throwing exceptions when a transition is invalid (e.g., `Board.move`).
+* **Minimize Visibility**: Every declaration (classes, functions, properties, composables) must use the most restrictive modifier that still satisfies its actual callers.
+    * Default to `private` for anything used only within its own file.
+    * Use `internal` for anything shared across files/packages that is never consumed outside the current Gradle module (e.g., most of `app`'s Activities' helpers, screens, ViewModels, test tags).
+    * Reserve `public` for a module's real external API. This has two distinct meanings, and both count as "external":
+        * The `core` module's domain API consumed by `app` (e.g., `Board`, `Coordinate`) — designed as an intentional contract, not narrowed to whatever the UI happens to call today.
+        * Android framework entry points declared in the manifest (Activities, Services, BroadcastReceivers, ContentProviders) — the OS instantiates these via Intents, so they must stay public regardless of whether another in-module class also references them.

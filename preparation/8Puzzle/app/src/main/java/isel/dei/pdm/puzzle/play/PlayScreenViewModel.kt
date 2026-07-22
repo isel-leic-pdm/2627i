@@ -1,4 +1,4 @@
-package isel.dei.pdm.puzzle.ui.play
+package isel.dei.pdm.puzzle.play
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,12 +13,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
-const val SOLVED_TIMEOUT_MS = 3000L
+internal const val SOLVED_TIMEOUT_MS = 3000L
 
 /**
  * The possible states of the play screen.
  */
-sealed interface PlayScreenState {
+internal sealed interface PlayScreenState {
     data object Idle : PlayScreenState
     data class Solving(val board: Board) : PlayScreenState
     data object Solved : PlayScreenState
@@ -28,7 +28,7 @@ sealed interface PlayScreenState {
  * The ViewModel for the play screen.
  * It hosts the screen's state machine and exposes the current state as a mutable state property.
  */
-class PlayScreenViewModel(initialState: PlayScreenState = PlayScreenState.Idle) : ViewModel() {
+internal class PlayScreenViewModel(initialState: PlayScreenState = PlayScreenState.Idle) : ViewModel() {
 
     var state by mutableStateOf(initialState)
         private set

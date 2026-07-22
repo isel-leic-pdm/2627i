@@ -1,4 +1,4 @@
-package isel.dei.pdm.puzzle.ui
+package isel.dei.pdm.puzzle.play.views
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,16 +19,16 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import isel.dei.pdm.puzzle.domain.Board
-import isel.dei.pdm.puzzle.ui.theme._8PuzzleTheme
+import isel.dei.pdm.puzzle.ui.theme.Demo8PuzzleTheme
 
-const val PuzzleViewTag = "PuzzleView"
+internal const val PuzzleViewTag = "PuzzleView"
 
 /**
  * Function that returns the test tag for a specific tile.
  * @param tile the tile value.
  * @return the test tag.
  */
-fun tileTag(tile: Int) = "tile-$tile"
+internal fun tileTag(tile: Int) = "tile-$tile"
 
 /**
  * Function that returns the test tag for a specific cell.
@@ -36,7 +36,7 @@ fun tileTag(tile: Int) = "tile-$tile"
  * @param col the column index.
  * @return the test tag.
  */
-fun cellTag(row: Int, col: Int) = "cell-$row-$col"
+internal fun cellTag(row: Int, col: Int) = "cell-$row-$col"
 
 /**
  * A Composable that displays the 8-puzzle board.
@@ -47,7 +47,7 @@ fun cellTag(row: Int, col: Int) = "cell-$row-$col"
  * @param modifier The modifier to be applied to the layout.
  */
 @Composable
-fun PuzzleView(
+internal fun PuzzleView(
     board: Board,
     modifier: Modifier = Modifier,
     onTileClick: ((Int) -> Unit)? = null,
@@ -92,7 +92,7 @@ fun PuzzleView(
  * @param modifier The modifier to be applied to the layout.
  */
 @Composable
-fun TileView(
+private fun TileView(
     tile: Int?,
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier
@@ -117,8 +117,8 @@ fun TileView(
 
 @Preview(showBackground = true)
 @Composable
-fun PuzzleViewPreview() {
-    _8PuzzleTheme {
+internal fun PuzzleViewPreviewDemo() {
+    Demo8PuzzleTheme {
         PuzzleView(board = Board.SOLVED, onTileClick = {})
     }
 }
