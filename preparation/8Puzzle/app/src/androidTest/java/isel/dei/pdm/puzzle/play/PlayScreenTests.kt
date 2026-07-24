@@ -2,11 +2,16 @@ package isel.dei.pdm.puzzle.play
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import isel.dei.pdm.puzzle.domain.Board
+import isel.dei.pdm.puzzle.play.SOLVED_TIMEOUT_MS
 import isel.dei.pdm.puzzle.play.views.ResetButtonTag
 import isel.dei.pdm.puzzle.play.views.ResetDialogConfirmTag
 import isel.dei.pdm.puzzle.play.views.StartButtonTag
+import isel.dei.pdm.puzzle.play.views.SuccessMessageTag
+import isel.dei.pdm.puzzle.play.views.tileTag
 import isel.dei.pdm.puzzle.ui.theme.Demo8PuzzleTheme
 import org.junit.Rule
 import org.junit.Test
@@ -52,6 +57,56 @@ class PlayScreenTests {
         composeTestRule.onNodeWithTag(ResetDialogConfirmTag).performClick()
 
         // Assert: We are back in Idle
+        composeTestRule.onNodeWithTag(StartButtonTag).assertIsDisplayed()
+    }
+
+    @Test
+    fun playScreen_transitions_to_Solved_after_winning_move_and_animation() {
+        // Arrange
+        // almost solved board: [1, 2, 3, 4, 5, 6, 7, 0, 8]
+        val almostSolvedBoard = Board.SOLVED.move(8)
+        val viewModel = PlayScreenViewModel(initialState = PlayScreenState.Solving(almostSolvedBoard))
+        
+        composeTestRule.setContent {
+            Demo8PuzzleTheme {
+                PlayScreen(onInfoRequested = {}, viewModel = viewModel)
+            }
+        }
+
+        // Act: perform winning move (clicking 8)
+        composeTestRule.onNodeWithTag(tileTag(8)).performClick()
+        
+        // Assert: SolvedView is now displayed (eventually)
+        composeTestRule.waitUntil(10000) {
+            composeTestRule.onAllNodesWithTag(SuccessMessageTag).fetchSemanticsNodes().isNotEmpty()
+        }
+        composeTestRule.onNodeWithTag(SuccessMessageTag).assertIsDisplayed()
+    }
+
+    @Test
+    fun playScreen_transitions_back_to_Idle_after_solved_timeout() {
+        // Arrange
+        // To trigger the timer, we must go from Solving(SolvedBoard) -> Solved
+        val viewModel = PlayScreenViewModel(initialState = PlayScreenState.Solving(Board.SOLVED))
+        
+        composeTestRule.setContent {
+            Demo8PuzzleTheme {
+                PlayScreen(onInfoRequested = {}, viewModel = viewModel)
+            }
+        }
+
+        // Act: trigger transition to Solved (simulating animation finish)
+        viewModel.onAnimationFinished()
+        
+        // Wait for Solved state to appear
+        composeTestRule.onNodeWithTag(SuccessMessageTag).assertIsDisplayed()
+        
+        // Act: wait for SOLVED_TIMEOUT_MS and transition back to Idle
+        composeTestRule.waitUntil(timeoutMillis = SOLVED_TIMEOUT_MS + 2000) {
+            composeTestRule.onAllNodesWithTag(StartButtonTag).fetchSemanticsNodes().isNotEmpty()
+        }
+        
+        // Assert: we are back in Idle
         composeTestRule.onNodeWithTag(StartButtonTag).assertIsDisplayed()
     }
 }

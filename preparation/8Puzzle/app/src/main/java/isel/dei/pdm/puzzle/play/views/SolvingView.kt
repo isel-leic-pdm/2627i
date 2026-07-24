@@ -35,6 +35,7 @@ internal enum class SolvingPresentationState {
  * View displayed while the user is solving the puzzle.
  * @param board current board state.
  * @param onMoveRequested callback when a tile is clicked.
+ * @param onAnimationFinished callback when the tile animation is finished.
  * @param onResetRequested callback to reset the game.
  * @param modifier the modifier to be applied to the layout.
  * @param initialPresentationState the initial presentation state of the view (mostly for testing).
@@ -43,6 +44,7 @@ internal enum class SolvingPresentationState {
 internal fun SolvingView(
     board: Board,
     onMoveRequested: (Int) -> Unit,
+    onAnimationFinished: () -> Unit,
     onResetRequested: () -> Unit,
     modifier: Modifier = Modifier,
     initialPresentationState: SolvingPresentationState = SolvingPresentationState.IDLE
@@ -52,7 +54,11 @@ internal fun SolvingView(
     AdaptivePlayLayout(
         modifier = modifier,
         puzzle = {
-            PuzzleView(board = board, onTileClick = onMoveRequested)
+            PuzzleView(
+                board = board,
+                onTileClick = onMoveRequested,
+                onAnimationFinished = onAnimationFinished
+            )
         },
         controls = {
             Button(
@@ -112,11 +118,12 @@ private fun ResetConfirmationDialog(
 
 @Preview(showBackground = true)
 @Composable
-internal fun SolvingViewPreview() {
+private fun SolvingViewPreview() {
     Demo8PuzzleTheme {
         SolvingView(
             board = Board.createRandom(),
             onMoveRequested = {},
+            onAnimationFinished = {},
             onResetRequested = {}
         )
     }
@@ -124,11 +131,12 @@ internal fun SolvingViewPreview() {
 
 @Preview(showBackground = true, widthDp = 800, heightDp = 400)
 @Composable
-internal fun SolvingViewLandscapePreview() {
+private fun SolvingViewLandscapePreview() {
     Demo8PuzzleTheme {
         SolvingView(
             board = Board.createRandom(),
             onMoveRequested = {},
+            onAnimationFinished = {},
             onResetRequested = {}
         )
     }
@@ -136,11 +144,12 @@ internal fun SolvingViewLandscapePreview() {
 
 @Preview(showBackground = true)
 @Composable
-internal fun SolvingViewConfirmingResetPreview() {
+private fun SolvingViewConfirmingResetPreview() {
     Demo8PuzzleTheme {
         SolvingView(
             board = Board.createRandom(),
             onMoveRequested = {},
+            onAnimationFinished = {},
             onResetRequested = {},
             initialPresentationState = SolvingPresentationState.CONFIRMING_RESET
         )
@@ -149,11 +158,12 @@ internal fun SolvingViewConfirmingResetPreview() {
 
 @Preview(showBackground = true, widthDp = 800, heightDp = 400)
 @Composable
-internal fun SolvingViewConfirmingResetLandscapePreview() {
+private fun SolvingViewConfirmingResetLandscapePreview() {
     Demo8PuzzleTheme {
         SolvingView(
             board = Board.createRandom(),
             onMoveRequested = {},
+            onAnimationFinished = {},
             onResetRequested = {},
             initialPresentationState = SolvingPresentationState.CONFIRMING_RESET
         )
@@ -162,7 +172,7 @@ internal fun SolvingViewConfirmingResetLandscapePreview() {
 
 @Preview(showBackground = true)
 @Composable
-internal fun ResetConfirmationDialogPreview() {
+private fun ResetConfirmationDialogPreview() {
     Demo8PuzzleTheme {
         ResetConfirmationDialog(
             onConfirm = {},

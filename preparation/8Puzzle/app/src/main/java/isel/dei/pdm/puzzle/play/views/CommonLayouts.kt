@@ -66,9 +66,19 @@ internal fun AdaptivePlayLayout(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            puzzle()
-            Spacer(modifier = Modifier.height(32.dp))
-            controls()
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                puzzle()
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                modifier = Modifier.weight(.4f),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                controls()
+            }
         }
     }
 }

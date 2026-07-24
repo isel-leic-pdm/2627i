@@ -46,7 +46,7 @@ internal fun TerminationConfirmationDialog(
 
 @Preview(showBackground = true)
 @Composable
-internal fun TerminationConfirmationDialogPreview() {
+private fun TerminationConfirmationDialogPreview() {
     Demo8PuzzleTheme {
         TerminationConfirmationDialog(onConfirm = {}, onDismiss = {})
     }

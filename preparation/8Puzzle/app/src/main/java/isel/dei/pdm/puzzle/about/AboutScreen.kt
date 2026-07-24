@@ -123,7 +123,7 @@ private fun GitHubSection(onOpenGitHubRequested: () -> Unit) {
 
 @Preview(showBackground = true)
 @Composable
-internal fun AboutScreenPreview() {
+private fun AboutScreenPreview() {
     Demo8PuzzleTheme {
         AboutScreen(onOpenGitHubRequested = {})
     }
@@ -131,7 +131,7 @@ internal fun AboutScreenPreview() {
 
 @Preview(showBackground = true, widthDp = 800, heightDp = 400)
 @Composable
-internal fun AboutScreenLandscapePreview() {
+private fun AboutScreenLandscapePreview() {
     Demo8PuzzleTheme {
         AboutScreen(onOpenGitHubRequested = {})
     }

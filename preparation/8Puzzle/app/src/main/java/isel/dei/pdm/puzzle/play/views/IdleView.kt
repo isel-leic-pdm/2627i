@@ -24,7 +24,7 @@ internal fun IdleView(onStartRequested: () -> Unit, modifier: Modifier = Modifie
     AdaptivePlayLayout(
         modifier = modifier,
         puzzle = {
-            PuzzleView(board = Board.SOLVED, onTileClick = null)
+            PuzzleView(board = Board.SOLVED, onAnimationFinished = {}, onTileClick = null)
         },
         controls = {
             Button(
@@ -42,7 +42,7 @@ internal fun IdleView(onStartRequested: () -> Unit, modifier: Modifier = Modifie
 
 @Preview(showBackground = true)
 @Composable
-internal fun IdleViewPreview() {
+private fun IdleViewPreview() {
     Demo8PuzzleTheme {
         IdleView(onStartRequested = {})
     }
@@ -50,7 +50,7 @@ internal fun IdleViewPreview() {
 
 @Preview(showBackground = true, widthDp = 800, heightDp = 400)
 @Composable
-internal fun IdleViewLandscapePreview() {
+private fun IdleViewLandscapePreview() {
     Demo8PuzzleTheme {
         IdleView(onStartRequested = {})
     }

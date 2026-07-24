@@ -22,7 +22,7 @@ internal fun SolvedView(modifier: Modifier = Modifier) {
     AdaptivePlayLayout(
         modifier = modifier,
         puzzle = {
-            PuzzleView(board = Board.SOLVED, onTileClick = null)
+            PuzzleView(board = Board.SOLVED, onAnimationFinished = {}, onTileClick = null)
         },
         controls = {
             Text(
@@ -37,7 +37,7 @@ internal fun SolvedView(modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-internal fun SolvedViewPreview() {
+private fun SolvedViewPreview() {
     Demo8PuzzleTheme {
         SolvedView()
     }
@@ -45,7 +45,7 @@ internal fun SolvedViewPreview() {
 
 @Preview(showBackground = true, widthDp = 800, heightDp = 400)
 @Composable
-internal fun SolvedViewLandscapePreview() {
+private fun SolvedViewLandscapePreview() {
     Demo8PuzzleTheme {
         SolvedView()
     }

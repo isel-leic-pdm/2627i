@@ -1,6 +1,12 @@
 package isel.dei.pdm.puzzle.start
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,8 +24,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -63,11 +71,7 @@ private fun StartScreenPortrait(onStartRequested: () -> Unit) {
             modifier = Modifier.fillMaxWidth(0.6f).aspectRatio(1f)
         )
         Spacer(modifier = Modifier.height(32.dp))
-        Text(
-            text = stringResource(R.string.start_screen_touch_to_play),
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.primary
-        )
+        PulsingText(text = stringResource(R.string.start_screen_touch_to_play))
     }
 }
 
@@ -89,17 +93,37 @@ private fun StartScreenLandscape(onStartRequested: () -> Unit) {
             modifier = Modifier.fillMaxHeight(0.6f).aspectRatio(1f)
         )
         Spacer(modifier = Modifier.width(32.dp))
-        Text(
-            text = stringResource(R.string.start_screen_touch_to_play),
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.primary
-        )
+        PulsingText(text = stringResource(R.string.start_screen_touch_to_play))
     }
+}
+
+/**
+ * A composable that displays a pulsing text.
+ * @param text the text to display.
+ */
+@Composable
+private fun PulsingText(text: String) {
+    val infiniteTransition = rememberInfiniteTransition(label = "touchToPlayPulse")
+    val alpha by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "touchToPlayAlpha"
+    )
+    Text(
+        text = text,
+        style = MaterialTheme.typography.headlineSmall,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.alpha(alpha)
+    )
 }
 
 @Preview(showBackground = true)
 @Composable
-internal fun StartScreenPreview() {
+private fun StartScreenPreview() {
     Demo8PuzzleTheme {
         StartScreen(onStartRequested = {})
     }
@@ -107,7 +131,7 @@ internal fun StartScreenPreview() {
 
 @Preview(showBackground = true, widthDp = 800, heightDp = 400)
 @Composable
-internal fun StartScreenLandscapePreview() {
+private fun StartScreenLandscapePreview() {
     Demo8PuzzleTheme {
         StartScreen(onStartRequested = {})
     }

@@ -22,7 +22,12 @@ class SolvingViewTests {
         val board = Board.SOLVED // Solved board for simplicity
         composeTestRule.setContent {
             Demo8PuzzleTheme {
-                SolvingView(board = board, onMoveRequested = {}, onResetRequested = {})
+                SolvingView(
+                    board = board,
+                    onMoveRequested = {},
+                    onAnimationFinished = {},
+                    onResetRequested = {}
+                )
             }
         }
 
@@ -35,7 +40,12 @@ class SolvingViewTests {
         // Arrange
         composeTestRule.setContent {
             Demo8PuzzleTheme {
-                SolvingView(board = Board.SOLVED, onMoveRequested = {}, onResetRequested = {})
+                SolvingView(
+                    board = Board.SOLVED,
+                    onMoveRequested = {},
+                    onAnimationFinished = {},
+                    onResetRequested = {}
+                )
             }
         }
 
@@ -52,6 +62,7 @@ class SolvingViewTests {
                 SolvingView(
                     board = Board.SOLVED,
                     onMoveRequested = { moveRequestedTile = it },
+                    onAnimationFinished = {},
                     onResetRequested = {}
                 )
             }
@@ -72,6 +83,7 @@ class SolvingViewTests {
                 SolvingView(
                     board = Board.SOLVED,
                     onMoveRequested = {},
+                    onAnimationFinished = {},
                     onResetRequested = {}
                 )
             }
@@ -93,6 +105,7 @@ class SolvingViewTests {
                 SolvingView(
                     board = Board.SOLVED,
                     onMoveRequested = {},
+                    onAnimationFinished = {},
                     onResetRequested = { resetRequested = true },
                     initialPresentationState = SolvingPresentationState.CONFIRMING_RESET
                 )
@@ -115,6 +128,7 @@ class SolvingViewTests {
                 SolvingView(
                     board = Board.SOLVED,
                     onMoveRequested = {},
+                    onAnimationFinished = {},
                     onResetRequested = { resetRequested = true },
                     initialPresentationState = SolvingPresentationState.CONFIRMING_RESET
                 )
@@ -138,6 +152,7 @@ class SolvingViewTests {
                 SolvingView(
                     board = Board.SOLVED,
                     onMoveRequested = {},
+                    onAnimationFinished = {},
                     onResetRequested = {}
                 )
             }

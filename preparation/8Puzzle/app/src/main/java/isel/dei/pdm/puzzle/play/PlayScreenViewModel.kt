@@ -4,9 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.lifecycle.viewModelScope
 import isel.dei.pdm.puzzle.domain.Board
 import kotlinx.coroutines.delay
@@ -48,14 +45,21 @@ internal class PlayScreenViewModel(initialState: PlayScreenState = PlayScreenSta
         val currentState = state
         if (currentState is PlayScreenState.Solving) {
             val nextBoard = currentState.board.move(tile)
-            if (nextBoard.isSolved) {
+            state = PlayScreenState.Solving(nextBoard)
+        }
+    }
+
+    /**
+     * Called when the animation for the last move has finished.
+     * If the board is solved, it transitions to the Solved state.
+     */
+    fun onAnimationFinished() {
+        val currentState = state
+        if (currentState is PlayScreenState.Solving && currentState.board.isSolved) {
+            viewModelScope.launch {
                 state = PlayScreenState.Solved
-                viewModelScope.launch {
-                    delay(SOLVED_TIMEOUT_MS.milliseconds)
-                    state = PlayScreenState.Idle
-                }
-            } else {
-                state = PlayScreenState.Solving(nextBoard)
+                delay(SOLVED_TIMEOUT_MS.milliseconds)
+                state = PlayScreenState.Idle
             }
         }
     }
@@ -65,16 +69,5 @@ internal class PlayScreenViewModel(initialState: PlayScreenState = PlayScreenSta
      */
     fun reset() {
         state = PlayScreenState.Idle
-    }
-
-    companion object {
-        /**
-         * The factory for the PlayScreenViewModel.
-         */
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                PlayScreenViewModel()
-            }
-        }
     }
 }

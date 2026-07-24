@@ -80,14 +80,23 @@ class PlayScreenViewModelTests {
         
         // Act
         viewModel.move(8)
-        
-        // Assert
+
+        // Assert: the board is updated immediately, but the screen stays in Solving so the
+        // last tile's slide animation can play out.
+        assertTrue(viewModel.state is PlayScreenState.Solving)
+        assertTrue((viewModel.state as PlayScreenState.Solving).board.isSolved)
+
+        // Act: simulate animation finishing
+        viewModel.onAnimationFinished()
+        testDispatcher.scheduler.runCurrent()
+
+        // Assert: only now do we reach Solved
         assertEquals(PlayScreenState.Solved, viewModel.state)
-        
+
         // Act: Advance time
         testDispatcher.scheduler.advanceTimeBy(SOLVED_TIMEOUT_MS.milliseconds)
         testDispatcher.scheduler.runCurrent()
-        
+
         // Assert: We are back to Idle
         assertEquals(PlayScreenState.Idle, viewModel.state)
     }

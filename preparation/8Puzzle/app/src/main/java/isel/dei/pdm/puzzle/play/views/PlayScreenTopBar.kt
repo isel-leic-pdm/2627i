@@ -38,7 +38,7 @@ internal fun PlayScreenTopBar(onInfoClick: () -> Unit) {
 
 @Preview(showBackground = true)
 @Composable
-internal fun PlayScreenTopBarPreview() {
+private fun PlayScreenTopBarPreview() {
     Demo8PuzzleTheme {
         PlayScreenTopBar(onInfoClick = {})
     }
