@@ -85,17 +85,15 @@ internal fun PuzzleView(
     onTileClick: ((Int) -> Unit)? = null,
 ) {
     val transition = updateTransition(targetState = board, label = "puzzleBoard")
-    val isAnimating = transition.isRunning
 
-    // Design Note: updateTransition starts in a "finished" state (currentState == targetState).
-    // We use a flag to skip the initial signal on composition, ensuring we only notify
-    // the VM when a real state transition has actually completed.
-    var isInitialComposition by remember { mutableStateOf(true) }
-    LaunchedEffect(transition.currentState) {
-        if (isInitialComposition) {
-            isInitialComposition = false
-        } else if (transition.currentState == transition.targetState) {
+    // Track whether this transition has actually started running.
+    var hasAnimated by remember { mutableStateOf(false) }
+    LaunchedEffect(transition.isRunning) {
+        if (transition.isRunning) {
+            hasAnimated = true
+        } else if (hasAnimated && transition.currentState == transition.targetState) {
             onAnimationFinished()
+            hasAnimated = false
         }
     }
 
@@ -135,7 +133,7 @@ internal fun PuzzleView(
             }
             TileView(
                 tile = tile,
-                onClick = if (!isAnimating && onTileClick != null) {
+                onClick = if (!transition.isRunning && onTileClick != null) {
                     { onTileClick(tile) }
                 } else null,
                 modifier = Modifier
