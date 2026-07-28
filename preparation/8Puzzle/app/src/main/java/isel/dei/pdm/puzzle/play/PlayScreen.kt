@@ -8,9 +8,12 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import isel.dei.pdm.puzzle.play.views.AutoSolvingView
 import isel.dei.pdm.puzzle.play.views.IdleView
 import isel.dei.pdm.puzzle.play.views.PlayScreenTopBar
 import isel.dei.pdm.puzzle.play.views.SolvedView
@@ -27,13 +30,14 @@ internal fun PlayScreen(
     onInfoRequested: () -> Unit,
     viewModel: PlayScreenViewModel = viewModel()
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
     Scaffold(
         topBar = { PlayScreenTopBar(onInfoClick = onInfoRequested) }
     ) { innerPadding ->
 
         val modifier = Modifier.padding(innerPadding)
         AnimatedContent(
-            targetState = viewModel.state,
+            targetState = state,
             transitionSpec = {
                 fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
             },
@@ -41,6 +45,7 @@ internal fun PlayScreen(
                 when (state) {
                     is PlayScreenState.Idle -> "Idle"
                     is PlayScreenState.Solving -> "Solving"
+                    is PlayScreenState.AutoSolving -> "AutoSolving"
                     is PlayScreenState.Solved -> "Solved"
                 }
             },
@@ -55,7 +60,13 @@ internal fun PlayScreen(
                     board = state.board,
                     onMoveRequested = viewModel::move,
                     onAnimationFinished = viewModel::onAnimationFinished,
+                    onAutoSolveRequested = viewModel::autoSolve,
                     onResetRequested = viewModel::reset,
+                    modifier = modifier
+                )
+                is PlayScreenState.AutoSolving -> AutoSolvingView(
+                    board = state.board,
+                    onStopRequested = viewModel::stopAutoSolve,
                     modifier = modifier
                 )
                 is PlayScreenState.Solved -> SolvedView(

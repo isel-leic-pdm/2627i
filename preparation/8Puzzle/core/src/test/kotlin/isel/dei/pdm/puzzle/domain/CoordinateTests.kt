@@ -1,5 +1,6 @@
 package isel.dei.pdm.puzzle.domain
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -34,5 +35,23 @@ class CoordinateTests {
     @Test(expected = IllegalArgumentException::class)
     fun `coordinate init throws for invalid col`() {
         Coordinate(1, -1)
+    }
+
+    @Test
+    fun `coordinate index constructor creates correct coordinate`() {
+        assertEquals(Coordinate(0, 0), Coordinate(0))
+        assertEquals(Coordinate(0, 1), Coordinate(1))
+        assertEquals(Coordinate(1, 1), Coordinate(4))
+        assertEquals(Coordinate(2, 1), Coordinate(7))
+        assertEquals(Coordinate(2, 2), Coordinate(8))
+    }
+
+    @Test
+    fun `coordinate linearIndex returns correct index`() {
+        assertEquals(0, Coordinate(0, 0).linearIndex)
+        assertEquals(1, Coordinate(0, 1).linearIndex)
+        assertEquals(4, Coordinate(1, 1).linearIndex)
+        assertEquals(7, Coordinate(2, 1).linearIndex)
+        assertEquals(8, Coordinate(2, 2).linearIndex)
     }
 }

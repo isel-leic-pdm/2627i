@@ -85,4 +85,50 @@ class BoardTests {
             assertNotEquals(Board.SOLVED, board)
         }
     }
+
+    @Test
+    fun `board computeManhattanDistance returns 0 for solved board`() {
+        assertEquals(0, Board.SOLVED.computeManhattanDistance())
+    }
+
+    @Test
+    fun `board computeManhattanDistance returns correct distance`() {
+        // 1 2 3
+        // 4 5 6
+        // 7 0 8
+        // 8 is at (2, 2), target is (2, 1). Distance = 1
+        val board = Board(listOf(1, 2, 3, 4, 5, 6, 7, 0, 8))
+        assertEquals(1, board.computeManhattanDistance())
+
+        // 0 1 2
+        // 3 4 5
+        // 6 7 8
+        // 1: (0, 1) target (0, 0) dist 1
+        // 2: (0, 2) target (0, 1) dist 1
+        // 3: (1, 0) target (0, 2) dist 3
+        // 4: (1, 1) target (1, 0) dist 1
+        // 5: (1, 2) target (1, 1) dist 1
+        // 6: (2, 0) target (1, 2) dist 3
+        // 7: (2, 1) target (2, 0) dist 1
+        // 8: (2, 2) target (2, 1) dist 1
+        // total: 1+1+3+1+1+3+1+1 = 12
+        val board2 = Board(listOf(0, 1, 2, 3, 4, 5, 6, 7, 8))
+        assertEquals(12, board2.computeManhattanDistance())
+    }
+
+    @Test
+    fun `board getAdjacentBoards returns all valid moves`() {
+        // 1 2 3
+        // 4 0 5
+        // 6 7 8
+        // Blank at (1, 1). Adjacents: (0, 1), (2, 1), (1, 0), (1, 2)
+        // Tiles: 2, 7, 4, 5
+        val board = Board(listOf(1, 2, 3, 4, 0, 5, 6, 7, 8))
+        val adjacents = board.getAdjacentBoards()
+        assertEquals(4, adjacents.size)
+        assertTrue(adjacents.contains(board.move(2)))
+        assertTrue(adjacents.contains(board.move(7)))
+        assertTrue(adjacents.contains(board.move(4)))
+        assertTrue(adjacents.contains(board.move(5)))
+    }
 }

@@ -26,6 +26,7 @@ class SolvingViewTests {
                     board = board,
                     onMoveRequested = {},
                     onAnimationFinished = {},
+                    onAutoSolveRequested = {},
                     onResetRequested = {}
                 )
             }
@@ -44,6 +45,7 @@ class SolvingViewTests {
                     board = Board.SOLVED,
                     onMoveRequested = {},
                     onAnimationFinished = {},
+                    onAutoSolveRequested = {},
                     onResetRequested = {}
                 )
             }
@@ -51,6 +53,29 @@ class SolvingViewTests {
 
         // Assert
         composeTestRule.onNodeWithTag(ResetButtonTag).assertIsDisplayed().assertIsEnabled()
+    }
+
+    @Test
+    fun playScreenSolvingView_pressingSolveButton_callsOnAutoSolveRequested() {
+        // Arrange
+        var autoSolveRequested = false
+        composeTestRule.setContent {
+            Demo8PuzzleTheme {
+                SolvingView(
+                    board = Board.SOLVED,
+                    onMoveRequested = {},
+                    onAnimationFinished = {},
+                    onAutoSolveRequested = { autoSolveRequested = true },
+                    onResetRequested = {}
+                )
+            }
+        }
+
+        // Act
+        composeTestRule.onNodeWithTag(SolveButtonTag).performClick()
+
+        // Assert
+        assert(autoSolveRequested) { "onAutoSolveRequested should have been called." }
     }
 
     @Test
@@ -63,6 +88,7 @@ class SolvingViewTests {
                     board = Board.SOLVED,
                     onMoveRequested = { moveRequestedTile = it },
                     onAnimationFinished = {},
+                    onAutoSolveRequested = {},
                     onResetRequested = {}
                 )
             }
@@ -84,6 +110,7 @@ class SolvingViewTests {
                     board = Board.SOLVED,
                     onMoveRequested = {},
                     onAnimationFinished = {},
+                    onAutoSolveRequested = {},
                     onResetRequested = {}
                 )
             }
@@ -106,6 +133,7 @@ class SolvingViewTests {
                     board = Board.SOLVED,
                     onMoveRequested = {},
                     onAnimationFinished = {},
+                    onAutoSolveRequested = {},
                     onResetRequested = { resetRequested = true },
                     initialPresentationState = SolvingPresentationState.CONFIRMING_RESET
                 )
@@ -129,6 +157,7 @@ class SolvingViewTests {
                     board = Board.SOLVED,
                     onMoveRequested = {},
                     onAnimationFinished = {},
+                    onAutoSolveRequested = {},
                     onResetRequested = { resetRequested = true },
                     initialPresentationState = SolvingPresentationState.CONFIRMING_RESET
                 )
@@ -153,6 +182,7 @@ class SolvingViewTests {
                     board = Board.SOLVED,
                     onMoveRequested = {},
                     onAnimationFinished = {},
+                    onAutoSolveRequested = {},
                     onResetRequested = {}
                 )
             }

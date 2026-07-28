@@ -19,6 +19,14 @@ class Board private constructor(private val tiles: List<Int>) {
             require(col in 0 until BOARD_SIDE) { "Column must be between 0 and ${BOARD_SIDE - 1}" }
         }
 
+        internal constructor(index: Int) : this(index / BOARD_SIDE, index % BOARD_SIDE)
+
+        /**
+         * The linear index corresponding to this coordinate.
+         */
+        internal val linearIndex: Int
+            get() = row * BOARD_SIDE + col
+
         /**
          * Checks if this coordinate is adjacent to another coordinate (not including diagonals).
          * @param other The other coordinate to check.
@@ -86,25 +94,19 @@ class Board private constructor(private val tiles: List<Int>) {
      * @return The tile value, or null if the space is blank.
      */
     fun getTileAt(coordinate: Coordinate): Int? {
-        val tile = tiles[coordinate.row * BOARD_SIDE + coordinate.col]
+        val tile = tiles[coordinate.linearIndex]
         return if (tile == BLANK) null else tile
     }
 
     /**
      * Gets the coordinate of a specific tile.
      */
-    fun getCoordinateOf(tile: Int): Coordinate {
-        val index = tiles.indexOf(tile)
-        return Coordinate(index / BOARD_SIDE, index % BOARD_SIDE)
-    }
+    fun getCoordinateOf(tile: Int): Coordinate = Coordinate(tiles.indexOf(tile))
 
     /**
      * Gets the coordinate of the blank space.
      */
-    private fun getBlankCoordinate(): Coordinate {
-        val index = tiles.indexOf(BLANK)
-        return Coordinate(index / BOARD_SIDE, index % BOARD_SIDE)
-    }
+    private fun getBlankCoordinate(): Coordinate = Coordinate(tiles.indexOf(BLANK))
 
     /**
      * Moves a tile if it is adjacent to the blank space.
@@ -123,6 +125,37 @@ class Board private constructor(private val tiles: List<Int>) {
             Board(tiles.swap(tileIndex, blankIndex))
         } else {
             this
+        }
+    }
+
+    /**
+     * Computes the Manhattan distance of the board.
+     * The Manhattan distance is the sum of the distances of each tile from its solved position.
+     * The blank tile is not included in the calculation.
+     */
+    fun computeManhattanDistance(): Int {
+        var distance = 0
+        for (tileValue in TILE_RANGE) {
+            val currentCoord = getCoordinateOf(tileValue)
+            val targetCoord = Coordinate(tileValue - 1)
+            distance += abs(currentCoord.row - targetCoord.row) + abs(currentCoord.col - targetCoord.col)
+        }
+        return distance
+    }
+
+    /**
+     * Gets all boards that can be reached from this board by a single move.
+     */
+    fun getAdjacentBoards(): List<Board> {
+        val blankCoord = getBlankCoordinate()
+        return listOfNotNull(
+            if (blankCoord.row > 0) Coordinate(blankCoord.row - 1, blankCoord.col) else null,
+            if (blankCoord.row < BOARD_SIDE - 1) Coordinate(blankCoord.row + 1, blankCoord.col) else null,
+            if (blankCoord.col > 0) Coordinate(blankCoord.row, blankCoord.col - 1) else null,
+            if (blankCoord.col < BOARD_SIDE - 1) Coordinate(blankCoord.row, blankCoord.col + 1) else null
+        ).map { coord ->
+            val tile = getTileAt(coord)!!
+            move(tile)
         }
     }
 

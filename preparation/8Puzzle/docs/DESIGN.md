@@ -14,7 +14,7 @@ The Play Screen follows a minimalist 3x3 grid layout as envisioned in our initia
 The application's logic is modeled as a formal state machine to ensure predictable transitions and a robust user experience.
 
 ### Play Screen State Machine
-![State Machine](./logic/play-screen-state-machine.png)
+![State Machine](logic/play-screen-state-machine-v1.png)
 
 ### State Descriptions
 - **Idle**: The initial state. Shows a solved board. The "Start" button is active.

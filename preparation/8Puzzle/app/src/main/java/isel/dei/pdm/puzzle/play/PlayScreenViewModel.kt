@@ -1,16 +1,21 @@
 package isel.dei.pdm.puzzle.play
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import isel.dei.pdm.puzzle.domain.Board
+import isel.dei.pdm.puzzle.domain.learningRealTimeAStar
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 internal const val SOLVED_TIMEOUT_MS = 3000L
+internal const val AUTO_SOLVE_DELAY_MS = 500L
 
 /**
  * The possible states of the play screen.
@@ -18,6 +23,7 @@ internal const val SOLVED_TIMEOUT_MS = 3000L
 internal sealed interface PlayScreenState {
     data object Idle : PlayScreenState
     data class Solving(val board: Board) : PlayScreenState
+    data class AutoSolving(val board: Board) : PlayScreenState
     data object Solved : PlayScreenState
 }
 
@@ -27,14 +33,16 @@ internal sealed interface PlayScreenState {
  */
 internal class PlayScreenViewModel(initialState: PlayScreenState = PlayScreenState.Idle) : ViewModel() {
 
-    var state by mutableStateOf(initialState)
-        private set
+    private val _state = MutableStateFlow(initialState)
+    val state: StateFlow<PlayScreenState> = _state.asStateFlow()
+
+    private var autoSolveJob: Job? = null
 
     /**
      * Starts the game with a random board.
      */
     fun start() {
-        state = PlayScreenState.Solving(Board.createRandom())
+        _state.value = PlayScreenState.Solving(Board.createRandom())
     }
 
     /**
@@ -42,10 +50,43 @@ internal class PlayScreenViewModel(initialState: PlayScreenState = PlayScreenSta
      * @param tile the tile to move.
      */
     fun move(tile: Int) {
-        val currentState = state
+        _state.update { currentState ->
+            if (currentState is PlayScreenState.Solving) {
+                PlayScreenState.Solving(currentState.board.move(tile))
+            } else {
+                currentState
+            }
+        }
+    }
+
+    /**
+     * Starts the automatic solver.
+     */
+    fun autoSolve() {
+        val currentState = _state.value
         if (currentState is PlayScreenState.Solving) {
-            val nextBoard = currentState.board.move(tile)
-            state = PlayScreenState.Solving(nextBoard)
+            autoSolveJob = viewModelScope.launch {
+                learningRealTimeAStar(currentState.board)
+                    .onEach { delay(AUTO_SOLVE_DELAY_MS.milliseconds) }
+                    .collect { board ->
+                        _state.value = PlayScreenState.AutoSolving(board)
+                        if (board.isSolved) {
+                            onAnimationFinished()
+                        }
+                    }
+            }
+        }
+    }
+
+    /**
+     * Stops the automatic solver.
+     */
+    fun stopAutoSolve() {
+        val currentState = _state.value
+        if (currentState is PlayScreenState.AutoSolving) {
+            autoSolveJob?.cancel()
+            autoSolveJob = null
+            _state.value = PlayScreenState.Solving(currentState.board)
         }
     }
 
@@ -54,12 +95,19 @@ internal class PlayScreenViewModel(initialState: PlayScreenState = PlayScreenSta
      * If the board is solved, it transitions to the Solved state.
      */
     fun onAnimationFinished() {
-        val currentState = state
-        if (currentState is PlayScreenState.Solving && currentState.board.isSolved) {
+        val isSolved = when (val currentState = _state.value) {
+            is PlayScreenState.Solving -> currentState.board.isSolved
+            is PlayScreenState.AutoSolving -> currentState.board.isSolved
+            else -> false
+        }
+
+        if (isSolved) {
+            autoSolveJob?.cancel()
+            autoSolveJob = null
             viewModelScope.launch {
-                state = PlayScreenState.Solved
+                _state.value = PlayScreenState.Solved
                 delay(SOLVED_TIMEOUT_MS.milliseconds)
-                state = PlayScreenState.Idle
+                _state.value = PlayScreenState.Idle
             }
         }
     }
@@ -68,6 +116,8 @@ internal class PlayScreenViewModel(initialState: PlayScreenState = PlayScreenSta
      * Resets the game to the idle state.
      */
     fun reset() {
-        state = PlayScreenState.Idle
+        autoSolveJob?.cancel()
+        autoSolveJob = null
+        _state.value = PlayScreenState.Idle
     }
 }

@@ -11,14 +11,15 @@ This document defines the coding standards and architectural boundaries for the 
     * **Instrumented Tests**: Use underscores (e.g., `action_whenPrecondition_expectedOutcome`) because Android's DEX format (prior to version 040) does not support spaces in method names.
 * **Structure**: Tests follow the Arrange-Act-Assert pattern.  
 
-## 2. Current Architectural Phase: Iteration 1 (ViewModels)
+## 2. Current Architectural Phase: Iteration 2 (Reactive Architecture with Flows)
 To preserve the pedagogical value of this project, **do not introduce advanced patterns** until explicitly moved to the next iteration.
 
 ### Allowed Patterns:
 * Standard Kotlin classes and basic functions.
 * Simple Jetpack Compose @Composables.
 * State management using `androidx.lifecycle.ViewModel` for **Application State** (Screen UI State).
-* The ViewModel hosts the screen's state machine and exposes the current state as a `mutableStateOf` property.
+* The ViewModel hosts the screen's state machine and exposes the current state as a `StateFlow` property.
+* The UI observes the ViewModel's state using `collectAsStateWithLifecycle()`.
 * State management using plain classes or `remember` for **Presentation State** (UI Element State).
 * The application comprises several Activities, one per-screen.
   * Each screen is composed of: 

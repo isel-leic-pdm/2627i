@@ -1,5 +1,9 @@
 package isel.dei.pdm.puzzle.play.views
 
+import android.content.res.Configuration
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -10,15 +14,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import isel.dei.pdm.puzzle.R
 import isel.dei.pdm.puzzle.domain.Board
 import isel.dei.pdm.puzzle.ui.theme.Demo8PuzzleTheme
 
 internal const val ResetButtonTag = "ResetButton"
+internal const val SolveButtonTag = "SolveButton"
 internal const val ResetDialogTag = "ResetDialog"
 internal const val ResetDialogConfirmTag = "ResetDialogConfirm"
 internal const val ResetDialogDismissTag = "ResetDialogDismiss"
@@ -36,6 +44,7 @@ internal enum class SolvingPresentationState {
  * @param board current board state.
  * @param onMoveRequested callback when a tile is clicked.
  * @param onAnimationFinished callback when the tile animation is finished.
+ * @param onAutoSolveRequested callback when the auto-solve button is clicked.
  * @param onResetRequested callback to reset the game.
  * @param modifier the modifier to be applied to the layout.
  * @param initialPresentationState the initial presentation state of the view (mostly for testing).
@@ -45,6 +54,7 @@ internal fun SolvingView(
     board: Board,
     onMoveRequested: (Int) -> Unit,
     onAnimationFinished: () -> Unit,
+    onAutoSolveRequested: () -> Unit,
     onResetRequested: () -> Unit,
     modifier: Modifier = Modifier,
     initialPresentationState: SolvingPresentationState = SolvingPresentationState.IDLE
@@ -61,14 +71,55 @@ internal fun SolvingView(
             )
         },
         controls = {
-            Button(
-                onClick = { presentationState = SolvingPresentationState.CONFIRMING_RESET },
-                modifier = Modifier.testTag(ResetButtonTag)
-            ) {
-                Text(
-                    text = stringResource(R.string.play_screen_reset_button),
-                    style = MaterialTheme.typography.titleLarge
-                )
+            val orientation = LocalConfiguration.current.orientation
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = onAutoSolveRequested,
+                        modifier = Modifier.testTag(SolveButtonTag)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.play_screen_solve_button),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
+                    Button(
+                        onClick = { presentationState = SolvingPresentationState.CONFIRMING_RESET },
+                        modifier = Modifier.testTag(ResetButtonTag)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.play_screen_reset_button),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
+                }
+            } else {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = onAutoSolveRequested,
+                        modifier = Modifier.testTag(SolveButtonTag)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.play_screen_solve_button),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
+                    Button(
+                        onClick = { presentationState = SolvingPresentationState.CONFIRMING_RESET },
+                        modifier = Modifier.testTag(ResetButtonTag)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.play_screen_reset_button),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
+                }
             }
         }
     )
@@ -124,6 +175,7 @@ private fun SolvingViewPreview() {
             board = Board.createRandom(),
             onMoveRequested = {},
             onAnimationFinished = {},
+            onAutoSolveRequested = {},
             onResetRequested = {}
         )
     }
@@ -137,6 +189,7 @@ private fun SolvingViewLandscapePreview() {
             board = Board.createRandom(),
             onMoveRequested = {},
             onAnimationFinished = {},
+            onAutoSolveRequested = {},
             onResetRequested = {}
         )
     }
@@ -150,6 +203,7 @@ private fun SolvingViewConfirmingResetPreview() {
             board = Board.createRandom(),
             onMoveRequested = {},
             onAnimationFinished = {},
+            onAutoSolveRequested = {},
             onResetRequested = {},
             initialPresentationState = SolvingPresentationState.CONFIRMING_RESET
         )
@@ -164,6 +218,7 @@ private fun SolvingViewConfirmingResetLandscapePreview() {
             board = Board.createRandom(),
             onMoveRequested = {},
             onAnimationFinished = {},
+            onAutoSolveRequested = {},
             onResetRequested = {},
             initialPresentationState = SolvingPresentationState.CONFIRMING_RESET
         )
