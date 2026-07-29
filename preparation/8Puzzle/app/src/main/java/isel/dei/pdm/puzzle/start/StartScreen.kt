@@ -9,6 +9,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,9 +23,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -55,11 +58,17 @@ internal fun StartScreen(onStartRequested: () -> Unit) {
 
 @Composable
 private fun StartScreenPortrait(onStartRequested: () -> Unit) {
+    val startScreenInteractionSource = remember { MutableInteractionSource() }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
-            .clickable { onStartRequested() }
+            .clickable(
+                interactionSource = startScreenInteractionSource,
+                indication = null,
+                onClick = onStartRequested
+            )
             .padding(16.dp)
             .testTag(StartScreenTag),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -77,11 +86,17 @@ private fun StartScreenPortrait(onStartRequested: () -> Unit) {
 
 @Composable
 private fun StartScreenLandscape(onStartRequested: () -> Unit) {
+    val startScreenInteractionSource = remember { MutableInteractionSource() }
+
     Row(
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
-            .clickable { onStartRequested() }
+            .clickable(
+                interactionSource = startScreenInteractionSource,
+                indication = null,
+                onClick = onStartRequested
+            )
             .padding(16.dp)
             .testTag(StartScreenTag),
         verticalAlignment = Alignment.CenterVertically,
@@ -121,18 +136,22 @@ private fun PulsingText(text: String) {
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = false)
 @Composable
 private fun StartScreenPreview() {
     Demo8PuzzleTheme {
-        StartScreen(onStartRequested = {})
+        Surface(color = MaterialTheme.colorScheme.background) {
+            StartScreen(onStartRequested = {})
+        }
     }
 }
 
-@Preview(showBackground = true, widthDp = 800, heightDp = 400)
+@Preview(showBackground = false, widthDp = 800, heightDp = 400)
 @Composable
 private fun StartScreenLandscapePreview() {
     Demo8PuzzleTheme {
-        StartScreen(onStartRequested = {})
+        Surface(color = MaterialTheme.colorScheme.background) {
+            StartScreen(onStartRequested = {})
+        }
     }
 }

@@ -6,7 +6,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -32,6 +34,7 @@ internal fun PlayScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = { PlayScreenTopBar(onInfoClick = onInfoRequested) }
     ) { innerPadding ->
 
@@ -77,19 +80,23 @@ internal fun PlayScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = false)
 @Composable
 private fun PlayScreenPreview() {
     Demo8PuzzleTheme {
-        PlayScreen(onInfoRequested = {})
+        Surface(color = MaterialTheme.colorScheme.background) {
+            PlayScreen(onInfoRequested = {})
+        }
     }
 }
 
-@Preview(showBackground = true, widthDp = 800, heightDp = 400)
+@Preview(showBackground = false, widthDp = 800, heightDp = 400)
 @Composable
 private fun PlayScreenLandscapePreview() {
     Demo8PuzzleTheme {
-        PlayScreen(onInfoRequested = {})
+        Surface(color = MaterialTheme.colorScheme.background) {
+            PlayScreen(onInfoRequested = {})
+        }
     }
 }
 
@@ -97,10 +104,12 @@ private fun PlayScreenLandscapePreview() {
 // subtracted, so it can't catch a puzzle that's sized wider than it is tall. A real phone's
 // landscape aspect ratio is far more elongated than 2:1, so this preview trades width for height
 // to reproduce that squeeze.
-@Preview(showBackground = true, widthDp = 900, heightDp = 360)
+@Preview(showBackground = false, widthDp = 900, heightDp = 360)
 @Composable
 private fun PlayScreenLandscapeNarrowPreview() {
     Demo8PuzzleTheme {
-        PlayScreen(onInfoRequested = {})
+        Surface(color = MaterialTheme.colorScheme.background) {
+            PlayScreen(onInfoRequested = {})
+        }
     }
 }

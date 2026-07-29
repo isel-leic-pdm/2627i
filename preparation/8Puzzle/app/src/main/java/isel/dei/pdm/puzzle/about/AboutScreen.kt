@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -121,18 +122,22 @@ private fun GitHubSection(onOpenGitHubRequested: () -> Unit) {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = false)
 @Composable
 private fun AboutScreenPreview() {
     Demo8PuzzleTheme {
-        AboutScreen(onOpenGitHubRequested = {})
+        Surface(color = MaterialTheme.colorScheme.background) {
+            AboutScreen(onOpenGitHubRequested = {})
+        }
     }
 }
 
-@Preview(showBackground = true, widthDp = 800, heightDp = 400)
+@Preview(showBackground = false, widthDp = 800, heightDp = 400)
 @Composable
 private fun AboutScreenLandscapePreview() {
     Demo8PuzzleTheme {
-        AboutScreen(onOpenGitHubRequested = {})
+        Surface(color = MaterialTheme.colorScheme.background) {
+            AboutScreen(onOpenGitHubRequested = {})
+        }
     }
 }
