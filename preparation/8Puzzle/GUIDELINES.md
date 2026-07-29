@@ -11,7 +11,7 @@ This document defines the coding standards and architectural boundaries for the 
     * **Instrumented Tests**: Use underscores (e.g., `action_whenPrecondition_expectedOutcome`) because Android's DEX format (prior to version 040) does not support spaces in method names.
 * **Structure**: Tests follow the Arrange-Act-Assert pattern.  
 
-## 2. Current Architectural Phase: Iteration 2 (Reactive Architecture with Flows)
+## 2. Current Architectural Phase: Iteration 3 (Single Activity with Navigation 3)
 To preserve the pedagogical value of this project, **do not introduce advanced patterns** until explicitly moved to the next iteration.
 
 ### Allowed Patterns:
@@ -21,17 +21,17 @@ To preserve the pedagogical value of this project, **do not introduce advanced p
 * The ViewModel hosts the screen's state machine and exposes the current state as a `StateFlow` property.
 * The UI observes the ViewModel's state using `collectAsStateWithLifecycle()`.
 * State management using plain classes or `remember` for **Presentation State** (UI Element State).
-* The application comprises several Activities, one per-screen.
-  * Each screen is composed of: 
-    * an activity; 
-    * a viewmodel used to host the screen's state machine, if one exists;
-    * at last one composable function that represents the screen's UI
+* **Single Activity architecture**: The application uses one Activity as a host for all screens.
+* **Navigation 3**: Screen management and transitions are handled using `androidx.navigation3`.
+  * Navigation keys are defined as `sealed class` hierarchies annotated with `@Serializable`.
+  * Screens are provided via a `NavDisplay` and an `entryProvider`.
+  * Screen-specific ViewModels are scoped to the `NavEntry`.
 * Clear separation of concerns between UI and business logic.
 
 ### Prohibited Patterns (Do NOT use yet):
 * **No Dependency Injection (Hilt/Koin)**: Use manual instantiation or basic factories.
 * **No Data Persistence (Room)**: Use in-memory collections.
-* **No Advanced Navigation**: Use simple conditional rendering for screen switching.
+* **No Legacy Navigation**: Do not add new Activities for screens or use manual Activity switching.
 
 ## 3. Coding Style
 * Prefer functional transformations (`map`, `filter`) over imperative loops.
