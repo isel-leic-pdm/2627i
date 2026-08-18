@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">My Game Vault</string>
+    <string name="search_game_hint">Search game</string>
+    <string name="platform_label">Platform</string>
+    <string name="search_results_header">Results</string>
+    <string name="released_label">Released: %1$d</string>
+    <string name="game_cover_description">Cover for %1$s</string>
+    <string name="image_placeholder_label">Image</string>
+    <string name="greeting_text">Hello %1$s!</string>
+</resources>

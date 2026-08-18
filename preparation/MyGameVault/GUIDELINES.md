@@ -1,4 +1,4 @@
-# Project Guidelines: 8-Puzzle Demo
+# Project Guidelines: My Game Vault
 
 This document defines the coding standards and architectural boundaries for the project. **AI agents must strictly adhere to these rules.**
 
@@ -43,12 +43,12 @@ To preserve the pedagogical value of this project, **do not introduce advanced p
 ## 4. Core Design Principles
 * **Make Invalid States Unrepresentable**: Leverage the type system and visibility modifiers to ensure the system cannot enter an inconsistent state.
     * Use `internal` or `private` constructors for domain objects that require complex validation.
-    * Use nested classes and scoping to tie related concepts together (e.g., `Board.Coordinate`).
+    * Use nested classes and scoping to tie related concepts together.
     * Use `init` blocks to enforce invariants at construction time.
-    * Prefer returning existing valid states over throwing exceptions when a transition is invalid (e.g., `Board.move`).
+    * Prefer returning existing valid states over throwing exceptions when a transition is invalid.
 * **Minimize Visibility**: Every declaration (classes, functions, properties, composables) must use the most restrictive modifier that still satisfies its actual callers.
     * Default to `private` for anything used only within its own file.
-    * Use `internal` for anything shared across files/packages that is never consumed outside the current Gradle module (e.g., most of `app`'s Activities' helpers, screens, ViewModels, test tags).
+    * Use `internal` for anything shared across files/packages that is never consumed outside the current Gradle module.
     * Reserve `public` for a module's real external API. This has two distinct meanings, and both count as "external":
-        * The `core` module's domain API consumed by `app` (e.g., `Board`, `Coordinate`) — designed as an intentional contract, not narrowed to whatever the UI happens to call today.
+        * The `core` module's domain API consumed by `app` — designed as an intentional contract, not narrowed to whatever the UI happens to call today.
         * Android framework entry points declared in the manifest (Activities, Services, BroadcastReceivers, ContentProviders) — the OS instantiates these via Intents, so they must stay public regardless of whether another in-module class also references them.
