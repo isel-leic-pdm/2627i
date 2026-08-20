@@ -7,25 +7,19 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import isel.dei.pdm.mygamevault.add.AddGameScreen
 import isel.dei.pdm.mygamevault.add.AddGameViewModel
-import isel.dei.pdm.mygamevault.infrastructure.FakeSearchService
 import isel.dei.pdm.mygamevault.ui.theme.MyGameVaultTheme
 
 class MainActivity : ComponentActivity() {
 
-    private val searchService = FakeSearchService()
+    private val searchService by lazy {
+        (application as DependenciesContainer).searchService
+    }
 
     private val addGameViewModel by viewModels<AddGameViewModel> {
-        object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return AddGameViewModel(searchService) as T
-            }
-        }
+        AddGameViewModel.factory(searchService)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

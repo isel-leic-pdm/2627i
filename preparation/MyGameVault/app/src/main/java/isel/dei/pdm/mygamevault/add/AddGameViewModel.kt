@@ -1,8 +1,10 @@
 package isel.dei.pdm.mygamevault.add
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import isel.dei.pdm.mygamevault.core.SearchService
+import isel.dei.pdm.mygamevault.core.SearchServiceException
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +19,7 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 @OptIn(FlowPreview::class)
 class AddGameViewModel(
-    private val searchService: SearchService
+    private val searchService: SearchService,
 ) : ViewModel() {
 
     /**
@@ -34,13 +36,13 @@ class AddGameViewModel(
     val state: StateFlow<AddGameScreenState> = _state.asStateFlow()
 
     init {
-        // Observe query changes with a 2-second debounce
+        // Observe query changes with a debounce timeout
         viewModelScope.launch {
             _query
-                .debounce(2000L.milliseconds)
+                .debounce(SEARCH_DEBOUNCE_MS.milliseconds)
                 .collectLatest { q ->
                     if (q.isBlank()) {
-                        _state.value = AddGameScreenState.Idle(emptyList())
+                        _state.value = AddGameScreenState.Idle(sourceQuery = null, results = emptyList())
                     } else {
                         performSearch(q)
                     }
@@ -58,12 +60,29 @@ class AddGameViewModel(
 
     private suspend fun performSearch(q: String) {
         _state.value = AddGameScreenState.Searching(_state.value.results)
-        val newResults = try {
-            searchService.search(q)
-        } catch (_: Exception) {
-            // In a real app, we'd handle errors here. For now, keep old results.
-            _state.value.results
+        searchService
+            .search(q)
+            .fold(
+                onSuccess = { newResults -> 
+                    _state.value = AddGameScreenState.Idle(sourceQuery = q, results = newResults) 
+                },
+                onFailure = { error ->
+                    _state.value = AddGameScreenState.Error(
+                        error = error as SearchServiceException,
+                        previousResults = _state.value.results
+                    )
+                }
+            )
+    }
+
+    companion object {
+        const val SEARCH_DEBOUNCE_MS = 2000L
+
+        fun factory(searchService: SearchService) = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return AddGameViewModel(searchService) as T
+            }
         }
-        _state.value = AddGameScreenState.Idle(newResults)
     }
 }

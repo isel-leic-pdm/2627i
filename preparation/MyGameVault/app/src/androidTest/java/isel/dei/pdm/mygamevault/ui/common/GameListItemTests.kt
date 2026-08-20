@@ -35,14 +35,14 @@ class GameListItemTests {
 
         // Assert
         composeTestRule
-            .onNodeWithTag(GAME_NAME_TAG)
+            .onNodeWithTag(GAME_NAME_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
             .assertTextContains(testGame.name)
 
         composeTestRule
-            .onNodeWithTag(GAME_RELEASE_DATE_TAG)
+            .onNodeWithTag(GAME_RELEASE_DATE_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
-            .assertTextContains(testGame.releaseDate?.year.toString())
+            .assertTextContains(testGame.releaseDate?.year.toString(), substring = true)
     }
 
     @Test

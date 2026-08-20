@@ -52,3 +52,10 @@ To preserve the pedagogical value of this project, **do not introduce advanced p
     * Reserve `public` for a module's real external API. This has two distinct meanings, and both count as "external":
         * The `core` module's domain API consumed by `app` — designed as an intentional contract, not narrowed to whatever the UI happens to call today.
         * Android framework entry points declared in the manifest (Activities, Services, BroadcastReceivers, ContentProviders) — the OS instantiates these via Intents, so they must stay public regardless of whether another in-module class also references them.
+
+## 5. Logging and Observability
+* **Tagging Convention**: Use a consistent tag for all log messages.
+    * The tag must follow the pattern: `AppName.ComponentName` (e.g., `MyGameVault.IgdbSearchService`).
+    * Use the `MyGameVaultApplication.buildTag()` function to generate these tags.
+* **Message Format**: Every log message should start with the name of the function being executed, followed by a colon and the message (e.g., `Log.d(TAG, "search: started with query = \"$query\"")`).
+* **Process Boundaries**: Log all interactions that cross process boundaries (e.g., network calls, database access once implemented).

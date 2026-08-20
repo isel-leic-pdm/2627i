@@ -7,7 +7,7 @@ fun interface SearchService {
     /**
      * Searches for games that match the given [query].
      * @param query The search query.
-     * @return A list of games that match the query.
+     * @return A result containing the list of games that match the query.
      */
-    suspend fun search(query: String): List<Game>
+    suspend fun search(query: String): Result<List<Game>>
 }

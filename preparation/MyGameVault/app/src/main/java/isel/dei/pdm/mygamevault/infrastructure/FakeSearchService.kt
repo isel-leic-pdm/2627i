@@ -4,10 +4,12 @@ import isel.dei.pdm.mygamevault.core.Game
 import isel.dei.pdm.mygamevault.core.SearchService
 import kotlinx.coroutines.delay
 import java.time.LocalDate
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * A fake implementation of [SearchService] that filters a small in-memory list of games.
  */
+@Suppress("unused")
 class FakeSearchService : SearchService {
 
     private val games = listOf(
@@ -23,13 +25,14 @@ class FakeSearchService : SearchService {
         Game(10, "Outer Wilds", LocalDate.of(2019, 5, 28), "cache://ow_cover", "cache://ow_thumb")
     )
 
-    override suspend fun search(query: String): List<Game> {
+    override suspend fun search(query: String): Result<List<Game>> {
         // Simulate network delay
-        delay(500)
-        return if (query.isBlank()) {
+        delay(500.milliseconds)
+        val result = if (query.isBlank()) {
             emptyList()
         } else {
             games.filter { it.name.contains(query, ignoreCase = true) }
         }
+        return Result.success(result)
     }
 }
