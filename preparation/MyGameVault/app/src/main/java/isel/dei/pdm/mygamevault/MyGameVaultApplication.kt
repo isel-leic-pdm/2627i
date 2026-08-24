@@ -1,16 +1,23 @@
 package isel.dei.pdm.mygamevault
 
 import android.app.Application
+import androidx.datastore.preferences.preferencesDataStore
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import isel.dei.pdm.mygamevault.core.SearchService
+import isel.dei.pdm.mygamevault.core.SecretsRepository
+import isel.dei.pdm.mygamevault.infrastructure.DataStoreSecretsRepository
 import isel.dei.pdm.mygamevault.infrastructure.IgdbSearchService
 import kotlinx.serialization.json.Json
 
+private const val PREFERENCES_DATA_STORE_NAME = "preferences"
+
 class MyGameVaultApplication : Application(), DependenciesContainer {
+
+    private val dataStore by preferencesDataStore(name = PREFERENCES_DATA_STORE_NAME)
 
     override val searchService: SearchService by lazy {
         IgdbSearchService(
@@ -18,6 +25,10 @@ class MyGameVaultApplication : Application(), DependenciesContainer {
             clientId = BuildConfig.IGDB_CLIENT_ID,
             accessToken = BuildConfig.IGDB_ACCESS_TOKEN
         )
+    }
+
+    override val secretsRepository: SecretsRepository by lazy {
+        DataStoreSecretsRepository(dataStore)
     }
 
     companion object {

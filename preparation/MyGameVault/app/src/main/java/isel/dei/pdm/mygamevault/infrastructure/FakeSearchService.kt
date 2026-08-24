@@ -1,6 +1,7 @@
 package isel.dei.pdm.mygamevault.infrastructure
 
 import isel.dei.pdm.mygamevault.core.Game
+import isel.dei.pdm.mygamevault.core.NonBlankString
 import isel.dei.pdm.mygamevault.core.SearchService
 import kotlinx.coroutines.delay
 import java.time.LocalDate
@@ -25,14 +26,14 @@ class FakeSearchService : SearchService {
         Game(10, "Outer Wilds", LocalDate.of(2019, 5, 28), "cache://ow_cover", "cache://ow_thumb")
     )
 
-    override suspend fun search(query: String): Result<List<Game>> {
+    override suspend fun search(
+        partialName: NonBlankString,
+        platform: Game.Platform,
+        category: Game.Category?
+    ): Result<List<Game>> {
         // Simulate network delay
         delay(500.milliseconds)
-        val result = if (query.isBlank()) {
-            emptyList()
-        } else {
-            games.filter { it.name.contains(query, ignoreCase = true) }
-        }
+        val result = games.filter { it.name.value.contains(partialName.value, ignoreCase = true) }
         return Result.success(result)
     }
 }

@@ -12,10 +12,10 @@ class GameTests {
         val name = "Elden Ring"
         
         // Act
-        val game = Game(1, name, LocalDate.of(2022, 2, 25), coverUri = null as Uri?, thumbnailUri = null)
+        val game = Game(1, NonBlankString(name), LocalDate.of(2022, 2, 25), coverUri = null as Uri?, thumbnailUri = null)
         
         // Assert
-        assertEquals(name, game.name)
+        assertEquals(name, game.name.value)
     }
 
     @Test

@@ -9,7 +9,8 @@ This document defines the coding standards and architectural boundaries for the 
 * **Naming Convention**:
     * **Unit Tests**: Use backticks with spaces to describe the scenario and outcome (e.g., `` `action when precondition expected outcome` ``).
     * **Instrumented Tests**: Use underscores (e.g., `action_whenPrecondition_expectedOutcome`) because Android's DEX format (prior to version 040) does not support spaces in method names.
-* **Structure**: Tests follow the Arrange-Act-Assert pattern.  
+* **Structure**: Tests follow the Arrange-Act-Assert pattern.
+* **Resource Management**: Use JUnit Rules (e.g., `TestWatcher`) to manage setup and teardown of external resources (files, databases, dispatchers) to ensure test isolation and reliability.
 
 ## 2. Current Architectural Phase: Iteration 3 (Single Activity with Navigation 3)
 To preserve the pedagogical value of this project, **do not introduce advanced patterns** until explicitly moved to the next iteration.

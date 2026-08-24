@@ -3,13 +3,17 @@ package isel.dei.pdm.mygamevault.add
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import isel.dei.pdm.mygamevault.core.Game
+import isel.dei.pdm.mygamevault.core.NonBlankString
 import isel.dei.pdm.mygamevault.core.SearchService
 import isel.dei.pdm.mygamevault.core.SearchServiceException
+import isel.dei.pdm.mygamevault.core.toNonBlankStringOrNull
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
@@ -22,29 +26,31 @@ class AddGameViewModel(
     private val searchService: SearchService,
 ) : ViewModel() {
 
-    /**
-     * Represents the sequence of search query values entered by the user (note that only the
-     * latest value is kept)
-     */
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query.asStateFlow()
 
-    /**
-     * Represents the sequence of states the screen is in (note that only the latest value is kept)
-     */
+    private val _selectedPlatform = MutableStateFlow(Game.Platform.PS5)
+    val selectedPlatform: StateFlow<Game.Platform> = _selectedPlatform.asStateFlow()
+
+    private val _selectedCategory = MutableStateFlow<Game.Category?>(null)
+    val selectedCategory: StateFlow<Game.Category?> = _selectedCategory.asStateFlow()
+
     private val _state = MutableStateFlow<AddGameScreenState>(AddGameScreenState.Idle())
     val state: StateFlow<AddGameScreenState> = _state.asStateFlow()
 
     init {
-        // Observe query changes with a debounce timeout
+        // Observe changes with a debounce timeout
         viewModelScope.launch {
-            _query
+            combine(_query, _selectedPlatform, _selectedCategory) { q, p, c ->
+                Triple(q, p, c)
+            }
                 .debounce(SEARCH_DEBOUNCE_MS.milliseconds)
-                .collectLatest { q ->
-                    if (q.isBlank()) {
-                        _state.value = AddGameScreenState.Idle(sourceQuery = null, results = emptyList())
+                .collectLatest { (q, p, c) ->
+                    val nonBlankQuery = q.toNonBlankStringOrNull()
+                    if (nonBlankQuery == null) {
+                        _state.value = AddGameScreenState.Idle(null, emptyList(), p, c)
                     } else {
-                        performSearch(q)
+                        performSearch(nonBlankQuery, p, c)
                     }
                 }
         }
@@ -55,21 +61,74 @@ class AddGameViewModel(
      */
     fun onQueryChange(newQuery: String) {
         _query.value = newQuery
-        _state.value = AddGameScreenState.Typing(_state.value.results)
+        _state.value = AddGameScreenState.Typing(
+            results = _state.value.results,
+            selectedPlatform = _selectedPlatform.value,
+            selectedCategory = _selectedCategory.value
+        )
     }
 
-    private suspend fun performSearch(q: String) {
-        _state.value = AddGameScreenState.Searching(_state.value.results)
+    /**
+     * Updates the selected platform and transitions to the Searching state if query is not blank.
+     */
+    fun onPlatformChange(newPlatform: Game.Platform) {
+        _selectedPlatform.value = newPlatform
+        if (_query.value.isNotBlank()) {
+            _state.value = AddGameScreenState.Searching(
+                results = _state.value.results,
+                selectedPlatform = newPlatform,
+                selectedCategory = _selectedCategory.value
+            )
+        } else {
+            _state.value = AddGameScreenState.Idle(
+                sourceQuery = null,
+                results = emptyList(),
+                selectedPlatform = newPlatform,
+                selectedCategory = _selectedCategory.value
+            )
+        }
+    }
+
+    /**
+     * Updates the selected category and transitions to the Searching state if query is not blank.
+     */
+    fun onCategoryChange(newCategory: Game.Category?) {
+        _selectedCategory.value = newCategory
+        if (_query.value.isNotBlank()) {
+            _state.value = AddGameScreenState.Searching(
+                results = _state.value.results,
+                selectedPlatform = _selectedPlatform.value,
+                selectedCategory = newCategory
+            )
+        } else {
+            _state.value = AddGameScreenState.Idle(
+                sourceQuery = null,
+                results = emptyList(),
+                selectedPlatform = _selectedPlatform.value,
+                selectedCategory = newCategory
+            )
+        }
+    }
+
+    private suspend fun performSearch(q: NonBlankString, p: Game.Platform, c: Game.Category?) {
+        _state.value = AddGameScreenState.Searching(_state.value.results, p, c)
         searchService
-            .search(q)
+            .search(q, p, c)
             .fold(
-                onSuccess = { newResults -> 
-                    _state.value = AddGameScreenState.Idle(sourceQuery = q, results = newResults) 
+                onSuccess = { newResults ->
+                    _state.value = AddGameScreenState.Idle(
+                        sourceQuery = q.value,
+                        results = newResults,
+                        selectedPlatform = p,
+                        selectedCategory = c
+                    )
                 },
                 onFailure = { error ->
                     _state.value = AddGameScreenState.Error(
                         error = error as SearchServiceException,
-                        previousResults = _state.value.results
+                        previousResults = _state.value.results,
+                        selectedPlatform = p,
+                        selectedCategory = c
                     )
                 }
             )

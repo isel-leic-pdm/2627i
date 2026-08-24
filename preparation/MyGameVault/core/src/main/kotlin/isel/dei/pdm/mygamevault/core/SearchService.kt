@@ -5,9 +5,15 @@ package isel.dei.pdm.mygamevault.core
  */
 fun interface SearchService {
     /**
-     * Searches for games that match the given [query].
-     * @param query The search query.
+     * Searches for games that match the given [partialName].
+     * @param partialName The partial name of the game to search for.
+     * @param platform The platform to search for.
+     * @param category The category to search for, or null for all.
      * @return A result containing the list of games that match the query.
      */
-    suspend fun search(query: String): Result<List<Game>>
+    suspend fun search(
+        partialName: NonBlankString,
+        platform: Game.Platform,
+        category: Game.Category?
+    ): Result<List<Game>>
 }

@@ -9,7 +9,9 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
+import isel.dei.pdm.mygamevault.core.Game
 import isel.dei.pdm.mygamevault.core.NoConnectivityException
+import isel.dei.pdm.mygamevault.core.NonBlankString
 import isel.dei.pdm.mygamevault.core.RateLimitExceededException
 import isel.dei.pdm.mygamevault.core.ServiceUnavailableException
 import isel.dei.pdm.mygamevault.core.UnauthenticatedException
@@ -50,13 +52,14 @@ class IgdbSearchServiceTests {
         val service = IgdbSearchService(httpClient, clientId, token)
 
         // Act
-        val result = service.search(query)
+        val result = service.search(NonBlankString(query), Game.Platform.PS5, null)
 
         // Assert
         assertTrue(result.isSuccess)
         assertEquals(clientId, capturedHeaders["Client-ID"])
         assertEquals("Bearer $token", capturedHeaders["Authorization"])
-        assertTrue("Query should contain search term", capturedRequestContent.contains("where name ~ \"$query\"*;"))
+        assertTrue("Query should contain search term", capturedRequestContent.contains("& name ~ \"$query\"*"))
+        assertTrue("Query should contain platform", capturedRequestContent.contains("where platforms = (167)"))
         assertTrue("Query should contain fields", capturedRequestContent.contains("fields name"))
     }
 
@@ -89,13 +92,13 @@ class IgdbSearchServiceTests {
         val service = IgdbSearchService(httpClient, "id", "token")
 
         // Act
-        val result = service.search("Elden")
+        val result = service.search(NonBlankString("Elden"), Game.Platform.PS5, null)
 
         // Assert
         assertTrue(result.isSuccess)
         val games = result.getOrThrow()
         assertEquals(1, games.size)
-        assertEquals("Elden Ring", games[0].name)
+        assertEquals("Elden Ring", games[0].name.value)
         assertEquals(123L, games[0].id)
         assertEquals("https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg", games[0].coverUri?.value)
         assertEquals("https://images.igdb.com/igdb/image/upload/t_thumb/co4jni.jpg", games[0].thumbnailUri?.value)
@@ -121,7 +124,7 @@ class IgdbSearchServiceTests {
         val service = IgdbSearchService(httpClient, "id", "token")
 
         // Act
-        val result = service.search("Unknown")
+        val result = service.search(NonBlankString("Unknown"), Game.Platform.PS5, null)
 
         // Assert
         assertTrue(result.isSuccess)
@@ -141,7 +144,7 @@ class IgdbSearchServiceTests {
         val service = IgdbSearchService(httpClient, "id", "token")
 
         // Act
-        val result = service.search("Elden")
+        val result = service.search(NonBlankString("Elden"), Game.Platform.PS5, null)
 
         // Assert
         assertTrue(result.isFailure)
@@ -161,7 +164,7 @@ class IgdbSearchServiceTests {
         val service = IgdbSearchService(httpClient, "id", "token")
 
         // Act
-        val result = service.search("Elden")
+        val result = service.search(NonBlankString("Elden"), Game.Platform.PS5, null)
 
         // Assert
         assertTrue(result.isFailure)
@@ -178,7 +181,7 @@ class IgdbSearchServiceTests {
         val service = IgdbSearchService(httpClient, "id", "token")
 
         // Act
-        val result = service.search("Elden")
+        val result = service.search(NonBlankString("Elden"), Game.Platform.PS5, null)
 
         // Assert
         assertTrue(result.isFailure)
@@ -198,7 +201,7 @@ class IgdbSearchServiceTests {
         val service = IgdbSearchService(httpClient, "id", "token")
 
         // Act
-        val result = service.search("Elden")
+        val result = service.search(NonBlankString("Elden"), Game.Platform.PS5, null)
 
         // Assert
         assertTrue(result.isFailure)
@@ -215,7 +218,7 @@ class IgdbSearchServiceTests {
         val service = IgdbSearchService(httpClient, "id", "token")
 
         // Act
-        val result = service.search("Elden")
+        val result = service.search(NonBlankString("Elden"), Game.Platform.PS5, null)
 
         // Assert
         assertTrue(result.isFailure)

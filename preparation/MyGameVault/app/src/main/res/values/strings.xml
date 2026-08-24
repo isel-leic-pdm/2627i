@@ -1,13 +1,28 @@
 <resources>
     <string name="app_name">My Game Vault</string>
+
     <string name="search_game_hint">Search game</string>
-    <string name="platform_label">Platform</string>
+    <string name="search_platform_label">Platform</string>
+    <string name="search_category_label">Category</string>
+    <string name="search_category_all">All</string>
     <string name="search_results_header">Results</string>
+
     <string name="released_label">Released: %1$d</string>
+
     <string name="game_cover_description">Cover for %1$s</string>
     <string name="image_placeholder_label">Image</string>
+
     <string name="error_no_connectivity">Please check your internet connection.</string>
     <string name="error_service_unavailable">Service is currently unavailable. Try again later.</string>
     <string name="error_rate_limit">Too many requests. Please wait a moment.</string>
+    <string name="error_storage_access">Could not access local storage.</string>
     <string name="error_generic">Something went wrong.</string>
+
+    <string name="preferences_title">API Configuration</string>
+    <string name="preferences_client_id_label">IGDB Client ID</string>
+    <string name="preferences_client_secret_label">IGDB Client Secret</string>
+    <string name="preferences_save_button_label">Save Settings</string>
+    <string name="preferences_error_blank">Field cannot be blank.</string>
+    <string name="preferences_show_secret">Show secret</string>
+    <string name="preferences_hide_secret">Hide secret</string>
 </resources>

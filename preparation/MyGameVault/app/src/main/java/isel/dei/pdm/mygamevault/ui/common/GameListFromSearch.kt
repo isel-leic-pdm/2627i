@@ -2,6 +2,7 @@ package isel.dei.pdm.mygamevault.ui.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,16 +40,19 @@ internal const val GAME_LIST_RESULTS_TAG = "GameListResults"
 internal const val GAME_LIST_HEADER_TAG = "GameListHeader"
 internal const val SEARCH_BAR_TAG = "SearchBar"
 internal const val PLATFORM_SELECTOR_TAG = "PlatformSelector"
+internal const val CATEGORY_SELECTOR_TAG = "CategorySelector"
 internal const val SEARCHING_OVERLAY_TAG = "SearchingOverlay"
 
 /**
  * A reusable Composable that displays a list of games resulting from a search.
- * It includes a search input field, a platform selector, a "Results" header and handles interaction gating.
+ * It includes a search input field, platform and category selectors, a "Results" header and handles interaction gating.
  *
  * @param searchQuery The current search query.
  * @param onQueryChange The callback to be invoked when the search query changes.
  * @param selectedPlatform The currently selected platform.
  * @param onPlatformClick The callback to be invoked when the platform selector is clicked.
+ * @param selectedCategory The currently selected category, or null for all.
+ * @param onCategoryClick The callback to be invoked when the category selector is clicked.
  * @param results The list of games to display.
  * @param onGameSelected The callback to be invoked when a game is selected.
  * @param modifier The modifier to be applied to the layout.
@@ -59,8 +63,10 @@ internal const val SEARCHING_OVERLAY_TAG = "SearchingOverlay"
 fun GameListFromSearch(
     searchQuery: String,
     onQueryChange: (String) -> Unit,
-    selectedPlatform: String,
+    selectedPlatform: Game.Platform,
     onPlatformClick: () -> Unit,
+    selectedCategory: Game.Category?,
+    onCategoryClick: () -> Unit,
     results: List<Game>,
     onGameSelected: (Game) -> Unit,
     modifier: Modifier = Modifier,
@@ -74,7 +80,7 @@ fun GameListFromSearch(
             onValueChange = onQueryChange,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
                 .testTag(SEARCH_BAR_TAG),
             placeholder = { Text(stringResource(R.string.search_game_hint)) },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
@@ -82,29 +88,35 @@ fun GameListFromSearch(
             singleLine = true
         )
 
-        // Platform Selector
+        // Filters Row
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .clickable { onPlatformClick() }
-                .testTag(PLATFORM_SELECTOR_TAG),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(horizontal = 16.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(
-                text = stringResource(R.string.platform_label),
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(end = 8.dp)
+            // Platform Selector
+            FilterChip(
+                label = stringResource(R.string.search_platform_label),
+                value = selectedPlatform.name,
+                onClick = onPlatformClick,
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag(PLATFORM_SELECTOR_TAG)
             )
-            Text(
-                text = selectedPlatform,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
+
+            // Category Selector
+            FilterChip(
+                label = stringResource(R.string.search_category_label),
+                value = selectedCategory?.name ?: stringResource(R.string.search_category_all),
+                onClick = onCategoryClick,
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag(CATEGORY_SELECTOR_TAG)
             )
-            Icon(Icons.Default.ArrowDropDown, contentDescription = null)
         }
 
-        Spacer(modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.size(8.dp))
 
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
@@ -156,6 +168,32 @@ fun GameListFromSearch(
     }
 }
 
+@Composable
+private fun FilterChip(
+    label: String,
+    value: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .clickable { onClick() }
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "$label: ",
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun GameListFromSearchPreview() {
@@ -163,8 +201,10 @@ fun GameListFromSearchPreview() {
         GameListFromSearch(
             searchQuery = "",
             onQueryChange = {},
-            selectedPlatform = "PS5",
+            selectedPlatform = Game.Platform.PS5,
             onPlatformClick = {},
+            selectedCategory = null,
+            onCategoryClick = {},
             results = listOf(
                 Game(
                     1,

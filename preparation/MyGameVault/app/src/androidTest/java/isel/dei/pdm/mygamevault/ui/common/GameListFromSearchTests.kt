@@ -26,14 +26,16 @@ class GameListFromSearchTests {
     )
 
     @Test
-    fun gameListFromSearch_displaysHeaderAndItems() {
+    fun gameList_displaysHeaderAndItems() {
         // Arrange
         composeTestRule.setContent {
             GameListFromSearch(
                 searchQuery = "",
                 onQueryChange = {},
-                selectedPlatform = "PS5",
+                selectedPlatform = Game.Platform.PS5,
                 onPlatformClick = {},
+                selectedCategory = null,
+                onCategoryClick = {},
                 results = testGames,
                 onGameSelected = {}
             )
@@ -42,20 +44,23 @@ class GameListFromSearchTests {
         // Assert
         composeTestRule.onNodeWithTag(SEARCH_BAR_TAG).assertIsDisplayed()
         composeTestRule.onNodeWithTag(PLATFORM_SELECTOR_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(CATEGORY_SELECTOR_TAG).assertIsDisplayed()
         composeTestRule.onNodeWithTag(GAME_LIST_HEADER_TAG).assertIsDisplayed()
         composeTestRule.onAllNodesWithTag(GAME_LIST_ITEM_TAG).assertCountEquals(2)
     }
 
     @Test
-    fun gameListFromSearch_whenTextEntered_invokesOnQueryChange() {
+    fun onQueryChange_whenTextEntered_isInvoked() {
         // Arrange
         var query = ""
         composeTestRule.setContent {
             GameListFromSearch(
                 searchQuery = query,
                 onQueryChange = { query = it },
-                selectedPlatform = "PS5",
+                selectedPlatform = Game.Platform.PS5,
                 onPlatformClick = {},
+                selectedCategory = null,
+                onCategoryClick = {},
                 results = emptyList(),
                 onGameSelected = {}
             )
@@ -69,15 +74,17 @@ class GameListFromSearchTests {
     }
 
     @Test
-    fun gameListFromSearch_whenPlatformClicked_invokesOnPlatformClick() {
+    fun onPlatformClick_whenPlatformSelected_isInvoked() {
         // Arrange
         var platformClicked = false
         composeTestRule.setContent {
             GameListFromSearch(
                 searchQuery = "",
                 onQueryChange = {},
-                selectedPlatform = "PS5",
+                selectedPlatform = Game.Platform.PS5,
                 onPlatformClick = { platformClicked = true },
+                selectedCategory = null,
+                onCategoryClick = {},
                 results = emptyList(),
                 onGameSelected = {}
             )
@@ -91,15 +98,41 @@ class GameListFromSearchTests {
     }
 
     @Test
-    fun gameListFromSearch_whenClickEnabled_invokesOnGameSelected() {
+    fun onCategoryClick_whenCategorySelected_isInvoked() {
+        // Arrange
+        var categoryClicked = false
+        composeTestRule.setContent {
+            GameListFromSearch(
+                searchQuery = "",
+                onQueryChange = {},
+                selectedPlatform = Game.Platform.PS5,
+                onPlatformClick = {},
+                selectedCategory = null,
+                onCategoryClick = { categoryClicked = true },
+                results = emptyList(),
+                onGameSelected = {}
+            )
+        }
+
+        // Act
+        composeTestRule.onNodeWithTag(CATEGORY_SELECTOR_TAG).performClick()
+
+        // Assert
+        assertTrue(categoryClicked)
+    }
+
+    @Test
+    fun onGameSelected_whenClickEnabled_isInvoked() {
         // Arrange
         var selectedGame: Game? = null
         composeTestRule.setContent {
             GameListFromSearch(
                 searchQuery = "",
                 onQueryChange = {},
-                selectedPlatform = "PS5",
+                selectedPlatform = Game.Platform.PS5,
                 onPlatformClick = {},
+                selectedCategory = null,
+                onCategoryClick = {},
                 results = testGames,
                 onGameSelected = { selectedGame = it },
                 isClickEnabled = true
@@ -114,15 +147,17 @@ class GameListFromSearchTests {
     }
 
     @Test
-    fun gameListFromSearch_whenClickDisabled_ignoresClicks() {
+    fun onGameSelected_whenClickDisabled_isNotInvoked() {
         // Arrange
         var selectedGame: Game? = null
         composeTestRule.setContent {
             GameListFromSearch(
                 searchQuery = "",
                 onQueryChange = {},
-                selectedPlatform = "PS5",
+                selectedPlatform = Game.Platform.PS5,
                 onPlatformClick = {},
+                selectedCategory = null,
+                onCategoryClick = {},
                 results = testGames,
                 onGameSelected = { selectedGame = it },
                 isClickEnabled = false
@@ -137,14 +172,16 @@ class GameListFromSearchTests {
     }
 
     @Test
-    fun gameListFromSearch_whenSearching_displaysOverlay() {
+    fun searchingOverlay_whenSearching_isDisplayed() {
         // Act
         composeTestRule.setContent {
             GameListFromSearch(
                 searchQuery = "test",
                 onQueryChange = {},
-                selectedPlatform = "PS5",
+                selectedPlatform = Game.Platform.PS5,
                 onPlatformClick = {},
+                selectedCategory = null,
+                onCategoryClick = {},
                 results = emptyList(),
                 onGameSelected = {},
                 isSearching = true
@@ -156,14 +193,16 @@ class GameListFromSearchTests {
     }
 
     @Test
-    fun gameListFromSearch_whenNotSearching_hidesOverlay() {
+    fun searchingOverlay_whenNotSearching_doesNotExist() {
         // Act
         composeTestRule.setContent {
             GameListFromSearch(
                 searchQuery = "test",
                 onQueryChange = {},
-                selectedPlatform = "PS5",
+                selectedPlatform = Game.Platform.PS5,
                 onPlatformClick = {},
+                selectedCategory = null,
+                onCategoryClick = {},
                 results = emptyList(),
                 onGameSelected = {},
                 isSearching = false

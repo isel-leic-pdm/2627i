@@ -1,13 +1,20 @@
 package isel.dei.pdm.mygamevault.add
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -33,12 +40,16 @@ fun AddGameScreen(
     state: AddGameScreenState,
     searchQuery: String,
     onQueryChange: (String) -> Unit,
+    onPlatformChange: (Game.Platform) -> Unit,
+    onCategoryChange: (Game.Category?) -> Unit,
     onGameSelected: (Game) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val snackbarHostState = remember { SnackbarHostState() }
+    var platformMenuExpanded by remember { mutableStateOf(false) }
+    var categoryMenuExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.isKeyboardVisible) {
         if (!state.isKeyboardVisible) {
@@ -68,19 +79,60 @@ fun AddGameScreen(
             .testTag(ADD_GAME_SCREEN_TAG),
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
-        GameListFromSearch(
-            searchQuery = searchQuery,
-            onQueryChange = onQueryChange,
-            selectedPlatform = "PS5", // Placeholder
-            onPlatformClick = { }, // Placeholder
-            results = state.results,
-            onGameSelected = onGameSelected,
-            isSearching = state is AddGameScreenState.Searching,
-            isClickEnabled = state.isClickDetectionEnabled,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        )
+        Box(modifier = Modifier.padding(innerPadding)) {
+            GameListFromSearch(
+                searchQuery = searchQuery,
+                onQueryChange = onQueryChange,
+                selectedPlatform = state.selectedPlatform,
+                onPlatformClick = { platformMenuExpanded = true },
+                selectedCategory = state.selectedCategory,
+                onCategoryClick = { categoryMenuExpanded = true },
+                results = state.results,
+                onGameSelected = onGameSelected,
+                isSearching = state is AddGameScreenState.Searching,
+                isClickEnabled = state.isClickDetectionEnabled,
+                modifier = Modifier.fillMaxSize()
+            )
+
+            // Platform Dropdown
+            DropdownMenu(
+                expanded = platformMenuExpanded,
+                onDismissRequest = { platformMenuExpanded = false }
+            ) {
+                Game.Platform.entries.forEach { platform ->
+                    DropdownMenuItem(
+                        text = { Text(platform.name) },
+                        onClick = {
+                            onPlatformChange(platform)
+                            platformMenuExpanded = false
+                        }
+                    )
+                }
+            }
+
+            // Category Dropdown
+            DropdownMenu(
+                expanded = categoryMenuExpanded,
+                onDismissRequest = { categoryMenuExpanded = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.search_category_all)) },
+                    onClick = {
+                        onCategoryChange(null)
+                        categoryMenuExpanded = false
+                    }
+                )
+                Game.Category.entries.forEach { category ->
+                    DropdownMenuItem(
+                        text = { Text(category.name) },
+                        onClick = {
+                            onCategoryChange(category)
+                            categoryMenuExpanded = false
+                        }
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -100,6 +152,8 @@ fun AddGameScreenIdleInitialPreview() {
             state = AddGameScreenState.Idle(),
             searchQuery = "",
             onQueryChange = {},
+            onPlatformChange = {},
+            onCategoryChange = {},
             onGameSelected = {}
         )
     }
@@ -113,6 +167,8 @@ fun AddGameScreenIdleResultsPreview() {
             state = AddGameScreenState.Idle(sourceQuery = "Elden", results = sampleGames),
             searchQuery = "Elden",
             onQueryChange = {},
+            onPlatformChange = {},
+            onCategoryChange = {},
             onGameSelected = {}
         )
     }
@@ -123,9 +179,15 @@ fun AddGameScreenIdleResultsPreview() {
 fun AddGameScreenTypingPreview() {
     MyGameVaultTheme {
         AddGameScreen(
-            state = AddGameScreenState.Typing(results = sampleGames),
+            state = AddGameScreenState.Typing(
+                results = sampleGames,
+                selectedPlatform = Game.Platform.PS5,
+                selectedCategory = null
+            ),
             searchQuery = "Elden R",
             onQueryChange = {},
+            onPlatformChange = {},
+            onCategoryChange = {},
             onGameSelected = {}
         )
     }
@@ -136,9 +198,15 @@ fun AddGameScreenTypingPreview() {
 fun AddGameScreenSearchingPreview() {
     MyGameVaultTheme {
         AddGameScreen(
-            state = AddGameScreenState.Searching(results = sampleGames),
+            state = AddGameScreenState.Searching(
+                results = sampleGames,
+                selectedPlatform = Game.Platform.PS5,
+                selectedCategory = null
+            ),
             searchQuery = "Elden Ring",
             onQueryChange = {},
+            onPlatformChange = {},
+            onCategoryChange = {},
             onGameSelected = {}
         )
     }
@@ -151,10 +219,14 @@ fun AddGameScreenErrorPreview() {
         AddGameScreen(
             state = AddGameScreenState.Error(
                 error = ServiceUnavailableException("Server is down"),
-                previousResults = sampleGames
+                previousResults = sampleGames,
+                selectedPlatform = Game.Platform.PS5,
+                selectedCategory = null
             ),
             searchQuery = "Elden Ring",
             onQueryChange = {},
+            onPlatformChange = {},
+            onCategoryChange = {},
             onGameSelected = {}
         )
     }

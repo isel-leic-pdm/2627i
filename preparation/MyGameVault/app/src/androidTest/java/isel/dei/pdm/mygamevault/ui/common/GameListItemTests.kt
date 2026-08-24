@@ -37,7 +37,7 @@ class GameListItemTests {
         composeTestRule
             .onNodeWithTag(GAME_NAME_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
-            .assertTextContains(testGame.name)
+            .assertTextContains(testGame.name.value)
 
         composeTestRule
             .onNodeWithTag(GAME_RELEASE_DATE_TAG, useUnmergedTree = true)

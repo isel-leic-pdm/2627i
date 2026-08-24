@@ -2,6 +2,7 @@ package isel.dei.pdm.mygamevault.add
 
 import isel.dei.pdm.mygamevault.MainDispatcherRule
 import isel.dei.pdm.mygamevault.core.Game
+import isel.dei.pdm.mygamevault.core.NonBlankString
 import isel.dei.pdm.mygamevault.core.SearchService
 import isel.dei.pdm.mygamevault.core.ServiceUnavailableException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,11 +34,19 @@ class AddGameViewModelTests {
         var errorToReturn: Throwable? = null
     ) : SearchService {
         var searchCallCount = 0
-        var lastQuery = ""
+        var lastPartialName: NonBlankString? = null
+        var lastPlatform: Game.Platform? = null
+        var lastCategory: Game.Category? = null
 
-        override suspend fun search(query: String): Result<List<Game>> {
+        override suspend fun search(
+            partialName: NonBlankString,
+            platform: Game.Platform,
+            category: Game.Category?
+        ): Result<List<Game>> {
             searchCallCount++
-            lastQuery = query
+            lastPartialName = partialName
+            lastPlatform = platform
+            lastCategory = category
             if (delayMs > 0) delay(delayMs.milliseconds)
             return if (errorToReturn != null) {
                 Result.failure(errorToReturn!!)
@@ -95,7 +104,7 @@ class AddGameViewModelTests {
 
             // Assert
             assertEquals(1, fakeService.searchCallCount)
-            assertEquals("Elden", fakeService.lastQuery)
+            assertEquals("Elden", fakeService.lastPartialName?.value)
             assertTrue(viewModel.state.value is AddGameScreenState.Idle)
             val state = viewModel.state.value as AddGameScreenState.Idle
             assertEquals("Elden", state.sourceQuery)
@@ -183,7 +192,7 @@ class AddGameViewModelTests {
 
             // Assert
             assertEquals(1, fakeService.searchCallCount)
-            assertEquals("Elden", fakeService.lastQuery)
+            assertEquals("Elden", fakeService.lastPartialName?.value)
         }
 
     @Test
@@ -291,9 +300,59 @@ class AddGameViewModelTests {
             advanceUntilIdle()
 
             // Assert: Final query was indeed the last one
-            assertEquals("Second", fakeService.lastQuery)
+            assertEquals("Second", fakeService.lastPartialName?.value)
             assertTrue(sut.state.value is AddGameScreenState.Idle)
             val state = sut.state.value as AddGameScreenState.Idle
             assertEquals("Second", state.sourceQuery)
+        }
+
+    @Test
+    fun `changing platform triggers new search with same query`() =
+        runTest(mainDispatcherRule.testDispatcher) {
+            // Arrange
+            val fakeService = FakeSearchService()
+            val sut = AddGameViewModel(fakeService)
+
+            // Act: Search for Elden on PS5
+            sut.onQueryChange("Elden")
+            advanceTimeBy(beyondDebounceTimeout)
+            runCurrent()
+            assertEquals(1, fakeService.searchCallCount)
+            assertEquals(Game.Platform.PS5, fakeService.lastPlatform)
+
+            // Act: Change to PC
+            sut.onPlatformChange(Game.Platform.PC)
+            advanceTimeBy(beyondDebounceTimeout)
+            runCurrent()
+
+            // Assert: Search triggered again with PC
+            assertEquals(2, fakeService.searchCallCount)
+            assertEquals("Elden", fakeService.lastPartialName?.value)
+            assertEquals(Game.Platform.PC, fakeService.lastPlatform)
+        }
+
+    @Test
+    fun `changing category triggers new search with same query`() =
+        runTest(mainDispatcherRule.testDispatcher) {
+            // Arrange
+            val fakeService = FakeSearchService()
+            val sut = AddGameViewModel(fakeService)
+
+            // Act: Search for Elden with no category
+            sut.onQueryChange("Elden")
+            advanceTimeBy(beyondDebounceTimeout)
+            runCurrent()
+            assertEquals(1, fakeService.searchCallCount)
+            assertEquals(null, fakeService.lastCategory)
+
+            // Act: Change to Main Game
+            sut.onCategoryChange(Game.Category.MAIN_GAME)
+            advanceTimeBy(beyondDebounceTimeout)
+            runCurrent()
+
+            // Assert: Search triggered again with Main Game
+            assertEquals(2, fakeService.searchCallCount)
+            assertEquals("Elden", fakeService.lastPartialName?.value)
+            assertEquals(Game.Category.MAIN_GAME, fakeService.lastCategory)
         }
 }

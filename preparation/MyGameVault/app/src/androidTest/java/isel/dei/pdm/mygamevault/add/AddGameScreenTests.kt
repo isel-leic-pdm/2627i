@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import isel.dei.pdm.mygamevault.core.Game
+import isel.dei.pdm.mygamevault.core.NonBlankString
 import isel.dei.pdm.mygamevault.ui.common.GAME_LIST_ITEM_TAG
 import isel.dei.pdm.mygamevault.ui.common.SEARCHING_OVERLAY_TAG
 import isel.dei.pdm.mygamevault.ui.common.SEARCH_BAR_TAG
@@ -31,14 +32,20 @@ class AddGameScreenTests {
     )
 
     @Test
-    fun addGameScreen_whenSearching_ignoresClicksOnListItems() {
+    fun onGameSelected_whenSearching_isNotInvoked() {
         // Arrange
         var selectedGame: Game? = null
         composeTestRule.setContent {
             AddGameScreen(
-                state = AddGameScreenState.Searching(listOf(testGame)),
+                state = AddGameScreenState.Searching(
+                    results = listOf(testGame),
+                    selectedPlatform = Game.Platform.PS5,
+                    selectedCategory = null
+                ),
                 searchQuery = "test",
                 onQueryChange = {},
+                onPlatformChange = {},
+                onCategoryChange = {},
                 onGameSelected = { selectedGame = it }
             )
         }
@@ -51,13 +58,19 @@ class AddGameScreenTests {
     }
 
     @Test
-    fun addGameScreen_whenSearching_showsSearchingOverlay() {
+    fun searchingOverlay_whenSearching_isDisplayed() {
         // Act
         composeTestRule.setContent {
             AddGameScreen(
-                state = AddGameScreenState.Searching(emptyList()),
+                state = AddGameScreenState.Searching(
+                    results = emptyList(),
+                    selectedPlatform = Game.Platform.PS5,
+                    selectedCategory = null
+                ),
                 searchQuery = "test",
                 onQueryChange = {},
+                onPlatformChange = {},
+                onCategoryChange = {},
                 onGameSelected = {}
             )
         }
@@ -67,14 +80,16 @@ class AddGameScreenTests {
     }
 
     @Test
-    fun addGameScreen_whenTyping_updatesQuery() {
+    fun onQueryChange_whenTyping_isInvoked() {
         // Arrange
         var query = ""
         composeTestRule.setContent {
             AddGameScreen(
-                state = AddGameScreenState.Idle(emptyList()),
+                state = AddGameScreenState.Idle(),
                 searchQuery = query,
                 onQueryChange = { query = it },
+                onPlatformChange = {},
+                onCategoryChange = {},
                 onGameSelected = {}
             )
         }
@@ -87,19 +102,21 @@ class AddGameScreenTests {
     }
 
     @Test
-    fun addGameScreen_withResults_displaysCorrectNumber() {
+    fun gameList_whenIdleWithResults_displaysAllGames() {
         // Arrange
         val games = listOf(
             testGame,
-            testGame.copy(id = 456, name = "Another Game")
+            testGame.copy(id = 456, name = NonBlankString("Another Game"))
         )
 
         // Act
         composeTestRule.setContent {
             AddGameScreen(
-                state = AddGameScreenState.Idle(games),
+                state = AddGameScreenState.Idle(results = games),
                 searchQuery = "",
                 onQueryChange = {},
+                onPlatformChange = {},
+                onCategoryChange = {},
                 onGameSelected = {}
             )
         }

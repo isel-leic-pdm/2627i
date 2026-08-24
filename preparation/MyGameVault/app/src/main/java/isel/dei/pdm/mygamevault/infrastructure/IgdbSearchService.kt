@@ -11,6 +11,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import isel.dei.pdm.mygamevault.core.Game
 import isel.dei.pdm.mygamevault.core.NoConnectivityException
+import isel.dei.pdm.mygamevault.core.NonBlankString
 import isel.dei.pdm.mygamevault.core.RateLimitExceededException
 import isel.dei.pdm.mygamevault.core.SearchService
 import isel.dei.pdm.mygamevault.core.ServiceUnavailableException
@@ -33,11 +34,24 @@ class IgdbSearchService(
         private val TAG = MyGameVaultApplication.buildTag("IgdbSearchService")
     }
 
-    override suspend fun search(query: String): Result<List<Game>> = try {
-        Log.d(TAG, "search: started with query = \"$query\"")
+    override suspend fun search(
+        partialName: NonBlankString,
+        platform: Game.Platform,
+        category: Game.Category?
+    ): Result<List<Game>> = try {
+        Log.d(TAG, "search: started with partialName = \"$partialName\", platform = $platform, category = $category")
+        
+        val whereClause = buildString {
+            append("where platforms = (${platform.toIgdbId()})")
+            if (category != null) {
+                append(" & category = (${category.toIgdbId()})")
+            }
+            append(" & name ~ \"$partialName\"*")
+        }
+
         val apicalypseQuery = """
             fields name, first_release_date, cover.url;
-            where name ~ "$query"*;
+            $whereClause;
             sort name asc;
             limit 20;
         """.trimIndent()
@@ -73,4 +87,27 @@ class IgdbSearchService(
         Log.wtf(TAG, "search: Unexpected error occurred", e)
         Result.failure(UnexpectedServiceException("Unexpected error", e))
     }
+}
+
+/**
+ * Maps the domain [Game.Platform] to the IGDB API ID.
+ */
+private fun Game.Platform.toIgdbId(): Int = when (this) {
+    Game.Platform.PS5 -> 167
+    Game.Platform.XBOX -> 169
+    Game.Platform.SWITCH -> 130
+    Game.Platform.PC -> 6
+    Game.Platform.PS4 -> 48
+    else -> 0 // Handle other platforms if needed
+}
+
+/**
+ * Maps the domain [Game.Category] to the IGDB API ID.
+ */
+private fun Game.Category.toIgdbId(): Int = when (this) {
+    Game.Category.MAIN_GAME -> 0
+    Game.Category.DLC -> 1
+    Game.Category.BUNDLE -> 3
+    Game.Category.REMAKE -> 8
+    Game.Category.REMASTER -> 9
 }
