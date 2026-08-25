@@ -66,7 +66,7 @@ fun GameListItem(
         ) {
             AsyncImage(
                 model = game.thumbnailUri ?: game.coverUri,
-                contentDescription = stringResource(R.string.game_cover_description, game.name.value),
+                contentDescription = stringResource(R.string.game_cover_description, game.name()),
                 modifier = Modifier
                     .size(80.dp)
                     .clip(RoundedCornerShape(8.dp))
@@ -80,7 +80,7 @@ fun GameListItem(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = game.name.value,
+                    text = game.name(),
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 2,
                     modifier = Modifier.testTag(GAME_NAME_TAG)

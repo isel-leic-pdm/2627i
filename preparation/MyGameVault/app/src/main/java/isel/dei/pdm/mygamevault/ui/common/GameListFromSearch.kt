@@ -100,7 +100,7 @@ fun GameListFromSearch(
             // Platform Selector
             FilterChip(
                 label = stringResource(R.string.search_platform_label),
-                value = selectedPlatform.name.value,
+                value = selectedPlatform.name(),
                 onClick = onPlatformClick,
                 modifier = Modifier
                     .weight(1f)

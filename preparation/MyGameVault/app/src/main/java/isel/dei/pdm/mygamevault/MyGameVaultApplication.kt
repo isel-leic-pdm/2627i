@@ -7,10 +7,12 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
+import isel.dei.pdm.mygamevault.ports.CollectionRepository
 import isel.dei.pdm.mygamevault.ports.SearchService
 import isel.dei.pdm.mygamevault.ports.SecretsRepository
 import isel.dei.pdm.mygamevault.adapters.DataStoreSecretsRepository
 import isel.dei.pdm.mygamevault.adapters.IgdbSearchService
+import isel.dei.pdm.mygamevault.adapters.InMemoryCollectionRepository
 import kotlinx.serialization.json.Json
 
 private const val PREFERENCES_DATA_STORE_NAME = "preferences"
@@ -29,6 +31,10 @@ class MyGameVaultApplication : Application(), DependenciesContainer {
 
     override val secretsRepository: SecretsRepository by lazy {
         DataStoreSecretsRepository(dataStore)
+    }
+
+    override val collectionRepository: CollectionRepository by lazy {
+        InMemoryCollectionRepository()
     }
 
     companion object {

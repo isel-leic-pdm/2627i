@@ -1,5 +1,6 @@
 package isel.dei.pdm.mygamevault
 
+import isel.dei.pdm.mygamevault.ports.CollectionRepository
 import isel.dei.pdm.mygamevault.ports.SearchService
 import isel.dei.pdm.mygamevault.ports.SecretsRepository
 
@@ -9,4 +10,5 @@ import isel.dei.pdm.mygamevault.ports.SecretsRepository
 interface DependenciesContainer {
     val searchService: SearchService
     val secretsRepository: SecretsRepository
+    val collectionRepository: CollectionRepository
 }

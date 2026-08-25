@@ -93,7 +93,7 @@ class IgdbSearchService(
 /**
  * Maps the domain [Platform] to the IGDB API ID.
  */
-private fun Platform.toIgdbId(): Int = when (this.abbreviation.value) {
+private fun Platform.toIgdbId(): Int = when (this.abbreviation()) {
     "PS5" -> 167
     "XBOX" -> 169
     "SWITCH" -> 130

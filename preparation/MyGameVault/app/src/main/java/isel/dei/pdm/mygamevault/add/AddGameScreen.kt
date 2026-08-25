@@ -103,7 +103,7 @@ fun AddGameScreen(
             ) {
                 Platforms.all.forEach { platform ->
                     DropdownMenuItem(
-                        text = { Text(platform.name.value) },
+                        text = { Text(platform.name()) },
                         onClick = {
                             onPlatformChange(platform)
                             platformMenuExpanded = false
