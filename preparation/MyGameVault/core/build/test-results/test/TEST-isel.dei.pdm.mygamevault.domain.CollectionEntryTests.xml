@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="isel.dei.pdm.mygamevault.domain.CollectionEntryTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-08-25T15:26:50.696Z" hostname="Paulos-MBP-2.lan" time="0.019">
-  <properties/>
-  <testcase name="collection entry holds its properties" classname="isel.dei.pdm.mygamevault.domain.CollectionEntryTests" time="0.017"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
