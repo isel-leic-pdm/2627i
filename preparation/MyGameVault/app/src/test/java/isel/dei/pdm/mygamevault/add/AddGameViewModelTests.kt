@@ -1,10 +1,12 @@
 package isel.dei.pdm.mygamevault.add
 
 import isel.dei.pdm.mygamevault.MainDispatcherRule
-import isel.dei.pdm.mygamevault.core.Game
-import isel.dei.pdm.mygamevault.core.NonBlankString
-import isel.dei.pdm.mygamevault.core.SearchService
-import isel.dei.pdm.mygamevault.core.ServiceUnavailableException
+import isel.dei.pdm.mygamevault.domain.Game
+import isel.dei.pdm.mygamevault.domain.NonBlankString
+import isel.dei.pdm.mygamevault.domain.Platform
+import isel.dei.pdm.mygamevault.domain.Platforms
+import isel.dei.pdm.mygamevault.ports.SearchService
+import isel.dei.pdm.mygamevault.ports.ServiceUnavailableException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -35,12 +37,12 @@ class AddGameViewModelTests {
     ) : SearchService {
         var searchCallCount = 0
         var lastPartialName: NonBlankString? = null
-        var lastPlatform: Game.Platform? = null
+        var lastPlatform: Platform? = null
         var lastCategory: Game.Category? = null
 
         override suspend fun search(
             partialName: NonBlankString,
-            platform: Game.Platform,
+            platform: Platform,
             category: Game.Category?
         ): Result<List<Game>> {
             searchCallCount++
@@ -318,17 +320,17 @@ class AddGameViewModelTests {
             advanceTimeBy(beyondDebounceTimeout)
             runCurrent()
             assertEquals(1, fakeService.searchCallCount)
-            assertEquals(Game.Platform.PS5, fakeService.lastPlatform)
+            assertEquals(Platforms.PS5, fakeService.lastPlatform)
 
             // Act: Change to PC
-            sut.onPlatformChange(Game.Platform.PC)
+            sut.onPlatformChange(Platforms.PC)
             advanceTimeBy(beyondDebounceTimeout)
             runCurrent()
 
             // Assert: Search triggered again with PC
             assertEquals(2, fakeService.searchCallCount)
             assertEquals("Elden", fakeService.lastPartialName?.value)
-            assertEquals(Game.Platform.PC, fakeService.lastPlatform)
+            assertEquals(Platforms.PC, fakeService.lastPlatform)
         }
 
     @Test

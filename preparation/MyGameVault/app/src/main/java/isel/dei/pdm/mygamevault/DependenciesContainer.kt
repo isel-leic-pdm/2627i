@@ -1,7 +1,7 @@
 package isel.dei.pdm.mygamevault
 
-import isel.dei.pdm.mygamevault.core.SearchService
-import isel.dei.pdm.mygamevault.core.SecretsRepository
+import isel.dei.pdm.mygamevault.ports.SearchService
+import isel.dei.pdm.mygamevault.ports.SecretsRepository
 
 /**
  * Interface that represents the container for the application's dependencies.

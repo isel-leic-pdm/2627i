@@ -10,7 +10,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.platform.app.InstrumentationRegistry
 import isel.dei.pdm.mygamevault.add.ADD_GAME_SCREEN_TAG
 import isel.dei.pdm.mygamevault.collection.MY_COLLECTION_SCREEN_TAG
-import isel.dei.pdm.mygamevault.core.Secrets
+import isel.dei.pdm.mygamevault.ports.Secrets
 import isel.dei.pdm.mygamevault.preferences.PREFERENCES_SCREEN_TAG
 import isel.dei.pdm.mygamevault.ui.common.SEARCH_BAR_TAG
 import kotlinx.coroutines.flow.first

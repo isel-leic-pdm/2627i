@@ -35,7 +35,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import isel.dei.pdm.mygamevault.R
-import isel.dei.pdm.mygamevault.core.StorageAccessException
+import isel.dei.pdm.mygamevault.ports.StorageAccessException
 import isel.dei.pdm.mygamevault.ui.theme.MyGameVaultTheme
 
 internal const val PREFERENCES_SCREEN_TAG = "PreferencesScreen"

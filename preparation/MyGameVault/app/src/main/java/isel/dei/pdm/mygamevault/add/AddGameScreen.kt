@@ -22,10 +22,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import isel.dei.pdm.mygamevault.R
-import isel.dei.pdm.mygamevault.core.Game
-import isel.dei.pdm.mygamevault.core.NoConnectivityException
-import isel.dei.pdm.mygamevault.core.RateLimitExceededException
-import isel.dei.pdm.mygamevault.core.ServiceUnavailableException
+import isel.dei.pdm.mygamevault.domain.Game
+import isel.dei.pdm.mygamevault.domain.Platform
+import isel.dei.pdm.mygamevault.domain.Platforms
+import isel.dei.pdm.mygamevault.ports.NoConnectivityException
+import isel.dei.pdm.mygamevault.ports.RateLimitExceededException
+import isel.dei.pdm.mygamevault.ports.ServiceUnavailableException
 import isel.dei.pdm.mygamevault.ui.common.GameListFromSearch
 import isel.dei.pdm.mygamevault.ui.theme.MyGameVaultTheme
 import java.time.LocalDate
@@ -40,7 +42,7 @@ fun AddGameScreen(
     state: AddGameScreenState,
     searchQuery: String,
     onQueryChange: (String) -> Unit,
-    onPlatformChange: (Game.Platform) -> Unit,
+    onPlatformChange: (Platform) -> Unit,
     onCategoryChange: (Game.Category?) -> Unit,
     onGameSelected: (Game) -> Unit,
     modifier: Modifier = Modifier
@@ -99,9 +101,9 @@ fun AddGameScreen(
                 expanded = platformMenuExpanded,
                 onDismissRequest = { platformMenuExpanded = false }
             ) {
-                Game.Platform.entries.forEach { platform ->
+                Platforms.all.forEach { platform ->
                     DropdownMenuItem(
-                        text = { Text(platform.name) },
+                        text = { Text(platform.name.value) },
                         onClick = {
                             onPlatformChange(platform)
                             platformMenuExpanded = false
@@ -181,7 +183,7 @@ fun AddGameScreenTypingPreview() {
         AddGameScreen(
             state = AddGameScreenState.Typing(
                 results = sampleGames,
-                selectedPlatform = Game.Platform.PS5,
+                selectedPlatform = Platforms.PS5,
                 selectedCategory = null
             ),
             searchQuery = "Elden R",
@@ -200,7 +202,7 @@ fun AddGameScreenSearchingPreview() {
         AddGameScreen(
             state = AddGameScreenState.Searching(
                 results = sampleGames,
-                selectedPlatform = Game.Platform.PS5,
+                selectedPlatform = Platforms.PS5,
                 selectedCategory = null
             ),
             searchQuery = "Elden Ring",
@@ -220,7 +222,7 @@ fun AddGameScreenErrorPreview() {
             state = AddGameScreenState.Error(
                 error = ServiceUnavailableException("Server is down"),
                 previousResults = sampleGames,
-                selectedPlatform = Game.Platform.PS5,
+                selectedPlatform = Platforms.PS5,
                 selectedCategory = null
             ),
             searchQuery = "Elden Ring",

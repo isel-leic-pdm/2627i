@@ -1,6 +1,6 @@
 package isel.dei.pdm.mygamevault.preferences
 
-import isel.dei.pdm.mygamevault.core.PersistenceException
+import isel.dei.pdm.mygamevault.ports.PersistenceException
 
 /**
  * Represents the possible states of the Preferences screen.

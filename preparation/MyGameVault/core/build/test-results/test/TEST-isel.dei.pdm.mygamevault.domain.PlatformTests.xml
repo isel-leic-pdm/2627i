@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="isel.dei.pdm.mygamevault.domain.PlatformTests" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-08-25T15:26:50.718Z" hostname="Paulos-MBP-2.lan" time="0.001">
+  <properties/>
+  <testcase name="abbreviation cannot be blank" classname="isel.dei.pdm.mygamevault.domain.PlatformTests" time="0.0"/>
+  <testcase name="platform holds its properties" classname="isel.dei.pdm.mygamevault.domain.PlatformTests" time="0.001"/>
+  <testcase name="name cannot be blank" classname="isel.dei.pdm.mygamevault.domain.PlatformTests" time="0.0"/>
+  <testcase name="platform logo can be null" classname="isel.dei.pdm.mygamevault.domain.PlatformTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

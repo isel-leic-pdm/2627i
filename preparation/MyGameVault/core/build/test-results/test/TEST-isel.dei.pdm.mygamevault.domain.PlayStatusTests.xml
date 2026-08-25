@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="isel.dei.pdm.mygamevault.domain.PlayStatusTests" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-08-25T15:26:50.720Z" hostname="Paulos-MBP-2.lan" time="0.0">
+  <properties/>
+  <testcase name="negative time spent is not allowed" classname="isel.dei.pdm.mygamevault.domain.PlayStatusTests" time="0.0"/>
+  <testcase name="non zero time spent is not allowed for NONE state" classname="isel.dei.pdm.mygamevault.domain.PlayStatusTests" time="0.0"/>
+  <testcase name="default values are correct" classname="isel.dei.pdm.mygamevault.domain.PlayStatusTests" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

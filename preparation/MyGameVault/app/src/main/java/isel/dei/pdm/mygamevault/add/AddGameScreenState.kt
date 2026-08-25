@@ -1,7 +1,9 @@
 package isel.dei.pdm.mygamevault.add
 
-import isel.dei.pdm.mygamevault.core.Game
-import isel.dei.pdm.mygamevault.core.SearchServiceException
+import isel.dei.pdm.mygamevault.domain.Game
+import isel.dei.pdm.mygamevault.domain.Platform
+import isel.dei.pdm.mygamevault.domain.Platforms
+import isel.dei.pdm.mygamevault.ports.SearchServiceException
 
 /**
  * Represents the possible states of the Add Game screen.
@@ -11,7 +13,7 @@ import isel.dei.pdm.mygamevault.core.SearchServiceException
  */
 sealed class AddGameScreenState(
     val results: List<Game>,
-    val selectedPlatform: Game.Platform,
+    val selectedPlatform: Platform,
     val selectedCategory: Game.Category?
 ) {
     /**
@@ -21,7 +23,7 @@ sealed class AddGameScreenState(
     class Idle(
         val sourceQuery: String? = null,
         results: List<Game> = emptyList(),
-        selectedPlatform: Game.Platform = Game.Platform.PS5,
+        selectedPlatform: Platform = Platforms.PS5,
         selectedCategory: Game.Category? = null
     ) : AddGameScreenState(results, selectedPlatform, selectedCategory)
 
@@ -30,7 +32,7 @@ sealed class AddGameScreenState(
      */
     class Typing(
         results: List<Game>,
-        selectedPlatform: Game.Platform,
+        selectedPlatform: Platform,
         selectedCategory: Game.Category?
     ) : AddGameScreenState(results, selectedPlatform, selectedCategory)
 
@@ -39,7 +41,7 @@ sealed class AddGameScreenState(
      */
     class Searching(
         results: List<Game>,
-        selectedPlatform: Game.Platform,
+        selectedPlatform: Platform,
         selectedCategory: Game.Category?
     ) : AddGameScreenState(results, selectedPlatform, selectedCategory)
 
@@ -51,7 +53,7 @@ sealed class AddGameScreenState(
     class Error(
         val error: SearchServiceException,
         val previousResults: List<Game>,
-        selectedPlatform: Game.Platform,
+        selectedPlatform: Platform,
         selectedCategory: Game.Category?
     ) : AddGameScreenState(previousResults, selectedPlatform, selectedCategory)
 

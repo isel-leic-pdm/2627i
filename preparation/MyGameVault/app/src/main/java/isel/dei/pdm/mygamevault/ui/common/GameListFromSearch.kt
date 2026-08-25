@@ -32,7 +32,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import isel.dei.pdm.mygamevault.R
-import isel.dei.pdm.mygamevault.core.Game
+import isel.dei.pdm.mygamevault.domain.Game
+import isel.dei.pdm.mygamevault.domain.Platform
+import isel.dei.pdm.mygamevault.domain.Platforms
 import isel.dei.pdm.mygamevault.ui.theme.MyGameVaultTheme
 import java.time.LocalDate
 
@@ -63,7 +65,7 @@ internal const val SEARCHING_OVERLAY_TAG = "SearchingOverlay"
 fun GameListFromSearch(
     searchQuery: String,
     onQueryChange: (String) -> Unit,
-    selectedPlatform: Game.Platform,
+    selectedPlatform: Platform,
     onPlatformClick: () -> Unit,
     selectedCategory: Game.Category?,
     onCategoryClick: () -> Unit,
@@ -98,7 +100,7 @@ fun GameListFromSearch(
             // Platform Selector
             FilterChip(
                 label = stringResource(R.string.search_platform_label),
-                value = selectedPlatform.name,
+                value = selectedPlatform.name.value,
                 onClick = onPlatformClick,
                 modifier = Modifier
                     .weight(1f)
@@ -201,7 +203,7 @@ fun GameListFromSearchPreview() {
         GameListFromSearch(
             searchQuery = "",
             onQueryChange = {},
-            selectedPlatform = Game.Platform.PS5,
+            selectedPlatform = Platforms.PS5,
             onPlatformClick = {},
             selectedCategory = null,
             onCategoryClick = {},

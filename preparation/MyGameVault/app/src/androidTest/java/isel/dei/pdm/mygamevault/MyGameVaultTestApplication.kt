@@ -1,10 +1,10 @@
 package isel.dei.pdm.mygamevault
 
 import android.app.Application
-import isel.dei.pdm.mygamevault.core.SearchService
-import isel.dei.pdm.mygamevault.core.SecretsRepository
-import isel.dei.pdm.mygamevault.infrastructure.FakeSearchService
-import isel.dei.pdm.mygamevault.infrastructure.FakeSecretsRepository
+import isel.dei.pdm.mygamevault.ports.SearchService
+import isel.dei.pdm.mygamevault.ports.SecretsRepository
+import isel.dei.pdm.mygamevault.adapters.fakes.FakeSearchService
+import isel.dei.pdm.mygamevault.adapters.fakes.FakeSecretsRepository
 
 class MyGameVaultTestApplication : Application(), DependenciesContainer {
     override val searchService: SearchService = FakeSearchService()

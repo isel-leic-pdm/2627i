@@ -27,7 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import isel.dei.pdm.mygamevault.R
-import isel.dei.pdm.mygamevault.core.Game
+import isel.dei.pdm.mygamevault.domain.Game
 import isel.dei.pdm.mygamevault.ui.theme.MyGameVaultTheme
 import java.time.LocalDate
 

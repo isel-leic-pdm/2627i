@@ -7,10 +7,10 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
-import isel.dei.pdm.mygamevault.core.SearchService
-import isel.dei.pdm.mygamevault.core.SecretsRepository
-import isel.dei.pdm.mygamevault.infrastructure.DataStoreSecretsRepository
-import isel.dei.pdm.mygamevault.infrastructure.IgdbSearchService
+import isel.dei.pdm.mygamevault.ports.SearchService
+import isel.dei.pdm.mygamevault.ports.SecretsRepository
+import isel.dei.pdm.mygamevault.adapters.DataStoreSecretsRepository
+import isel.dei.pdm.mygamevault.adapters.IgdbSearchService
 import kotlinx.serialization.json.Json
 
 private const val PREFERENCES_DATA_STORE_NAME = "preferences"

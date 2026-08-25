@@ -3,11 +3,13 @@ package isel.dei.pdm.mygamevault.add
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import isel.dei.pdm.mygamevault.core.Game
-import isel.dei.pdm.mygamevault.core.NonBlankString
-import isel.dei.pdm.mygamevault.core.SearchService
-import isel.dei.pdm.mygamevault.core.SearchServiceException
-import isel.dei.pdm.mygamevault.core.toNonBlankStringOrNull
+import isel.dei.pdm.mygamevault.domain.Game
+import isel.dei.pdm.mygamevault.domain.NonBlankString
+import isel.dei.pdm.mygamevault.domain.Platform
+import isel.dei.pdm.mygamevault.domain.Platforms
+import isel.dei.pdm.mygamevault.ports.SearchService
+import isel.dei.pdm.mygamevault.ports.SearchServiceException
+import isel.dei.pdm.mygamevault.domain.toNonBlankStringOrNull
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,8 +31,8 @@ class AddGameViewModel(
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query.asStateFlow()
 
-    private val _selectedPlatform = MutableStateFlow(Game.Platform.PS5)
-    val selectedPlatform: StateFlow<Game.Platform> = _selectedPlatform.asStateFlow()
+    private val _selectedPlatform = MutableStateFlow(Platforms.PS5)
+    val selectedPlatform: StateFlow<Platform> = _selectedPlatform.asStateFlow()
 
     private val _selectedCategory = MutableStateFlow<Game.Category?>(null)
     val selectedCategory: StateFlow<Game.Category?> = _selectedCategory.asStateFlow()
@@ -71,7 +73,7 @@ class AddGameViewModel(
     /**
      * Updates the selected platform and transitions to the Searching state if query is not blank.
      */
-    fun onPlatformChange(newPlatform: Game.Platform) {
+    fun onPlatformChange(newPlatform: Platform) {
         _selectedPlatform.value = newPlatform
         if (_query.value.isNotBlank()) {
             _state.value = AddGameScreenState.Searching(
@@ -110,7 +112,7 @@ class AddGameViewModel(
         }
     }
 
-    private suspend fun performSearch(q: NonBlankString, p: Game.Platform, c: Game.Category?) {
+    private suspend fun performSearch(q: NonBlankString, p: Platform, c: Game.Category?) {
         _state.value = AddGameScreenState.Searching(_state.value.results, p, c)
         searchService
             .search(q, p, c)

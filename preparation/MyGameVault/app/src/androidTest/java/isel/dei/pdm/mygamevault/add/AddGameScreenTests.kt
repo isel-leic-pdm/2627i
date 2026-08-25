@@ -8,8 +8,9 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import isel.dei.pdm.mygamevault.core.Game
-import isel.dei.pdm.mygamevault.core.NonBlankString
+import isel.dei.pdm.mygamevault.domain.Game
+import isel.dei.pdm.mygamevault.domain.NonBlankString
+import isel.dei.pdm.mygamevault.domain.Platforms
 import isel.dei.pdm.mygamevault.ui.common.GAME_LIST_ITEM_TAG
 import isel.dei.pdm.mygamevault.ui.common.SEARCHING_OVERLAY_TAG
 import isel.dei.pdm.mygamevault.ui.common.SEARCH_BAR_TAG
@@ -39,7 +40,7 @@ class AddGameScreenTests {
             AddGameScreen(
                 state = AddGameScreenState.Searching(
                     results = listOf(testGame),
-                    selectedPlatform = Game.Platform.PS5,
+                    selectedPlatform = Platforms.PS5,
                     selectedCategory = null
                 ),
                 searchQuery = "test",
@@ -64,7 +65,7 @@ class AddGameScreenTests {
             AddGameScreen(
                 state = AddGameScreenState.Searching(
                     results = emptyList(),
-                    selectedPlatform = Game.Platform.PS5,
+                    selectedPlatform = Platforms.PS5,
                     selectedCategory = null
                 ),
                 searchQuery = "test",

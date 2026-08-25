@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import isel.dei.pdm.mygamevault.MyGameVaultApplication
-import isel.dei.pdm.mygamevault.core.PersistenceException
-import isel.dei.pdm.mygamevault.core.Secrets
-import isel.dei.pdm.mygamevault.core.SecretsRepository
+import isel.dei.pdm.mygamevault.ports.PersistenceException
+import isel.dei.pdm.mygamevault.ports.Secrets
+import isel.dei.pdm.mygamevault.ports.SecretsRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -1,9 +1,9 @@
 package isel.dei.pdm.mygamevault.preferences
 
 import isel.dei.pdm.mygamevault.MainDispatcherRule
-import isel.dei.pdm.mygamevault.core.Secrets
-import isel.dei.pdm.mygamevault.core.StorageAccessException
-import isel.dei.pdm.mygamevault.infrastructure.FakeSecretsRepository
+import isel.dei.pdm.mygamevault.ports.Secrets
+import isel.dei.pdm.mygamevault.ports.StorageAccessException
+import isel.dei.pdm.mygamevault.adapters.fakes.FakeSecretsRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.StandardTestDispatcher

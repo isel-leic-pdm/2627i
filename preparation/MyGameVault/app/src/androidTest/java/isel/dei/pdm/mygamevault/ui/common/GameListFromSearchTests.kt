@@ -7,7 +7,8 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import isel.dei.pdm.mygamevault.core.Game
+import isel.dei.pdm.mygamevault.domain.Game
+import isel.dei.pdm.mygamevault.domain.Platforms
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -32,7 +33,7 @@ class GameListFromSearchTests {
             GameListFromSearch(
                 searchQuery = "",
                 onQueryChange = {},
-                selectedPlatform = Game.Platform.PS5,
+                selectedPlatform = Platforms.PS5,
                 onPlatformClick = {},
                 selectedCategory = null,
                 onCategoryClick = {},
@@ -57,7 +58,7 @@ class GameListFromSearchTests {
             GameListFromSearch(
                 searchQuery = query,
                 onQueryChange = { query = it },
-                selectedPlatform = Game.Platform.PS5,
+                selectedPlatform = Platforms.PS5,
                 onPlatformClick = {},
                 selectedCategory = null,
                 onCategoryClick = {},
@@ -81,7 +82,7 @@ class GameListFromSearchTests {
             GameListFromSearch(
                 searchQuery = "",
                 onQueryChange = {},
-                selectedPlatform = Game.Platform.PS5,
+                selectedPlatform = Platforms.PS5,
                 onPlatformClick = { platformClicked = true },
                 selectedCategory = null,
                 onCategoryClick = {},
@@ -105,7 +106,7 @@ class GameListFromSearchTests {
             GameListFromSearch(
                 searchQuery = "",
                 onQueryChange = {},
-                selectedPlatform = Game.Platform.PS5,
+                selectedPlatform = Platforms.PS5,
                 onPlatformClick = {},
                 selectedCategory = null,
                 onCategoryClick = { categoryClicked = true },
@@ -129,7 +130,7 @@ class GameListFromSearchTests {
             GameListFromSearch(
                 searchQuery = "",
                 onQueryChange = {},
-                selectedPlatform = Game.Platform.PS5,
+                selectedPlatform = Platforms.PS5,
                 onPlatformClick = {},
                 selectedCategory = null,
                 onCategoryClick = {},
@@ -154,7 +155,7 @@ class GameListFromSearchTests {
             GameListFromSearch(
                 searchQuery = "",
                 onQueryChange = {},
-                selectedPlatform = Game.Platform.PS5,
+                selectedPlatform = Platforms.PS5,
                 onPlatformClick = {},
                 selectedCategory = null,
                 onCategoryClick = {},
@@ -178,7 +179,7 @@ class GameListFromSearchTests {
             GameListFromSearch(
                 searchQuery = "test",
                 onQueryChange = {},
-                selectedPlatform = Game.Platform.PS5,
+                selectedPlatform = Platforms.PS5,
                 onPlatformClick = {},
                 selectedCategory = null,
                 onCategoryClick = {},
@@ -199,7 +200,7 @@ class GameListFromSearchTests {
             GameListFromSearch(
                 searchQuery = "test",
                 onQueryChange = {},
-                selectedPlatform = Game.Platform.PS5,
+                selectedPlatform = Platforms.PS5,
                 onPlatformClick = {},
                 selectedCategory = null,
                 onCategoryClick = {},
