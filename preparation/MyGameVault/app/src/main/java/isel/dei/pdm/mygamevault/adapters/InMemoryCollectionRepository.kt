@@ -36,20 +36,28 @@ class InMemoryCollectionRepository : CollectionRepository {
         return entries.first()[key]
     }
 
-    override fun getCurrentlyPlaying(): Flow<List<CollectionEntry>> =
-        entries.map { it.values.filter { entry -> entry.playStatus.state == PlayStatus.State.PLAYING } }
-
     override fun search(
         partialName: String?,
-        platform: Platform?,
-        state: PlayStatus.State?
-    ): Flow<List<CollectionEntry>> = entries.map {
-        it.values.filter { entry ->
+        platforms: Set<Platform>,
+        states: Set<PlayStatus.State>,
+        orderBy: CollectionRepository.OrderBy
+    ): Flow<List<CollectionEntry>> = entries.map { entry ->
+        entry.values.filter {
             val nameMatch = partialName == null || 
-                entry.game.name.contains(partialName, ignoreCase = true)
-            val platformMatch = platform == null || entry.platform == platform
-            val stateMatch = state == null || entry.playStatus.state == state
+                it.game.name.contains(partialName, ignoreCase = true)
+            val platformMatch = platforms.isEmpty() || it.platform in platforms
+            val stateMatch = states.isEmpty() || it.playStatus.state in states
             nameMatch && platformMatch && stateMatch
-        }
+        }.sortedWith(
+            comparator = compareBy<CollectionEntry> { it.platform.name() }
+                .thenBy { it.playStatus.state.ordinal }
+                .thenBy {
+                    when (orderBy) {
+                        CollectionRepository.OrderBy.NAME -> it.game.name()
+                        CollectionRepository.OrderBy.RELEASE_DATE -> it.game.releaseDate?.toEpochDay() ?: 0L
+                        CollectionRepository.OrderBy.ADDED_AT -> it.addedAt.toEpochDay()
+                    }
+                }
+        )
     }
 }

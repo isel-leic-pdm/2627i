@@ -10,6 +10,15 @@ import kotlinx.coroutines.flow.Flow
  */
 interface CollectionRepository {
     /**
+     * Represents the possible ordering criteria for the collection.
+     */
+    enum class OrderBy {
+        NAME,
+        RELEASE_DATE,
+        ADDED_AT
+    }
+
+    /**
      * Saves an entry to the collection. If an entry already exists for the same game and platform,
      * it will be updated.
      * @param entry The entry to save.
@@ -37,18 +46,21 @@ interface CollectionRepository {
      * Gets a flow that emits the list of entries currently being played.
      * @return The flow of entry lists.
      */
-    fun getCurrentlyPlaying(): Flow<List<CollectionEntry>>
+    fun getCurrentlyPlaying(): Flow<List<CollectionEntry>> =
+        search(states = setOf(PlayStatus.State.PLAYING))
 
     /**
      * Searches for entries in the collection that match the given criteria.
      * @param partialName The partial name of the game to search for, or null for any.
-     * @param platform The platform to search for, or null for any.
-     * @param state The playing status to search for, or null for any.
+     * @param platforms The set of platforms to search for. If empty, all platforms are included.
+     * @param states The set of playing statuses to search for. If empty, all states are included.
+     * @param orderBy The criteria to order the results by within each group (platform/status).
      * @return A flow that emits the list of matching entries.
      */
     fun search(
         partialName: String? = null,
-        platform: Platform? = null,
-        state: PlayStatus.State? = null
+        platforms: Set<Platform> = emptySet(),
+        states: Set<PlayStatus.State> = emptySet(),
+        orderBy: OrderBy = OrderBy.ADDED_AT
     ): Flow<List<CollectionEntry>>
 }

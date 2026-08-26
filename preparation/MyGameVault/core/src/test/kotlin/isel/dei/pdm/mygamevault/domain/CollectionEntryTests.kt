@@ -17,14 +17,23 @@ class CollectionEntryTests {
     @Test
     fun `collection entry holds its properties`() {
         val status = PlayStatus(state = PlayStatus.State.FINISHED)
+        val addedDate = LocalDate.of(2024, 1, 1)
         val entry = CollectionEntry(
             game = sampleGame,
             platform = Platforms.PS5,
-            playStatus = status
+            playStatus = status,
+            addedAt = addedDate
         )
 
         assertEquals(sampleGame, entry.game)
         assertEquals(Platforms.PS5, entry.platform)
         assertEquals(status, entry.playStatus)
+        assertEquals(addedDate, entry.addedAt)
+    }
+
+    @Test
+    fun `collection entry has current date by default`() {
+        val entry = CollectionEntry(sampleGame, Platforms.PS5)
+        assertEquals(LocalDate.now(), entry.addedAt)
     }
 }
