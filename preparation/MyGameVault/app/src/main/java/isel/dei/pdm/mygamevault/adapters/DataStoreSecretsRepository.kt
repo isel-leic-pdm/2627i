@@ -17,9 +17,12 @@ import java.io.IOException
 
 /**
  * An implementation of [SecretsRepository] that uses [DataStore] to persist values.
+ * @property dataStore The DataStore instance to use.
+ * @property defaultSecrets The default secrets to use if none are found in the DataStore.
  */
 class DataStoreSecretsRepository(
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    private val defaultSecrets: Secrets? = null
 ) : SecretsRepository {
 
     private companion object {
@@ -29,9 +32,10 @@ class DataStoreSecretsRepository(
     }
 
     override val secrets: Flow<Secrets?> = dataStore.data.map { preferences ->
-        val id = preferences[CLIENT_ID_KEY]
-        val secret = preferences[CLIENT_SECRET_KEY]
-        if (id != null && secret != null) {
+        val id = preferences[CLIENT_ID_KEY] ?: defaultSecrets?.clientId
+        val secret = preferences[CLIENT_SECRET_KEY] ?: defaultSecrets?.clientSecret
+        
+        if (id != null && secret != null && id.isNotBlank() && secret.isNotBlank()) {
             Secrets(id, secret)
         } else {
             null

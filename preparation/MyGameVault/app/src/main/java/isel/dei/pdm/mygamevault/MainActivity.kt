@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import isel.dei.pdm.mygamevault.add.AddGameViewModel
+import isel.dei.pdm.mygamevault.collection.MyCollectionViewModel
 import isel.dei.pdm.mygamevault.preferences.PreferencesViewModel
 import isel.dei.pdm.mygamevault.ui.AppScaffold
 import isel.dei.pdm.mygamevault.ui.theme.MyGameVaultTheme
@@ -20,12 +21,20 @@ class MainActivity : ComponentActivity() {
         (application as DependenciesContainer).secretsRepository
     }
 
+    private val collectionRepository by lazy {
+        (application as DependenciesContainer).collectionRepository
+    }
+
     private val addGameViewModel by viewModels<AddGameViewModel> {
-        AddGameViewModel.factory(searchService)
+        AddGameViewModel.factory(searchService, collectionRepository)
     }
 
     private val preferencesViewModel by viewModels<PreferencesViewModel> {
         PreferencesViewModel.factory(secretsRepository)
+    }
+
+    private val myCollectionViewModel by viewModels<MyCollectionViewModel> {
+        MyCollectionViewModel.factory(collectionRepository)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +44,8 @@ class MainActivity : ComponentActivity() {
             MyGameVaultTheme {
                 AppScaffold(
                     addGameViewModel = addGameViewModel,
-                    preferencesViewModel = preferencesViewModel
+                    preferencesViewModel = preferencesViewModel,
+                    myCollectionViewModel = myCollectionViewModel
                 )
             }
         }

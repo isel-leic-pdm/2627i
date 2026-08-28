@@ -19,7 +19,9 @@ import isel.dei.pdm.mygamevault.ports.SearchService
 import isel.dei.pdm.mygamevault.ports.ServiceUnavailableException
 import isel.dei.pdm.mygamevault.ports.UnauthenticatedException
 import isel.dei.pdm.mygamevault.ports.UnexpectedServiceException
+import isel.dei.pdm.mygamevault.ports.SecretsRepository
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.first
 import java.io.IOException
 
 /**
@@ -27,8 +29,7 @@ import java.io.IOException
  */
 class IgdbSearchService(
     private val httpClient: HttpClient,
-    private val clientId: String,
-    private val accessToken: String
+    private val secretsRepository: SecretsRepository
 ) : SearchService {
 
     companion object {
@@ -40,6 +41,9 @@ class IgdbSearchService(
         platform: Platform,
         category: Game.Category?
     ): Result<List<Game>> = try {
+        val secrets = secretsRepository.secrets.first()
+            ?: Result.failure<List<Game>>(UnauthenticatedException("API credentials not configured")).let { return it }
+
         Log.d(TAG, "search: started with partialName = \"$partialName\", platform = $platform, category = $category")
         
         val whereClause = buildString {
@@ -58,8 +62,8 @@ class IgdbSearchService(
         """.trimIndent()
 
         val response = httpClient.post("https://api.igdb.com/v4/games") {
-            header("Client-ID", clientId)
-            header("Authorization", "Bearer $accessToken")
+            header("Client-ID", secrets.clientId)
+            header("Authorization", "Bearer ${secrets.clientSecret}")
             contentType(ContentType.Application.Json)
             setBody(apicalypseQuery)
         }

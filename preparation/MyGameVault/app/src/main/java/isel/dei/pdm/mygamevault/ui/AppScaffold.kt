@@ -22,6 +22,7 @@ import androidx.navigation3.ui.NavDisplay
 import isel.dei.pdm.mygamevault.add.AddGameScreen
 import isel.dei.pdm.mygamevault.add.AddGameViewModel
 import isel.dei.pdm.mygamevault.collection.MyCollectionScreen
+import isel.dei.pdm.mygamevault.collection.MyCollectionViewModel
 import isel.dei.pdm.mygamevault.preferences.PreferencesScreen
 import isel.dei.pdm.mygamevault.preferences.PreferencesViewModel
 
@@ -41,6 +42,7 @@ private val navigationItems = listOf(
 fun AppScaffold(
     addGameViewModel: AddGameViewModel,
     preferencesViewModel: PreferencesViewModel,
+    myCollectionViewModel: MyCollectionViewModel,
     modifier: Modifier = Modifier
 ) {
     val navigationState = rememberNavigationState(
@@ -51,7 +53,11 @@ fun AppScaffold(
 
     val entryProvider = entryProvider {
         entry<AppRoute.MyCollection> {
-            MyCollectionScreen()
+            val state by myCollectionViewModel.state.collectAsStateWithLifecycle()
+            MyCollectionScreen(
+                state = state,
+                onEntrySelected = { /* TODO: Show details */ }
+            )
         }
         entry<AppRoute.AddGame> {
             val state by addGameViewModel.state.collectAsStateWithLifecycle()
@@ -62,7 +68,10 @@ fun AppScaffold(
                 onQueryChange = addGameViewModel::onQueryChange,
                 onPlatformChange = addGameViewModel::onPlatformChange,
                 onCategoryChange = addGameViewModel::onCategoryChange,
-                onGameSelected = { /* TODO: Add to collection */ }
+                onGameSelected = { game ->
+                    addGameViewModel.addGame(game, state.selectedPlatform)
+                    navigator.navigate(AppRoute.MyCollection)
+                }
             )
         }
         entry<AppRoute.Preferences> {

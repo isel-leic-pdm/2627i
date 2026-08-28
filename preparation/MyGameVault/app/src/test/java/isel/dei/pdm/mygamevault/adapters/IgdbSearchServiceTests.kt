@@ -14,9 +14,12 @@ import isel.dei.pdm.mygamevault.domain.Platforms
 import isel.dei.pdm.mygamevault.ports.NoConnectivityException
 import isel.dei.pdm.mygamevault.domain.NonBlankString
 import isel.dei.pdm.mygamevault.ports.RateLimitExceededException
+import isel.dei.pdm.mygamevault.ports.Secrets
+import isel.dei.pdm.mygamevault.ports.SecretsRepository
 import isel.dei.pdm.mygamevault.ports.ServiceUnavailableException
 import isel.dei.pdm.mygamevault.ports.UnauthenticatedException
 import isel.dei.pdm.mygamevault.ports.UnexpectedServiceException
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
@@ -24,6 +27,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class IgdbSearchServiceTests {
+
+    private class FakeSecretsRepository(clientId: String, secret: String) : SecretsRepository {
+        override val secrets = flowOf(Secrets(clientId, secret))
+        override suspend fun saveSecrets(secrets: Secrets) = Result.success(Unit)
+    }
 
     @Test
     fun `search sends correct headers and body`() = runTest {
@@ -50,7 +58,7 @@ class IgdbSearchServiceTests {
             }
         }
 
-        val service = IgdbSearchService(httpClient, clientId, token)
+        val service = IgdbSearchService(httpClient, FakeSecretsRepository(clientId, token))
 
         // Act
         val result = service.search(NonBlankString(query), Platforms.PS5, null)
@@ -90,7 +98,7 @@ class IgdbSearchServiceTests {
             }
         }
 
-        val service = IgdbSearchService(httpClient, "id", "token")
+        val service = IgdbSearchService(httpClient, FakeSecretsRepository("id", "token"))
 
         // Act
         val result = service.search(NonBlankString("Elden"), Platforms.PS5, null)
@@ -99,7 +107,7 @@ class IgdbSearchServiceTests {
         assertTrue(result.isSuccess)
         val games = result.getOrThrow()
         assertEquals(1, games.size)
-        assertEquals("Elden Ring", games[0].name.value)
+        assertEquals("Elden Ring", games[0].name())
         assertEquals(123L, games[0].id)
         assertEquals("https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg", games[0].coverUri?.value)
         assertEquals("https://images.igdb.com/igdb/image/upload/t_thumb/co4jni.jpg", games[0].thumbnailUri?.value)
@@ -122,7 +130,7 @@ class IgdbSearchServiceTests {
             }
         }
 
-        val service = IgdbSearchService(httpClient, "id", "token")
+        val service = IgdbSearchService(httpClient, FakeSecretsRepository("id", "token"))
 
         // Act
         val result = service.search(NonBlankString("Unknown"), Platforms.PS5, null)
@@ -142,7 +150,7 @@ class IgdbSearchServiceTests {
             )
         }
         val httpClient = HttpClient(mockEngine)
-        val service = IgdbSearchService(httpClient, "id", "token")
+        val service = IgdbSearchService(httpClient, FakeSecretsRepository("id", "token"))
 
         // Act
         val result = service.search(NonBlankString("Elden"), Platforms.PS5, null)
@@ -162,7 +170,7 @@ class IgdbSearchServiceTests {
             )
         }
         val httpClient = HttpClient(mockEngine)
-        val service = IgdbSearchService(httpClient, "id", "token")
+        val service = IgdbSearchService(httpClient, FakeSecretsRepository("id", "token"))
 
         // Act
         val result = service.search(NonBlankString("Elden"), Platforms.PS5, null)
@@ -179,7 +187,7 @@ class IgdbSearchServiceTests {
             throw java.io.IOException("No internet")
         }
         val httpClient = HttpClient(mockEngine)
-        val service = IgdbSearchService(httpClient, "id", "token")
+        val service = IgdbSearchService(httpClient, FakeSecretsRepository("id", "token"))
 
         // Act
         val result = service.search(NonBlankString("Elden"), Platforms.PS5, null)
@@ -199,7 +207,7 @@ class IgdbSearchServiceTests {
             )
         }
         val httpClient = HttpClient(mockEngine)
-        val service = IgdbSearchService(httpClient, "id", "token")
+        val service = IgdbSearchService(httpClient, FakeSecretsRepository("id", "token"))
 
         // Act
         val result = service.search(NonBlankString("Elden"), Platforms.PS5, null)
@@ -216,7 +224,7 @@ class IgdbSearchServiceTests {
             throw IllegalStateException("Something broke")
         }
         val httpClient = HttpClient(mockEngine)
-        val service = IgdbSearchService(httpClient, "id", "token")
+        val service = IgdbSearchService(httpClient, FakeSecretsRepository("id", "token"))
 
         // Act
         val result = service.search(NonBlankString("Elden"), Platforms.PS5, null)

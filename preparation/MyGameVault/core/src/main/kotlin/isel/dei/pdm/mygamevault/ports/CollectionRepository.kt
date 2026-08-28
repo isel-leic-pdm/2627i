@@ -47,20 +47,59 @@ interface CollectionRepository {
      * @return The flow of entry lists.
      */
     fun getCurrentlyPlaying(): Flow<List<CollectionEntry>> =
-        search(states = setOf(PlayStatus.State.PLAYING))
+        searchByStates(states = setOf(PlayStatus.State.PLAYING))
 
     /**
-     * Searches for entries in the collection that match the given criteria.
-     * @param partialName The partial name of the game to search for, or null for any.
-     * @param platforms The set of platforms to search for. If empty, all platforms are included.
-     * @param states The set of playing statuses to search for. If empty, all states are included.
-     * @param orderBy The criteria to order the results by within each group (platform/status).
+     * Gets the [limit] most recently added entries in the collection.
+     * The results are limited to at most 100 entries.
+     *
+     * @param limit The maximum number of entries to return. Defaults to 20.
      * @return A flow that emits the list of matching entries.
      */
-    fun search(
-        partialName: String? = null,
-        platforms: Set<Platform> = emptySet(),
-        states: Set<PlayStatus.State> = emptySet(),
-        orderBy: OrderBy = OrderBy.ADDED_AT
+    fun getLatest(limit: Int = 20): Flow<List<CollectionEntry>>
+
+    /**
+     * Searches for entries where the game name contains [partialName].
+     * The results are limited to at most 100 entries.
+     *
+     * @param partialName The partial name of the game to search for.
+     * @param orderBy The criteria to order the results by. Defaults to NAME.
+     * @param limit The maximum number of entries to return. Defaults to 20.
+     * @return A flow that emits the list of matching entries.
+     */
+    fun searchByName(
+        partialName: String,
+        orderBy: OrderBy = OrderBy.NAME,
+        limit: Int = 20
+    ): Flow<List<CollectionEntry>>
+
+    /**
+     * Searches for entries belonging to any of the given [platforms].
+     * The results are limited to at most 100 entries.
+     *
+     * @param platforms The set of platforms to search for.
+     * @param orderBy The criteria to order the results by. Defaults to ADDED_AT.
+     * @param limit The maximum number of entries to return. Defaults to 20.
+     * @return A flow that emits the list of matching entries.
+     */
+    fun searchByPlatforms(
+        platforms: Set<Platform>,
+        orderBy: OrderBy = OrderBy.ADDED_AT,
+        limit: Int = 20
+    ): Flow<List<CollectionEntry>>
+
+    /**
+     * Searches for entries in any of the given playing [states].
+     * The results are limited to at most 100 entries.
+     *
+     * @param states The set of playing statuses to search for.
+     * @param orderBy The criteria to order the results by. Defaults to ADDED_AT.
+     * @param limit The maximum number of entries to return. Defaults to 20.
+     * @return A flow that emits the list of matching entries.
+     */
+    fun searchByStates(
+        states: Set<PlayStatus.State>,
+        orderBy: OrderBy = OrderBy.ADDED_AT,
+        limit: Int = 20
     ): Flow<List<CollectionEntry>>
 }

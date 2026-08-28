@@ -1,20 +1,26 @@
 package isel.dei.pdm.mygamevault.add
 
 import isel.dei.pdm.mygamevault.MainDispatcherRule
+import isel.dei.pdm.mygamevault.domain.CollectionEntry
 import isel.dei.pdm.mygamevault.domain.Game
 import isel.dei.pdm.mygamevault.domain.NonBlankString
 import isel.dei.pdm.mygamevault.domain.Platform
 import isel.dei.pdm.mygamevault.domain.Platforms
+import isel.dei.pdm.mygamevault.domain.PlayStatus
+import isel.dei.pdm.mygamevault.ports.CollectionRepository
 import isel.dei.pdm.mygamevault.ports.SearchService
 import isel.dei.pdm.mygamevault.ports.ServiceUnavailableException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -58,10 +64,22 @@ class AddGameViewModelTests {
         }
     }
 
+    private class FakeCollectionRepository : CollectionRepository {
+        var lastSavedEntry: CollectionEntry? = null
+        override suspend fun save(entry: CollectionEntry) { lastSavedEntry = entry }
+        override suspend fun delete(gameId: Long, platform: Platform) {}
+        override suspend fun get(gameId: Long, platform: Platform): CollectionEntry? = null
+        override fun getCurrentlyPlaying(): Flow<List<CollectionEntry>> = flowOf(emptyList())
+        override fun getLatest(limit: Int): Flow<List<CollectionEntry>> = flowOf(emptyList())
+        override fun searchByName(partialName: String, orderBy: CollectionRepository.OrderBy, limit: Int): Flow<List<CollectionEntry>> = flowOf(emptyList())
+        override fun searchByPlatforms(platforms: Set<Platform>, orderBy: CollectionRepository.OrderBy, limit: Int): Flow<List<CollectionEntry>> = flowOf(emptyList())
+        override fun searchByStates(states: Set<PlayStatus.State>, orderBy: CollectionRepository.OrderBy, limit: Int): Flow<List<CollectionEntry>> = flowOf(emptyList())
+    }
+
     @Test
     fun `initial state is Idle with empty results`() =
         runTest(mainDispatcherRule.testDispatcher) {
-            val viewModel = AddGameViewModel(FakeSearchService())
+            val viewModel = AddGameViewModel(FakeSearchService(), FakeCollectionRepository())
             val state = viewModel.state.value as AddGameScreenState.Idle
             assertTrue(state.results.isEmpty())
             assertEquals(null, state.sourceQuery)
@@ -71,7 +89,7 @@ class AddGameViewModelTests {
     fun `typing updates query and transitions to Typing state`() =
         runTest(mainDispatcherRule.testDispatcher) {
             val newQuery = "Elden"
-            val sut = AddGameViewModel(FakeSearchService())
+            val sut = AddGameViewModel(FakeSearchService(), FakeCollectionRepository())
 
             // Act
             sut.onQueryChange(newQuery)
@@ -92,7 +110,7 @@ class AddGameViewModelTests {
                     releaseDate = LocalDate.of(2022, 2, 25), null as String?, null)
             )
             val fakeService = FakeSearchService(resultsToReturn = expectedResults)
-            val viewModel = AddGameViewModel(fakeService)
+            val viewModel = AddGameViewModel(fakeService, FakeCollectionRepository())
 
             // Act
             viewModel.onQueryChange("Elden")
@@ -120,7 +138,7 @@ class AddGameViewModelTests {
             val initialResults =
                 listOf(Game(1, "Elden Ring", null, coverUri = null as String?, null))
             val fakeService = FakeSearchService(resultsToReturn = initialResults)
-            val sut = AddGameViewModel(fakeService)
+            val sut = AddGameViewModel(fakeService, FakeCollectionRepository())
 
             sut.onQueryChange("Elden")
             advanceTimeBy(beyondDebounceTimeout)
@@ -157,7 +175,7 @@ class AddGameViewModelTests {
             val initialResults =
                 listOf(Game(1, "Elden Ring", null, coverUri = null as String?, null))
             val fakeService = FakeSearchService(resultsToReturn = initialResults)
-            val viewModel = AddGameViewModel(fakeService)
+            val viewModel = AddGameViewModel(fakeService, FakeCollectionRepository())
 
             viewModel.onQueryChange("Elden")
             advanceTimeBy(beyondDebounceTimeout)
@@ -180,7 +198,7 @@ class AddGameViewModelTests {
     fun `rapid typing only triggers one search for the last query`() =
         runTest(mainDispatcherRule.testDispatcher) {
             val fakeService = FakeSearchService()
-            val viewModel = AddGameViewModel(fakeService)
+            val viewModel = AddGameViewModel(fakeService, FakeCollectionRepository())
 
             // Act
             viewModel.onQueryChange("E")
@@ -204,7 +222,7 @@ class AddGameViewModelTests {
             val initialResults = listOf(Game(1, "Old Game", null, coverUri = null as String?, null))
             val error = ServiceUnavailableException("Server down")
             val fakeService = FakeSearchService(resultsToReturn = initialResults)
-            val sut = AddGameViewModel(fakeService)
+            val sut = AddGameViewModel(fakeService, FakeCollectionRepository())
 
             // Step 1: Get some initial successful results
             sut.onQueryChange("Old")
@@ -231,7 +249,7 @@ class AddGameViewModelTests {
             // Arrange
             val searchDelay = 1000.milliseconds
             val fakeService = FakeSearchService(delayMs = searchDelay.inWholeMilliseconds)
-            val sut = AddGameViewModel(fakeService)
+            val sut = AddGameViewModel(fakeService, FakeCollectionRepository())
 
             // Act
             sut.onQueryChange("Elden")
@@ -259,7 +277,7 @@ class AddGameViewModelTests {
         runTest(mainDispatcherRule.testDispatcher) {
             // Arrange
             val fakeService = FakeSearchService(errorToReturn = ServiceUnavailableException())
-            val sut = AddGameViewModel(fakeService)
+            val sut = AddGameViewModel(fakeService, FakeCollectionRepository())
 
             // Trigger error
             sut.onQueryChange("Fail")
@@ -282,7 +300,7 @@ class AddGameViewModelTests {
         runTest(mainDispatcherRule.testDispatcher) {
             // Arrange: Service with a long delay to allow overlapping
             val fakeService = FakeSearchService(delayMs = 5000)
-            val sut = AddGameViewModel(fakeService)
+            val sut = AddGameViewModel(fakeService, FakeCollectionRepository())
 
             // Act: Start first search
             sut.onQueryChange("First")
@@ -313,7 +331,7 @@ class AddGameViewModelTests {
         runTest(mainDispatcherRule.testDispatcher) {
             // Arrange
             val fakeService = FakeSearchService()
-            val sut = AddGameViewModel(fakeService)
+            val sut = AddGameViewModel(fakeService, FakeCollectionRepository())
 
             // Act: Search for Elden on PS5
             sut.onQueryChange("Elden")
@@ -338,7 +356,7 @@ class AddGameViewModelTests {
         runTest(mainDispatcherRule.testDispatcher) {
             // Arrange
             val fakeService = FakeSearchService()
-            val sut = AddGameViewModel(fakeService)
+            val sut = AddGameViewModel(fakeService, FakeCollectionRepository())
 
             // Act: Search for Elden with no category
             sut.onQueryChange("Elden")
@@ -356,5 +374,24 @@ class AddGameViewModelTests {
             assertEquals(2, fakeService.searchCallCount)
             assertEquals("Elden", fakeService.lastPartialName?.value)
             assertEquals(Game.Category.MAIN_GAME, fakeService.lastCategory)
+        }
+
+    @Test
+    fun `addGame saves the entry to the repository`() =
+        runTest(mainDispatcherRule.testDispatcher) {
+            // Arrange
+            val repo = FakeCollectionRepository()
+            val sut = AddGameViewModel(FakeSearchService(), repo)
+            val game = Game(1, "Game", null, null as String?)
+            val platform = Platforms.PS5
+            
+            // Act
+            sut.addGame(game, platform)
+            runCurrent()
+            
+            // Assert
+            assertNotNull(repo.lastSavedEntry)
+            assertEquals(game, repo.lastSavedEntry?.game)
+            assertEquals(platform, repo.lastSavedEntry?.platform)
         }
 }

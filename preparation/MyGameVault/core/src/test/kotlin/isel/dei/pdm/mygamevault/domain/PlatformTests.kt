@@ -8,25 +8,26 @@ class PlatformTests {
 
     @Test
     fun `platform holds its properties`() {
-        val platform = Platform("PS5", "PlayStation 5", "https://example.com/logo.png")
-        assertEquals("PS5", platform.abbreviation.value)
-        assertEquals("PlayStation 5", platform.name.value)
+        val platform = Platform(167, "PS5", "PlayStation 5", "https://example.com/logo.png")
+        assertEquals(167L, platform.id)
+        assertEquals("PS5", platform.abbreviation())
+        assertEquals("PlayStation 5", platform.name())
         assertEquals("https://example.com/logo.png", platform.logoUri?.value)
     }
 
     @Test
     fun `platform logo can be null`() {
-        val platform = Platform("PS5", "PlayStation 5")
+        val platform = Platform(167, "PS5", "PlayStation 5")
         assertNull(platform.logoUri)
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `abbreviation cannot be blank`() {
-        Platform("", "PlayStation 5")
+        Platform(167, "", "PlayStation 5")
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `name cannot be blank`() {
-        Platform("PS5", " ")
+        Platform(167, "PS5", " ")
     }
 }

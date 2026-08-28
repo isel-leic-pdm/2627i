@@ -25,4 +25,8 @@
     <string name="preferences_error_blank">Field cannot be blank.</string>
     <string name="preferences_show_secret">Show secret</string>
     <string name="preferences_hide_secret">Hide secret</string>
+
+    <string name="my_collection_header">My Collection</string>
+    <string name="collection_empty_message">Your collection is empty.</string>
+    <string name="added_on_label">Added on: %1$s</string>
 </resources>
