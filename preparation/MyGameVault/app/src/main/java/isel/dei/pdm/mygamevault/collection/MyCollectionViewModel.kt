@@ -6,8 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import isel.dei.pdm.mygamevault.MyGameVaultApplication
 import isel.dei.pdm.mygamevault.domain.CollectionEntry
-import isel.dei.pdm.mygamevault.domain.Game
-import isel.dei.pdm.mygamevault.domain.Platform
+import isel.dei.pdm.mygamevault.domain.PlayStatus
 import isel.dei.pdm.mygamevault.ports.CollectionRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +23,8 @@ class MyCollectionViewModel(
     private val repository: CollectionRepository
 ) : ViewModel() {
 
+    private val _filter = MutableStateFlow(CollectionFilter.LATEST)
+
     private val _state = MutableStateFlow<MyCollectionScreenState>(MyCollectionScreenState.Idle())
 
     /**
@@ -34,26 +35,47 @@ class MyCollectionViewModel(
     private var fetchJob: Job? = null
 
     init {
-        fetchData()
+        viewModelScope.launch {
+            _filter.collect { filter ->
+                fetchData(filter)
+            }
+        }
     }
 
     /**
-     * Fetches the latest data from the collection.
+     * Updates the current filter and triggers a new data fetch.
+     */
+    fun onFilterChange(newFilter: CollectionFilter) {
+        Log.d(TAG, "onFilterChange: newFilter = $newFilter")
+        _filter.value = newFilter
+    }
+
+    /**
+     * Fetches data from the collection based on the given [filter].
      * Transitions from Idle to Loading, and back to Idle upon completion or update.
      */
-    fun fetchData() {
-        Log.d(TAG, "fetchData: started")
+    private fun fetchData(filter: CollectionFilter) {
+        Log.d(TAG, "fetchData: started with filter = $filter")
         fetchJob?.cancel()
         fetchJob = viewModelScope.launch {
-            _state.value = MyCollectionScreenState.Loading(_state.value.entries)
-            repository.getLatest()
-                .catch { error ->
-                    Log.e(TAG, "fetchData: error occurred", error)
-                    _state.value = MyCollectionScreenState.Idle(_state.value.entries, error)
-                }
+            _state.value = MyCollectionScreenState.Loading(_state.value.entries, filter)
+            val flow = when (filter) {
+                CollectionFilter.LATEST -> repository.getLatest()
+                CollectionFilter.PLAYING -> repository.searchByStates(setOf(PlayStatus.State.PLAYING))
+                CollectionFilter.FINISHED -> repository.searchByStates(
+                    setOf(PlayStatus.State.FINISHED, PlayStatus.State.PLATINUM)
+                )
+                CollectionFilter.PLATINUM -> repository.searchByStates(setOf(PlayStatus.State.PLATINUM))
+                CollectionFilter.BACKLOG -> repository.searchByStates(setOf(PlayStatus.State.BACKLOG))
+            }
+
+            flow.catch { error ->
+                Log.e(TAG, "fetchData: error occurred", error)
+                _state.value = MyCollectionScreenState.Idle(_state.value.entries, filter, error)
+            }
                 .collect { entries ->
                     Log.d(TAG, "fetchData: successfully collected ${entries.size} entries")
-                    _state.value = MyCollectionScreenState.Idle(entries)
+                    _state.value = MyCollectionScreenState.Idle(entries, filter)
                 }
         }
     }

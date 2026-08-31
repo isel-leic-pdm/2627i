@@ -2,7 +2,8 @@ package isel.dei.pdm.mygamevault.domain
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.time.Duration
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 class PlayStatusTests {
 
@@ -15,11 +16,11 @@ class PlayStatusTests {
 
     @Test(expected = IllegalArgumentException::class)
     fun `negative time spent is not allowed`() {
-        PlayStatus(timeSpent = Duration.ofMinutes(-1), state = PlayStatus.State.PLAYING)
+        PlayStatus(timeSpent = (-1).minutes, state = PlayStatus.State.PLAYING)
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `non zero time spent is not allowed for NONE state`() {
-        PlayStatus(timeSpent = Duration.ofMinutes(1), state = PlayStatus.State.NONE)
+        PlayStatus(timeSpent = 1.minutes, state = PlayStatus.State.NONE)
     }
 }

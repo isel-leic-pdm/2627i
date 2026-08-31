@@ -11,9 +11,6 @@ import androidx.compose.ui.test.performTextInput
 import isel.dei.pdm.mygamevault.domain.Game
 import isel.dei.pdm.mygamevault.domain.NonBlankString
 import isel.dei.pdm.mygamevault.domain.Platforms
-import isel.dei.pdm.mygamevault.ui.common.GAME_LIST_ITEM_TAG
-import isel.dei.pdm.mygamevault.ui.common.SEARCHING_OVERLAY_TAG
-import isel.dei.pdm.mygamevault.ui.common.SEARCH_BAR_TAG
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
@@ -33,7 +30,7 @@ class AddGameScreenTests {
     )
 
     @Test
-    fun onGameSelected_whenSearching_isNotInvoked() {
+    fun onAddRequested_whenSearching_isNotInvoked() {
         // Arrange
         var selectedGame: Game? = null
         composeTestRule.setContent {
@@ -47,15 +44,43 @@ class AddGameScreenTests {
                 onQueryChange = {},
                 onPlatformChange = {},
                 onCategoryChange = {},
-                onGameSelected = { selectedGame = it }
+                onAddRequested = { selectedGame = it },
+                onDetailsRequested = {}
             )
         }
 
         // Act
-        composeTestRule.onNodeWithTag(GAME_LIST_ITEM_TAG).performClick()
+        composeTestRule.onNodeWithTag(ADD_GAME_BUTTON_TAG).performClick()
 
         // Assert
-        assertNull("Click should have been ignored while searching", selectedGame)
+        assertNull("Add click should have been ignored while searching", selectedGame)
+    }
+
+    @Test
+    fun onDetailsRequested_whenSearching_isNotInvoked() {
+        // Arrange
+        var selectedGame: Game? = null
+        composeTestRule.setContent {
+            AddGameScreen(
+                state = AddGameScreenState.Searching(
+                    results = listOf(testGame),
+                    selectedPlatform = Platforms.PS5,
+                    selectedCategory = null
+                ),
+                searchQuery = "test",
+                onQueryChange = {},
+                onPlatformChange = {},
+                onCategoryChange = {},
+                onAddRequested = {},
+                onDetailsRequested = { selectedGame = it }
+            )
+        }
+
+        // Act
+        composeTestRule.onNodeWithTag(VIEW_DETAILS_BUTTON_TAG).performClick()
+
+        // Assert
+        assertNull("Details click should have been ignored while searching", selectedGame)
     }
 
     @Test
@@ -72,7 +97,8 @@ class AddGameScreenTests {
                 onQueryChange = {},
                 onPlatformChange = {},
                 onCategoryChange = {},
-                onGameSelected = {}
+                onAddRequested = {},
+                onDetailsRequested = {}
             )
         }
 
@@ -91,7 +117,8 @@ class AddGameScreenTests {
                 onQueryChange = { query = it },
                 onPlatformChange = {},
                 onCategoryChange = {},
-                onGameSelected = {}
+                onAddRequested = {},
+                onDetailsRequested = {}
             )
         }
 
@@ -118,7 +145,8 @@ class AddGameScreenTests {
                 onQueryChange = {},
                 onPlatformChange = {},
                 onCategoryChange = {},
-                onGameSelected = {}
+                onAddRequested = {},
+                onDetailsRequested = {}
             )
         }
 

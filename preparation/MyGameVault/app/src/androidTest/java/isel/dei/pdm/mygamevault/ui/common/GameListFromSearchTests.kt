@@ -7,6 +7,15 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import isel.dei.pdm.mygamevault.add.ADD_GAME_BUTTON_TAG
+import isel.dei.pdm.mygamevault.add.CATEGORY_SELECTOR_TAG
+import isel.dei.pdm.mygamevault.add.GAME_LIST_HEADER_TAG
+import isel.dei.pdm.mygamevault.add.GAME_LIST_ITEM_TAG
+import isel.dei.pdm.mygamevault.add.GameListFromSearch
+import isel.dei.pdm.mygamevault.add.PLATFORM_SELECTOR_TAG
+import isel.dei.pdm.mygamevault.add.SEARCHING_OVERLAY_TAG
+import isel.dei.pdm.mygamevault.add.SEARCH_BAR_TAG
+import isel.dei.pdm.mygamevault.add.VIEW_DETAILS_BUTTON_TAG
 import isel.dei.pdm.mygamevault.domain.Game
 import isel.dei.pdm.mygamevault.domain.Platforms
 import org.junit.Assert.assertEquals
@@ -38,7 +47,8 @@ class GameListFromSearchTests {
                 selectedCategory = null,
                 onCategoryClick = {},
                 results = testGames,
-                onGameSelected = {}
+                onAddRequested = {},
+                onDetailsRequested = {}
             )
         }
 
@@ -63,7 +73,8 @@ class GameListFromSearchTests {
                 selectedCategory = null,
                 onCategoryClick = {},
                 results = emptyList(),
-                onGameSelected = {}
+                onAddRequested = {},
+                onDetailsRequested = {}
             )
         }
 
@@ -87,7 +98,8 @@ class GameListFromSearchTests {
                 selectedCategory = null,
                 onCategoryClick = {},
                 results = emptyList(),
-                onGameSelected = {}
+                onAddRequested = {},
+                onDetailsRequested = {}
             )
         }
 
@@ -111,7 +123,8 @@ class GameListFromSearchTests {
                 selectedCategory = null,
                 onCategoryClick = { categoryClicked = true },
                 results = emptyList(),
-                onGameSelected = {}
+                onAddRequested = {},
+                onDetailsRequested = {}
             )
         }
 
@@ -123,7 +136,7 @@ class GameListFromSearchTests {
     }
 
     @Test
-    fun onGameSelected_whenClickEnabled_isInvoked() {
+    fun onAddRequested_whenClickEnabled_isInvoked() {
         // Arrange
         var selectedGame: Game? = null
         composeTestRule.setContent {
@@ -135,20 +148,21 @@ class GameListFromSearchTests {
                 selectedCategory = null,
                 onCategoryClick = {},
                 results = testGames,
-                onGameSelected = { selectedGame = it },
+                onAddRequested = { selectedGame = it },
+                onDetailsRequested = {},
                 isClickEnabled = true
             )
         }
 
         // Act
-        composeTestRule.onAllNodesWithTag(GAME_LIST_ITEM_TAG)[0].performClick()
+        composeTestRule.onAllNodesWithTag(ADD_GAME_BUTTON_TAG)[0].performClick()
 
         // Assert
         assertEquals(testGames[0], selectedGame)
     }
 
     @Test
-    fun onGameSelected_whenClickDisabled_isNotInvoked() {
+    fun onDetailsRequested_whenClickEnabled_isInvoked() {
         // Arrange
         var selectedGame: Game? = null
         composeTestRule.setContent {
@@ -160,13 +174,40 @@ class GameListFromSearchTests {
                 selectedCategory = null,
                 onCategoryClick = {},
                 results = testGames,
-                onGameSelected = { selectedGame = it },
+                onAddRequested = {},
+                onDetailsRequested = { selectedGame = it },
+                isClickEnabled = true
+            )
+        }
+
+        // Act
+        composeTestRule.onAllNodesWithTag(VIEW_DETAILS_BUTTON_TAG)[0].performClick()
+
+        // Assert
+        assertEquals(testGames[0], selectedGame)
+    }
+
+    @Test
+    fun onAddRequested_whenClickDisabled_isNotInvoked() {
+        // Arrange
+        var selectedGame: Game? = null
+        composeTestRule.setContent {
+            GameListFromSearch(
+                searchQuery = "",
+                onQueryChange = {},
+                selectedPlatform = Platforms.PS5,
+                onPlatformClick = {},
+                selectedCategory = null,
+                onCategoryClick = {},
+                results = testGames,
+                onAddRequested = { selectedGame = it },
+                onDetailsRequested = {},
                 isClickEnabled = false
             )
         }
 
         // Act
-        composeTestRule.onAllNodesWithTag(GAME_LIST_ITEM_TAG)[0].performClick()
+        composeTestRule.onAllNodesWithTag(ADD_GAME_BUTTON_TAG)[0].performClick()
 
         // Assert
         assertNull(selectedGame)
@@ -184,7 +225,8 @@ class GameListFromSearchTests {
                 selectedCategory = null,
                 onCategoryClick = {},
                 results = emptyList(),
-                onGameSelected = {},
+                onAddRequested = {},
+                onDetailsRequested = {},
                 isSearching = true
             )
         }
@@ -205,7 +247,8 @@ class GameListFromSearchTests {
                 selectedCategory = null,
                 onCategoryClick = {},
                 results = emptyList(),
-                onGameSelected = {},
+                onAddRequested = {},
+                onDetailsRequested = {},
                 isSearching = false
             )
         }

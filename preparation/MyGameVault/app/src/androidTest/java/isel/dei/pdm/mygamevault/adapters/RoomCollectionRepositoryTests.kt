@@ -15,7 +15,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.time.Duration
+import kotlin.time.Duration.Companion.hours
 import java.time.LocalDate
 
 @RunWith(AndroidJUnit4::class)
@@ -40,7 +40,7 @@ class RoomCollectionRepositoryTests {
         game = testGame,
         platform = Platforms.PS5,
         playStatus = PlayStatus(
-            timeSpent = Duration.ofHours(10),
+            timeSpent = 10.hours,
             state = PlayStatus.State.PLAYING
         )
     )

@@ -1,6 +1,6 @@
 package isel.dei.pdm.mygamevault.domain
 
-import java.time.Duration
+import kotlin.time.Duration
 
 /**
  * Represents the playing status of a game in the collection.
@@ -26,8 +26,8 @@ data class PlayStatus(
     }
 
     init {
-        require(!timeSpent.isNegative) { "Time spent cannot be negative" }
-        require(!(state == State.NONE && !timeSpent.isZero)) {
+        require(!timeSpent.isNegative()) { "Time spent cannot be negative" }
+        require(!(state == State.NONE && timeSpent != Duration.ZERO)) {
             "Time spent must be zero for games in the NONE state"
         }
     }

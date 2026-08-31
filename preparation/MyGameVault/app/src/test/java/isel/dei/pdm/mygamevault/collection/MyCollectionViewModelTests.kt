@@ -33,9 +33,13 @@ class MyCollectionViewModelTests {
 
     private class FakeRepository : CollectionRepository {
         val flow = MutableStateFlow<List<CollectionEntry>>(emptyList())
+        var lastSearchStates: Set<PlayStatus.State>? = null
+        var getLatestCalled = false
+
         // Use a wrapper flow that we can suspend if needed
         var shouldSuspend = false
         override fun getLatest(limit: Int): Flow<List<CollectionEntry>> = flow {
+            getLatestCalled = true
             if (shouldSuspend) delay(1000.milliseconds)
             flow.collect { emit(it) }
         }
@@ -46,7 +50,60 @@ class MyCollectionViewModelTests {
         override fun getCurrentlyPlaying(): Flow<List<CollectionEntry>> = flow
         override fun searchByName(partialName: String, orderBy: CollectionRepository.OrderBy, limit: Int): Flow<List<CollectionEntry>> = flow
         override fun searchByPlatforms(platforms: Set<Platform>, orderBy: CollectionRepository.OrderBy, limit: Int): Flow<List<CollectionEntry>> = flow
-        override fun searchByStates(states: Set<PlayStatus.State>, orderBy: CollectionRepository.OrderBy, limit: Int): Flow<List<CollectionEntry>> = flow
+        override fun searchByStates(states: Set<PlayStatus.State>, orderBy: CollectionRepository.OrderBy, limit: Int): Flow<List<CollectionEntry>> = flow {
+            lastSearchStates = states
+            flow.collect { emit(it) }
+        }
+    }
+
+    @Test
+    fun `changing filter triggers new search with correct states`() = runTest {
+        // Arrange
+        val repository = FakeRepository()
+        val sut = MyCollectionViewModel(repository)
+        runCurrent()
+        assertTrue(repository.getLatestCalled)
+
+        // Act
+        sut.onFilterChange(CollectionFilter.PLAYING)
+        runCurrent()
+
+        // Assert
+        assertEquals(setOf(PlayStatus.State.PLAYING), repository.lastSearchStates)
+        assertEquals(CollectionFilter.PLAYING, sut.state.value.filter)
+    }
+
+    @Test
+    fun `changing filter to Finished triggers search with correct states`() = runTest {
+        // Arrange
+        val repository = FakeRepository()
+        val sut = MyCollectionViewModel(repository)
+        runCurrent()
+
+        // Act
+        sut.onFilterChange(CollectionFilter.FINISHED)
+        runCurrent()
+
+        // Assert
+        assertEquals(
+            setOf(PlayStatus.State.FINISHED, PlayStatus.State.PLATINUM),
+            repository.lastSearchStates
+        )
+    }
+
+    @Test
+    fun `changing filter to Platinum triggers search with correct states`() = runTest {
+        // Arrange
+        val repository = FakeRepository()
+        val sut = MyCollectionViewModel(repository)
+        runCurrent()
+
+        // Act
+        sut.onFilterChange(CollectionFilter.PLATINUM)
+        runCurrent()
+
+        // Assert
+        assertEquals(setOf(PlayStatus.State.PLATINUM), repository.lastSearchStates)
     }
 
     @Test

@@ -28,7 +28,6 @@ import isel.dei.pdm.mygamevault.domain.Platforms
 import isel.dei.pdm.mygamevault.ports.NoConnectivityException
 import isel.dei.pdm.mygamevault.ports.RateLimitExceededException
 import isel.dei.pdm.mygamevault.ports.ServiceUnavailableException
-import isel.dei.pdm.mygamevault.ui.common.GameListFromSearch
 import isel.dei.pdm.mygamevault.ui.theme.MyGameVaultTheme
 import java.time.LocalDate
 
@@ -44,7 +43,8 @@ fun AddGameScreen(
     onQueryChange: (String) -> Unit,
     onPlatformChange: (Platform) -> Unit,
     onCategoryChange: (Game.Category?) -> Unit,
-    onGameSelected: (Game) -> Unit,
+    onAddRequested: (Game) -> Unit,
+    onDetailsRequested: (Game) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -90,7 +90,8 @@ fun AddGameScreen(
                 selectedCategory = state.selectedCategory,
                 onCategoryClick = { categoryMenuExpanded = true },
                 results = state.results,
-                onGameSelected = onGameSelected,
+                onAddRequested = onAddRequested,
+                onDetailsRequested = onDetailsRequested,
                 isSearching = state is AddGameScreenState.Searching,
                 isClickEnabled = state.isClickDetectionEnabled,
                 modifier = Modifier.fillMaxSize()
@@ -156,7 +157,8 @@ fun AddGameScreenIdleInitialPreview() {
             onQueryChange = {},
             onPlatformChange = {},
             onCategoryChange = {},
-            onGameSelected = {}
+            onAddRequested = {},
+            onDetailsRequested = {}
         )
     }
 }
@@ -171,7 +173,8 @@ fun AddGameScreenIdleResultsPreview() {
             onQueryChange = {},
             onPlatformChange = {},
             onCategoryChange = {},
-            onGameSelected = {}
+            onAddRequested = {},
+            onDetailsRequested = {}
         )
     }
 }
@@ -190,7 +193,8 @@ fun AddGameScreenTypingPreview() {
             onQueryChange = {},
             onPlatformChange = {},
             onCategoryChange = {},
-            onGameSelected = {}
+            onAddRequested = {},
+            onDetailsRequested = {}
         )
     }
 }
@@ -209,7 +213,8 @@ fun AddGameScreenSearchingPreview() {
             onQueryChange = {},
             onPlatformChange = {},
             onCategoryChange = {},
-            onGameSelected = {}
+            onAddRequested = {},
+            onDetailsRequested = {}
         )
     }
 }
@@ -229,7 +234,8 @@ fun AddGameScreenErrorPreview() {
             onQueryChange = {},
             onPlatformChange = {},
             onCategoryChange = {},
-            onGameSelected = {}
+            onAddRequested = {},
+            onDetailsRequested = {}
         )
     }
 }

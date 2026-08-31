@@ -1,12 +1,14 @@
 package isel.dei.pdm.mygamevault.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -14,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,7 +59,10 @@ fun AppScaffold(
             val state by myCollectionViewModel.state.collectAsStateWithLifecycle()
             MyCollectionScreen(
                 state = state,
-                onEntrySelected = { /* TODO: Show details */ }
+                onEntrySelected = { entry ->
+                    navigator.navigate(AppRoute.GameDetails(entry.game.id))
+                },
+                onFilterChange = myCollectionViewModel::onFilterChange
             )
         }
         entry<AppRoute.AddGame> {
@@ -68,9 +74,12 @@ fun AppScaffold(
                 onQueryChange = addGameViewModel::onQueryChange,
                 onPlatformChange = addGameViewModel::onPlatformChange,
                 onCategoryChange = addGameViewModel::onCategoryChange,
-                onGameSelected = { game ->
+                onAddRequested = { game ->
                     addGameViewModel.addGame(game, state.selectedPlatform)
                     navigator.navigate(AppRoute.MyCollection)
+                },
+                onDetailsRequested = { game ->
+                    navigator.navigate(AppRoute.GameDetails(game.id))
                 }
             )
         }
@@ -82,6 +91,14 @@ fun AppScaffold(
                 onClientSecretChange = preferencesViewModel::onClientSecretChange,
                 onSave = preferencesViewModel::onSave
             )
+        }
+        entry<AppRoute.GameDetails> { key ->
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    text = "Game Details for ID: ${key.gameId}",
+                    style = MaterialTheme.typography.headlineMedium
+                )
+            }
         }
     }
 

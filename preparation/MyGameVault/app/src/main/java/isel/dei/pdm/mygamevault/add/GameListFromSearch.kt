@@ -1,4 +1,4 @@
-package isel.dei.pdm.mygamevault.ui.common
+package isel.dei.pdm.mygamevault.add
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -56,7 +56,8 @@ internal const val SEARCHING_OVERLAY_TAG = "SearchingOverlay"
  * @param selectedCategory The currently selected category, or null for all.
  * @param onCategoryClick The callback to be invoked when the category selector is clicked.
  * @param results The list of games to display.
- * @param onGameSelected The callback to be invoked when a game is selected.
+ * @param onAddRequested The callback to be invoked when a game is selected to be added.
+ * @param onDetailsRequested The callback to be invoked when a game is selected to view details.
  * @param modifier The modifier to be applied to the layout.
  * @param isSearching Whether a search is currently in progress.
  * @param isClickEnabled Whether clicks on list items are enabled.
@@ -70,7 +71,8 @@ fun GameListFromSearch(
     selectedCategory: Game.Category?,
     onCategoryClick: () -> Unit,
     results: List<Game>,
-    onGameSelected: (Game) -> Unit,
+    onAddRequested: (Game) -> Unit,
+    onDetailsRequested: (Game) -> Unit,
     modifier: Modifier = Modifier,
     isSearching: Boolean = false,
     isClickEnabled: Boolean = true,
@@ -145,9 +147,15 @@ fun GameListFromSearch(
                     items(results) { game ->
                         GameListItem(
                             game = game,
-                            onGameSelected = {
+                            platform = selectedPlatform,
+                            onAddRequested = {
                                 if (isClickEnabled) {
-                                    onGameSelected(game)
+                                    onAddRequested(game)
+                                }
+                            },
+                            onDetailsRequested = {
+                                if (isClickEnabled) {
+                                    onDetailsRequested(game)
                                 }
                             }
                         )
@@ -223,7 +231,8 @@ fun GameListFromSearchPreview() {
                     null
                 )
             ),
-            onGameSelected = {}
+            onAddRequested = {},
+            onDetailsRequested = {}
         )
     }
 }

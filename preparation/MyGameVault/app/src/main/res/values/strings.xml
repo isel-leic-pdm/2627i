@@ -10,6 +10,8 @@
     <string name="released_label">Released: %1$d</string>
 
     <string name="game_cover_description">Cover for %1$s</string>
+    <string name="add_to_collection_description">Add %1$s to collection</string>
+    <string name="view_details_description">View details for %1$s</string>
     <string name="image_placeholder_label">Image</string>
 
     <string name="error_no_connectivity">Please check your internet connection.</string>
@@ -28,5 +30,15 @@
 
     <string name="my_collection_header">My Collection</string>
     <string name="collection_empty_message">Your collection is empty.</string>
+    <string name="collection_filter_latest">Latest</string>
     <string name="added_on_label">Added on: %1$s</string>
+    <string name="hours_spent_label">%1$d h</string>
+
+    <string name="status_backlog">Backlog</string>
+    <string name="status_playing">Playing</string>
+    <string name="status_finished">Finished</string>
+    <string name="status_platinum">Platinum</string>
+    <string name="status_paused">Paused</string>
+    <string name="status_dropped">Dropped</string>
+    <string name="status_none">None</string>
 </resources>
