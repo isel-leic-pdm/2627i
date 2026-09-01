@@ -49,7 +49,7 @@ class IgdbSearchService(
         val whereClause = buildString {
             append("where platforms = (${platform.toIgdbId()})")
             if (category != null) {
-                append(" & category = (${category.toIgdbId()})")
+                append(" & game_type = ${category.toIgdbId()}")
             }
             append(" & name ~ \"$partialName\"*")
         }

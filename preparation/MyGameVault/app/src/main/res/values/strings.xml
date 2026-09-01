@@ -13,6 +13,7 @@
     <string name="add_to_collection_description">Add %1$s to collection</string>
     <string name="view_details_description">View details for %1$s</string>
     <string name="image_placeholder_label">Image</string>
+    <string name="image_not_available">Image not available</string>
 
     <string name="error_no_connectivity">Please check your internet connection.</string>
     <string name="error_service_unavailable">Service is currently unavailable. Try again later.</string>
@@ -29,7 +30,7 @@
     <string name="preferences_hide_secret">Hide secret</string>
 
     <string name="my_collection_header">My Collection</string>
-    <string name="collection_empty_message">Your collection is empty.</string>
+    <string name="collection_empty_message">Nothing to see here.</string>
     <string name="collection_filter_latest">Latest</string>
     <string name="added_on_label">Added on: %1$s</string>
     <string name="hours_spent_label">%1$d h</string>

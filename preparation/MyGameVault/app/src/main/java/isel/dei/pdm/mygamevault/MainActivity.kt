@@ -5,10 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.CompositionLocalProvider
 import isel.dei.pdm.mygamevault.add.AddGameViewModel
 import isel.dei.pdm.mygamevault.collection.MyCollectionViewModel
 import isel.dei.pdm.mygamevault.preferences.PreferencesViewModel
 import isel.dei.pdm.mygamevault.ui.AppScaffold
+import isel.dei.pdm.mygamevault.ui.common.LocalImageLoader
 import isel.dei.pdm.mygamevault.ui.theme.MyGameVaultTheme
 
 class MainActivity : ComponentActivity() {
@@ -23,6 +25,10 @@ class MainActivity : ComponentActivity() {
 
     private val collectionRepository by lazy {
         (application as DependenciesContainer).collectionRepository
+    }
+
+    private val imageLoader by lazy {
+        (application as DependenciesContainer).imageLoader
     }
 
     private val addGameViewModel by viewModels<AddGameViewModel> {
@@ -41,12 +47,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MyGameVaultTheme {
-                AppScaffold(
-                    addGameViewModel = addGameViewModel,
-                    preferencesViewModel = preferencesViewModel,
-                    myCollectionViewModel = myCollectionViewModel
-                )
+            CompositionLocalProvider(LocalImageLoader provides imageLoader) {
+                MyGameVaultTheme {
+                    AppScaffold(
+                        addGameViewModel = addGameViewModel,
+                        preferencesViewModel = preferencesViewModel,
+                        myCollectionViewModel = myCollectionViewModel
+                    )
+                }
             }
         }
     }

@@ -68,7 +68,7 @@ fun CollectionEntryItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
-                model = entry.game.thumbnailUri ?: entry.game.coverUri,
+                uri = entry.game.thumbnailUri ?: entry.game.coverUri,
                 contentDescription = stringResource(R.string.game_cover_description, entry.game.name()),
                 modifier = Modifier
                     .size(80.dp)

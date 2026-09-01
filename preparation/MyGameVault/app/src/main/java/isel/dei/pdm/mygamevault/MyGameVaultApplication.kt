@@ -15,7 +15,10 @@ import isel.dei.pdm.mygamevault.ports.SecretsRepository
 import isel.dei.pdm.mygamevault.adapters.DataStoreSecretsRepository
 import isel.dei.pdm.mygamevault.adapters.IgdbSearchService
 import isel.dei.pdm.mygamevault.adapters.RoomCollectionRepository
+import isel.dei.pdm.mygamevault.adapters.createCachedImageLoader
+import isel.dei.pdm.mygamevault.adapters.createIgdbImageLoader
 import isel.dei.pdm.mygamevault.adapters.db.GameDatabase
+import isel.dei.pdm.mygamevault.ui.common.ImageLoader
 import kotlinx.serialization.json.Json
 
 private const val PREFERENCES_DATA_STORE_NAME = "preferences"
@@ -53,8 +56,16 @@ class MyGameVaultApplication : Application(), DependenciesContainer {
         RoomCollectionRepository(database.gameDao())
     }
 
+    override val imageLoader: ImageLoader by lazy {
+        createCachedImageLoader(
+            decorated = createIgdbImageLoader(createIgdbHttpClient(), secretsRepository),
+            maxEntries = 100
+        )
+
+    }
+
     companion object {
-        const val APP_TAG = "MyGameVault"
+        const val APP_TAG = "MyGameVaultApp"
 
         /**
          * Builds a log tag for the given component name following the project convention.

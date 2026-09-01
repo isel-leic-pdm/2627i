@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -31,7 +32,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @OptIn(FlowPreview::class)
 class AddGameViewModel(
     private val searchService: SearchService,
-    private val collectionRepository: CollectionRepository
+    private val collectionRepository: CollectionRepository,
 ) : ViewModel() {
 
     private val _query = MutableStateFlow("")
@@ -49,16 +50,21 @@ class AddGameViewModel(
     init {
         // Observe changes with a debounce timeout
         viewModelScope.launch {
-            combine(_query, _selectedPlatform, _selectedCategory) { q, p, c ->
-                Triple(q, p, c)
+            combine(_query, _selectedPlatform, _selectedCategory) {
+                query, platform, category -> Triple(query, platform, category)
             }
                 .debounce(SEARCH_DEBOUNCE_MS.milliseconds)
-                .collectLatest { (q, p, c) ->
-                    val nonBlankQuery = q.toNonBlankStringOrNull()
+                .collectLatest { (query, platform, category) ->
+                    val nonBlankQuery = query.toNonBlankStringOrNull()
                     if (nonBlankQuery == null) {
-                        _state.value = AddGameScreenState.Idle(null, emptyList(), p, c)
+                        _state.value = AddGameScreenState.Idle(
+                            sourceQuery = null,
+                            results = emptyList(),
+                            selectedPlatform = platform,
+                            selectedCategory = category
+                        )
                     } else {
-                        performSearch(nonBlankQuery, p, c)
+                        performSearch(nonBlankQuery, platform, category)
                     }
                 }
         }
@@ -121,8 +127,15 @@ class AddGameViewModel(
         }
     }
 
-    private suspend fun performSearch(partialName: NonBlankString, platform: Platform, category: Game.Category?) {
-        Log.d(TAG, "performSearch: partialName = \"$partialName\", platform = $platform, category = $category")
+    private suspend fun performSearch(
+        partialName: NonBlankString,
+        platform: Platform,
+        category: Game.Category?,
+    ) {
+        Log.d(
+            TAG,
+            "performSearch: partialName = \"$partialName\", platform = $platform, category = $category"
+        )
         _state.value = AddGameScreenState.Searching(_state.value.results, platform, category)
         searchService
             .search(partialName, platform, category)
@@ -158,7 +171,7 @@ class AddGameViewModel(
                 collectionRepository.save(CollectionEntry(game, platform))
                 Log.d(TAG, "addGame: successfully saved game ${game.id}")
             } catch (e: Exception) {
-                if (e is kotlinx.coroutines.CancellationException) throw e
+                if (e is CancellationException) throw e
                 Log.e(TAG, "addGame: error saving game", e)
                 _state.value = AddGameScreenState.Error(
                     error = UnexpectedServiceException("Could not add game to collection", e),
@@ -174,11 +187,12 @@ class AddGameViewModel(
         val TAG = MyGameVaultApplication.buildTag("AddGameViewModel")
         const val SEARCH_DEBOUNCE_MS = 2000L
 
-        fun factory(searchService: SearchService, collectionRepository: CollectionRepository) = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return AddGameViewModel(searchService, collectionRepository) as T
+        fun factory(searchService: SearchService, collectionRepository: CollectionRepository) =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return AddGameViewModel(searchService, collectionRepository) as T
+                }
             }
-        }
     }
 }

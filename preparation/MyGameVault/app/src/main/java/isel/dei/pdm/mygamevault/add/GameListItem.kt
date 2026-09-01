@@ -77,7 +77,7 @@ fun GameListItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
-                model = game.thumbnailUri ?: game.coverUri,
+                uri = game.thumbnailUri ?: game.coverUri,
                 contentDescription = stringResource(R.string.game_cover_description, game.name()),
                 modifier = Modifier
                     .size(80.dp)

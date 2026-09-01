@@ -8,6 +8,7 @@ import isel.dei.pdm.mygamevault.domain.CollectionEntry
 import isel.dei.pdm.mygamevault.domain.Game
 import isel.dei.pdm.mygamevault.domain.Platforms
 import isel.dei.pdm.mygamevault.domain.PlayStatus
+import isel.dei.pdm.mygamevault.setTestContent
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -39,7 +40,7 @@ class CollectionEntryItemTests {
     @Test
     fun collectionEntryItem_displaysInformation() {
         // Arrange
-        composeTestRule.setContent {
+        composeTestRule.setTestContent {
             CollectionEntryItem(
                 entry = testEntry,
                 onClick = {}
@@ -57,7 +58,7 @@ class CollectionEntryItemTests {
     fun collectionEntryItem_whenClicked_invokesOnClick() {
         // Arrange
         var clicked = false
-        composeTestRule.setContent {
+        composeTestRule.setTestContent {
             CollectionEntryItem(
                 entry = testEntry,
                 onClick = { clicked = true }

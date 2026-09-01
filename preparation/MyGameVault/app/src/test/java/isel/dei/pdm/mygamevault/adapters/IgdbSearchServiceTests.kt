@@ -73,6 +73,30 @@ class IgdbSearchServiceTests {
     }
 
     @Test
+    fun `search with category sends correct body`() = runTest {
+        // Arrange
+        var capturedRequestContent = ""
+        val mockEngine = MockEngine { request ->
+            capturedRequestContent = request.body.toByteArray().decodeToString()
+            respond(
+                content = "[]",
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+        val httpClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
+        }
+        val service = IgdbSearchService(httpClient, FakeSecretsRepository("id", "token"))
+
+        // Act
+        service.search(NonBlankString("Elden"), Platforms.PS5, Game.Category.MAIN_GAME)
+
+        // Assert
+        assertTrue("Query should contain game_type", capturedRequestContent.contains("& game_type = 0"))
+    }
+
+    @Test
     fun `search returns mapped games when API succeeds`() = runTest {
         // Arrange
         val mockEngine = MockEngine { _ ->

@@ -11,6 +11,7 @@ import androidx.compose.ui.test.performTextInput
 import isel.dei.pdm.mygamevault.domain.Game
 import isel.dei.pdm.mygamevault.domain.NonBlankString
 import isel.dei.pdm.mygamevault.domain.Platforms
+import isel.dei.pdm.mygamevault.setTestContent
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
@@ -33,7 +34,7 @@ class AddGameScreenTests {
     fun onAddRequested_whenSearching_isNotInvoked() {
         // Arrange
         var selectedGame: Game? = null
-        composeTestRule.setContent {
+        composeTestRule.setTestContent {
             AddGameScreen(
                 state = AddGameScreenState.Searching(
                     results = listOf(testGame),
@@ -60,7 +61,7 @@ class AddGameScreenTests {
     fun onDetailsRequested_whenSearching_isNotInvoked() {
         // Arrange
         var selectedGame: Game? = null
-        composeTestRule.setContent {
+        composeTestRule.setTestContent {
             AddGameScreen(
                 state = AddGameScreenState.Searching(
                     results = listOf(testGame),
@@ -86,7 +87,7 @@ class AddGameScreenTests {
     @Test
     fun searchingOverlay_whenSearching_isDisplayed() {
         // Act
-        composeTestRule.setContent {
+        composeTestRule.setTestContent {
             AddGameScreen(
                 state = AddGameScreenState.Searching(
                     results = emptyList(),
@@ -110,7 +111,7 @@ class AddGameScreenTests {
     fun onQueryChange_whenTyping_isInvoked() {
         // Arrange
         var query = ""
-        composeTestRule.setContent {
+        composeTestRule.setTestContent {
             AddGameScreen(
                 state = AddGameScreenState.Idle(),
                 searchQuery = query,
@@ -138,7 +139,7 @@ class AddGameScreenTests {
         )
 
         // Act
-        composeTestRule.setContent {
+        composeTestRule.setTestContent {
             AddGameScreen(
                 state = AddGameScreenState.Idle(results = games),
                 searchQuery = "",

@@ -9,6 +9,7 @@ import isel.dei.pdm.mygamevault.domain.CollectionEntry
 import isel.dei.pdm.mygamevault.domain.Game
 import isel.dei.pdm.mygamevault.domain.Platforms
 import isel.dei.pdm.mygamevault.domain.PlayStatus
+import isel.dei.pdm.mygamevault.setTestContent
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -29,7 +30,7 @@ class MyCollectionScreenTests {
     @Test
     fun myCollectionScreen_whenLoading_displaysLoadingIndicator() {
         // Act
-        composeTestRule.setContent {
+        composeTestRule.setTestContent {
             MyCollectionScreen(
                 state = MyCollectionScreenState.Loading(),
                 onEntrySelected = {},
@@ -44,7 +45,7 @@ class MyCollectionScreenTests {
     @Test
     fun myCollectionScreen_whenIdleAndNotEmpty_displaysList() {
         // Act
-        composeTestRule.setContent {
+        composeTestRule.setTestContent {
             MyCollectionScreen(
                 state = MyCollectionScreenState.Idle(listOf(sampleEntry)),
                 onEntrySelected = {},
@@ -60,7 +61,7 @@ class MyCollectionScreenTests {
     @Test
     fun myCollectionScreen_whenIdleAndEmpty_displaysEmptyMessage() {
         // Act
-        composeTestRule.setContent {
+        composeTestRule.setTestContent {
             MyCollectionScreen(
                 state = MyCollectionScreenState.Idle(emptyList()),
                 onEntrySelected = {},
@@ -69,14 +70,14 @@ class MyCollectionScreenTests {
         }
 
         // Assert
-        composeTestRule.onNodeWithText("Your collection is empty", substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Nothing to see here.", substring = true).assertIsDisplayed()
     }
 
     @Test
     fun myCollectionScreen_whenFilterClicked_invokesOnFilterChange() {
         // Arrange
         var selectedFilter: CollectionFilter? = null
-        composeTestRule.setContent {
+        composeTestRule.setTestContent {
             MyCollectionScreen(
                 state = MyCollectionScreenState.Idle(emptyList()),
                 onEntrySelected = {},
@@ -95,7 +96,7 @@ class MyCollectionScreenTests {
     fun myCollectionScreen_whenEntryClicked_invokesOnEntrySelected() {
         // Arrange
         var selectedEntry: CollectionEntry? = null
-        composeTestRule.setContent {
+        composeTestRule.setTestContent {
             MyCollectionScreen(
                 state = MyCollectionScreenState.Idle(listOf(sampleEntry)),
                 onEntrySelected = { selectedEntry = it },
