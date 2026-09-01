@@ -17,6 +17,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -54,6 +55,13 @@ class MyCollectionViewModelTests {
             lastSearchStates = states
             flow.collect { emit(it) }
         }
+    }
+
+    @Test
+    fun `initialization does not crash`() = runTest {
+        val repository = FakeRepository()
+        val sut = MyCollectionViewModel(repository)
+        assertNotNull(sut.state)
     }
 
     @Test

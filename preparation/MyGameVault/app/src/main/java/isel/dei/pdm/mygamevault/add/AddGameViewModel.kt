@@ -10,11 +10,11 @@ import isel.dei.pdm.mygamevault.domain.Game
 import isel.dei.pdm.mygamevault.domain.NonBlankString
 import isel.dei.pdm.mygamevault.domain.Platform
 import isel.dei.pdm.mygamevault.domain.Platforms
+import isel.dei.pdm.mygamevault.domain.toNonBlankStringOrNull
 import isel.dei.pdm.mygamevault.ports.CollectionRepository
 import isel.dei.pdm.mygamevault.ports.SearchService
 import isel.dei.pdm.mygamevault.ports.SearchServiceException
 import isel.dei.pdm.mygamevault.ports.UnexpectedServiceException
-import isel.dei.pdm.mygamevault.domain.toNonBlankStringOrNull
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
