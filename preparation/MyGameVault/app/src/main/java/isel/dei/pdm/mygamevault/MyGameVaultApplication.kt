@@ -15,7 +15,7 @@ import isel.dei.pdm.mygamevault.ports.SecretsRepository
 import isel.dei.pdm.mygamevault.adapters.DataStoreSecretsRepository
 import isel.dei.pdm.mygamevault.adapters.IgdbSearchService
 import isel.dei.pdm.mygamevault.adapters.RoomCollectionRepository
-import isel.dei.pdm.mygamevault.adapters.createCachedImageLoader
+import isel.dei.pdm.mygamevault.adapters.createFileCachedImageLoader
 import isel.dei.pdm.mygamevault.adapters.createIgdbImageLoader
 import isel.dei.pdm.mygamevault.adapters.db.GameDatabase
 import isel.dei.pdm.mygamevault.ui.common.ImageLoader
@@ -57,11 +57,11 @@ class MyGameVaultApplication : Application(), DependenciesContainer {
     }
 
     override val imageLoader: ImageLoader by lazy {
-        createCachedImageLoader(
+        createFileCachedImageLoader(
+            context = applicationContext,
             decorated = createIgdbImageLoader(createIgdbHttpClient(), secretsRepository),
             maxEntries = 100
         )
-
     }
 
     companion object {
