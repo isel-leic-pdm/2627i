@@ -29,7 +29,7 @@ class PreferencesScreenTests {
         composeTestRule.setContent {
             MyGameVaultTheme {
                 var state by remember { mutableStateOf<PreferencesScreenState>(PreferencesScreenState.Original()) }
-                PreferencesScreen(
+                PreferencesScreenView(
                     state = state,
                     onClientIdChange = { 
                         capturedId = it
@@ -57,7 +57,7 @@ class PreferencesScreenTests {
     fun saveButton_whenOriginalState_isDisabled() {
         composeTestRule.setContent {
             MyGameVaultTheme {
-                PreferencesScreen(
+                PreferencesScreenView(
                     state = PreferencesScreenState.Original("id", "secret"),
                     onClientIdChange = {},
                     onClientSecretChange = {},
@@ -72,7 +72,7 @@ class PreferencesScreenTests {
     fun saveButton_whenModifiedAndValidState_isEnabled() {
         composeTestRule.setContent {
             MyGameVaultTheme {
-                PreferencesScreen(
+                PreferencesScreenView(
                     state = PreferencesScreenState.Modified("new-id", "secret"),
                     onClientIdChange = {},
                     onClientSecretChange = {},
@@ -87,7 +87,7 @@ class PreferencesScreenTests {
     fun saveButton_whenModifiedAndInvalidState_isDisabled() {
         composeTestRule.setContent {
             MyGameVaultTheme {
-                PreferencesScreen(
+                PreferencesScreenView(
                     state = PreferencesScreenState.Modified("", "secret"),
                     onClientIdChange = {},
                     onClientSecretChange = {},
@@ -104,7 +104,7 @@ class PreferencesScreenTests {
         var saveClicked = false
         composeTestRule.setContent {
             MyGameVaultTheme {
-                PreferencesScreen(
+                PreferencesScreenView(
                     state = PreferencesScreenState.Modified("new-id", "secret"),
                     onClientIdChange = {},
                     onClientSecretChange = {},

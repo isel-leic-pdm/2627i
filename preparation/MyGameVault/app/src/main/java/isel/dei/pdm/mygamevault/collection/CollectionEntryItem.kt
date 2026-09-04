@@ -22,8 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,6 +32,7 @@ import isel.dei.pdm.mygamevault.domain.CollectionEntry
 import isel.dei.pdm.mygamevault.domain.Game
 import isel.dei.pdm.mygamevault.domain.Platforms
 import isel.dei.pdm.mygamevault.domain.PlayStatus
+import isel.dei.pdm.mygamevault.domain.toPlayTime
 import isel.dei.pdm.mygamevault.ui.common.AsyncImage
 import isel.dei.pdm.mygamevault.ui.common.PlayStatusTag
 import isel.dei.pdm.mygamevault.ui.theme.MyGameVaultTheme
@@ -96,7 +97,7 @@ fun CollectionEntryItem(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                
+
                 Spacer(modifier = Modifier.size(8.dp))
 
                 Row(
@@ -104,7 +105,7 @@ fun CollectionEntryItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     PlayStatusTag(state = entry.playStatus.state)
-                    val hours = entry.playStatus.timeSpent.inWholeHours
+                    val hours = entry.playStatus.timeSpent.hours
                     if (hours > 0) {
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
@@ -125,6 +126,7 @@ fun CollectionEntryItem(
     }
 }
 
+
 @Preview(showBackground = true, name = "Playing State")
 @Composable
 fun CollectionEntryItemPlayingPreview() {
@@ -133,7 +135,7 @@ fun CollectionEntryItemPlayingPreview() {
         platform = Platforms.PS5,
         playStatus = PlayStatus(
             state = PlayStatus.State.PLAYING,
-            timeSpent = 45.hours
+            timeSpent = 45.hours.toPlayTime()
         ),
         addedAt = LocalDate.now()
     )
@@ -153,7 +155,8 @@ fun CollectionEntryItemFinishedPreview() {
         platform = Platforms.SWITCH,
         playStatus = PlayStatus(
             state = PlayStatus.State.FINISHED,
-            timeSpent = 120.hours
+            timeSpent = 120.hours.toPlayTime(),
+            completedRuns = 1
         ),
         addedAt = LocalDate.of(2023, 6, 1)
     )

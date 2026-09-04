@@ -7,13 +7,13 @@ sealed class PersistenceException(message: String? = null, cause: Throwable? = n
     Exception(message, cause)
 
 /**
- * Thrown when an error occurs while accessing the local storage.
+ * Thrown when an error occurs while accessing the local storage and it is considered fatal.
  */
-class StorageAccessException(message: String? = null, cause: Throwable? = null) :
+class UnrecoverablePersistenceException(message: String? = null, cause: Throwable? = null) :
     PersistenceException(message, cause)
 
 /**
- * Thrown when an unexpected error occurs during a persistence operation.
+ * Thrown when a persistence error occurs that might be recoverable (e.g. temporary lock).
  */
-class UnexpectedPersistenceException(message: String? = null, cause: Throwable? = null) :
+class RecoverablePersistenceException(message: String? = null, cause: Throwable? = null) :
     PersistenceException(message, cause)

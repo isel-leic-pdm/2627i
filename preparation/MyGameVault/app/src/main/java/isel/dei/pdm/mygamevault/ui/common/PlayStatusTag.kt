@@ -22,7 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import isel.dei.pdm.mygamevault.R
 import isel.dei.pdm.mygamevault.domain.PlayStatus
@@ -40,11 +42,15 @@ import isel.dei.pdm.mygamevault.ui.theme.StatusPlaying
  *
  * @param state The play status state to display.
  * @param modifier The modifier to be applied to the layout.
+ * @param textStyle The text style to be used for the label.
+ * @param iconSize The size of the icon.
  */
 @Composable
 fun PlayStatusTag(
     state: PlayStatus.State,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = MaterialTheme.typography.labelSmall,
+    iconSize: Dp = 16.dp
 ) {
     val (icon, color, labelRes) = when (state) {
         PlayStatus.State.BACKLOG -> Triple(Icons.Default.Inventory2, StatusBacklog, R.string.status_backlog)
@@ -69,12 +75,12 @@ fun PlayStatusTag(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(iconSize)
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = stringResource(labelRes),
-                style = MaterialTheme.typography.labelSmall
+                style = textStyle
             )
         }
     }

@@ -29,6 +29,7 @@ class GameDaoTests {
                 platformId = 1,
                 timeSpentSeconds = 0,
                 state = PlayStatus.State.BACKLOG,
+                completedRuns = 0,
                 addedAt = i.toLong() // Use i as a simple timestamp
             )
             dbRule.dao.upsertGame(game)

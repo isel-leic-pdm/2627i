@@ -35,7 +35,7 @@ class AddGameScreenTests {
         // Arrange
         var selectedGame: Game? = null
         composeTestRule.setTestContent {
-            AddGameScreen(
+            AddGameScreenView(
                 state = AddGameScreenState.Searching(
                     results = listOf(testGame),
                     selectedPlatform = Platforms.PS5,
@@ -46,7 +46,8 @@ class AddGameScreenTests {
                 onPlatformChange = {},
                 onCategoryChange = {},
                 onAddRequested = { selectedGame = it },
-                onDetailsRequested = {}
+                onDetailsRequested = {},
+                onRecoverableErrorConsumed = {}
             )
         }
 
@@ -62,7 +63,7 @@ class AddGameScreenTests {
         // Arrange
         var selectedGame: Game? = null
         composeTestRule.setTestContent {
-            AddGameScreen(
+            AddGameScreenView(
                 state = AddGameScreenState.Searching(
                     results = listOf(testGame),
                     selectedPlatform = Platforms.PS5,
@@ -73,7 +74,8 @@ class AddGameScreenTests {
                 onPlatformChange = {},
                 onCategoryChange = {},
                 onAddRequested = {},
-                onDetailsRequested = { selectedGame = it }
+                onDetailsRequested = { selectedGame = it },
+                onRecoverableErrorConsumed = {}
             )
         }
 
@@ -88,7 +90,7 @@ class AddGameScreenTests {
     fun searchingOverlay_whenSearching_isDisplayed() {
         // Act
         composeTestRule.setTestContent {
-            AddGameScreen(
+            AddGameScreenView(
                 state = AddGameScreenState.Searching(
                     results = emptyList(),
                     selectedPlatform = Platforms.PS5,
@@ -99,7 +101,8 @@ class AddGameScreenTests {
                 onPlatformChange = {},
                 onCategoryChange = {},
                 onAddRequested = {},
-                onDetailsRequested = {}
+                onDetailsRequested = {},
+                onRecoverableErrorConsumed = {}
             )
         }
 
@@ -112,14 +115,15 @@ class AddGameScreenTests {
         // Arrange
         var query = ""
         composeTestRule.setTestContent {
-            AddGameScreen(
+            AddGameScreenView(
                 state = AddGameScreenState.Idle(),
                 searchQuery = query,
                 onQueryChange = { query = it },
                 onPlatformChange = {},
                 onCategoryChange = {},
                 onAddRequested = {},
-                onDetailsRequested = {}
+                onDetailsRequested = {},
+                onRecoverableErrorConsumed = {}
             )
         }
 
@@ -140,14 +144,15 @@ class AddGameScreenTests {
 
         // Act
         composeTestRule.setTestContent {
-            AddGameScreen(
+            AddGameScreenView(
                 state = AddGameScreenState.Idle(results = games),
                 searchQuery = "",
                 onQueryChange = {},
                 onPlatformChange = {},
                 onCategoryChange = {},
                 onAddRequested = {},
-                onDetailsRequested = {}
+                onDetailsRequested = {},
+                onRecoverableErrorConsumed = {}
             )
         }
 

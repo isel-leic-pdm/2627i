@@ -9,7 +9,11 @@ import isel.dei.pdm.mygamevault.domain.CollectionEntry
 import isel.dei.pdm.mygamevault.domain.Platform
 import isel.dei.pdm.mygamevault.domain.PlayStatus
 import isel.dei.pdm.mygamevault.ports.CollectionRepository
-import isel.dei.pdm.mygamevault.ports.UnexpectedPersistenceException
+import isel.dei.pdm.mygamevault.ports.RecoverablePersistenceException
+import isel.dei.pdm.mygamevault.ports.UnrecoverablePersistenceException
+import android.database.sqlite.SQLiteDatabaseLockedException
+import android.database.sqlite.SQLiteFullException
+import android.database.sqlite.SQLiteTableLockedException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -37,7 +41,7 @@ internal class RoomCollectionRepository(
         } catch (e: Exception) {
             if (e is kotlinx.coroutines.CancellationException) throw e
             Log.e(TAG, "save: error occurred", e)
-            throw UnexpectedPersistenceException("Error saving entry", e)
+            throw mapToPersistenceException("Error saving entry", e)
         }
     }
 
@@ -49,7 +53,7 @@ internal class RoomCollectionRepository(
         } catch (e: Exception) {
             if (e is kotlinx.coroutines.CancellationException) throw e
             Log.e(TAG, "delete: error occurred", e)
-            throw UnexpectedPersistenceException("Error deleting entry", e)
+            throw mapToPersistenceException("Error deleting entry", e)
         }
     }
 
@@ -62,7 +66,7 @@ internal class RoomCollectionRepository(
         } catch (e: Exception) {
             if (e is kotlinx.coroutines.CancellationException) throw e
             Log.e(TAG, "get: error occurred", e)
-            throw UnexpectedPersistenceException("Error getting entry", e)
+            throw mapToPersistenceException("Error getting entry", e)
         }
     }
 
@@ -114,5 +118,15 @@ internal class RoomCollectionRepository(
                         }
                     }
             )
+    }
+
+    private fun mapToPersistenceException(message: String, e: Exception) = when (e) {
+        is SQLiteDatabaseLockedException,
+        is SQLiteTableLockedException,
+        is SQLiteFullException,
+        is android.database.sqlite.SQLiteOutOfMemoryException ->
+            RecoverablePersistenceException(message, e)
+
+        else -> UnrecoverablePersistenceException(message, e)
     }
 }

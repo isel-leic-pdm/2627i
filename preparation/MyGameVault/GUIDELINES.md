@@ -27,11 +27,21 @@ To preserve the pedagogical value of this project, **do not introduce advanced p
   * Navigation keys are defined as `sealed class` hierarchies annotated with `@Serializable`.
   * Screens are provided via a `NavDisplay` and an `entryProvider`.
   * Screen-specific ViewModels are scoped to the `NavEntry`.
+* **Screen/View Pattern**: Every logical screen must be divided into two distinct layers to ensure a clean separation between interaction logic and UI layout.
+    * **Screen Layer (`XScreen.kt`)**: A high-level @Composable that manages interactions with the `ViewModel`. It is responsible for:
+        * Collecting state using `collectAsStateWithLifecycle()`.
+        * Managing side effects (e.g., `LaunchedEffect` for initial data fetch).
+        * Wiring UI events to ViewModel functions.
+        * Passing the immutable state and simplified callbacks to the View layer.
+    * **View Layer (`XScreenView.kt`)**: A pure, stateless @Composable that defines the UI layout. It must:
+        * Receive its data as an immutable state object.
+        * Expose simple lambda callbacks for all user interactions.
+        * Have no knowledge of ViewModels or repositories.
+        * Contain all internal helper composables (e.g., section headers, specialized list items) unless they are designed for project-wide reuse.
 * Clear separation of concerns between UI and business logic.
 
 ### Prohibited Patterns (Do NOT use yet):
 * **No Dependency Injection (Hilt/Koin)**: Use manual instantiation or basic factories.
-* **No Data Persistence (Room)**: Use in-memory collections.
 * **No Legacy Navigation**: Do not add new Activities for screens or use manual Activity switching.
 
 ## 3. Coding Style

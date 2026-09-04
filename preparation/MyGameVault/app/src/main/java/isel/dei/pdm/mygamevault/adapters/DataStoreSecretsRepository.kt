@@ -6,10 +6,10 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import isel.dei.pdm.mygamevault.MyGameVaultApplication
+import isel.dei.pdm.mygamevault.ports.RecoverablePersistenceException
 import isel.dei.pdm.mygamevault.ports.Secrets
 import isel.dei.pdm.mygamevault.ports.SecretsRepository
-import isel.dei.pdm.mygamevault.ports.StorageAccessException
-import isel.dei.pdm.mygamevault.ports.UnexpectedPersistenceException
+import isel.dei.pdm.mygamevault.ports.UnrecoverablePersistenceException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -52,10 +52,10 @@ class DataStoreSecretsRepository(
         Result.success(Unit)
     } catch (e: IOException) {
         Log.e(TAG, "saveSecrets: Storage access error occurred", e)
-        Result.failure(StorageAccessException("Failed to access local storage", e))
+        Result.failure(RecoverablePersistenceException("Failed to access local storage", e))
     } catch (e: Exception) {
         if (e is CancellationException) throw e
         Log.wtf(TAG, "saveSecrets: Unexpected error occurred", e)
-        Result.failure(UnexpectedPersistenceException("Unexpected error during save", e))
+        Result.failure(UnrecoverablePersistenceException("Unexpected error during save", e))
     }
 }

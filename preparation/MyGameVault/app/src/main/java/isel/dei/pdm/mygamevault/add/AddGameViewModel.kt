@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import isel.dei.pdm.mygamevault.MyGameVaultApplication
+import isel.dei.pdm.mygamevault.R
 import isel.dei.pdm.mygamevault.domain.CollectionEntry
 import isel.dei.pdm.mygamevault.domain.Game
 import isel.dei.pdm.mygamevault.domain.NonBlankString
@@ -12,9 +13,14 @@ import isel.dei.pdm.mygamevault.domain.Platform
 import isel.dei.pdm.mygamevault.domain.Platforms
 import isel.dei.pdm.mygamevault.domain.toNonBlankStringOrNull
 import isel.dei.pdm.mygamevault.ports.CollectionRepository
+import isel.dei.pdm.mygamevault.ports.NoConnectivityException
+import isel.dei.pdm.mygamevault.ports.RateLimitExceededException
+import isel.dei.pdm.mygamevault.ports.RecoverablePersistenceException
 import isel.dei.pdm.mygamevault.ports.SearchService
 import isel.dei.pdm.mygamevault.ports.SearchServiceException
+import isel.dei.pdm.mygamevault.ports.ServiceUnavailableException
 import isel.dei.pdm.mygamevault.ports.UnexpectedServiceException
+import isel.dei.pdm.mygamevault.ports.UnrecoverablePersistenceException
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -149,15 +155,37 @@ class AddGameViewModel(
                     )
                 },
                 onFailure = { error ->
-                    _state.value = AddGameScreenState.Error(
-                        error = error as SearchServiceException,
-                        previousResults = _state.value.results,
-                        selectedPlatform = platform,
-                        selectedCategory = category
-                    )
+                    val serviceError = error as SearchServiceException
+                    if (isRecoverable(serviceError)) {
+                        val msgId = when (serviceError) {
+                            is NoConnectivityException -> R.string.error_no_connectivity
+                            is ServiceUnavailableException -> R.string.error_service_unavailable
+                            is RateLimitExceededException -> R.string.error_rate_limit
+                            else -> R.string.error_generic
+                        }
+                        _state.value = AddGameScreenState.Idle(
+                            sourceQuery = partialName.value,
+                            results = _state.value.results,
+                            selectedPlatform = platform,
+                            selectedCategory = category,
+                            recoverableErrorMsgId = msgId
+                        )
+                    } else {
+                        _state.value = AddGameScreenState.Error(
+                            error = serviceError,
+                            previousResults = _state.value.results,
+                            selectedPlatform = platform,
+                            selectedCategory = category
+                        )
+                    }
                 }
             )
     }
+
+    private fun isRecoverable(error: SearchServiceException): Boolean =
+        error is NoConnectivityException ||
+        error is ServiceUnavailableException ||
+        error is RateLimitExceededException
 
     /**
      * Adds a game to the collection on the specified platform.
@@ -170,16 +198,50 @@ class AddGameViewModel(
             try {
                 collectionRepository.save(CollectionEntry(game, platform))
                 Log.d(TAG, "addGame: successfully saved game ${game.id}")
-            } catch (e: Exception) {
-                if (e is CancellationException) throw e
-                Log.e(TAG, "addGame: error saving game", e)
+            } catch (e: RecoverablePersistenceException) {
+                Log.e(TAG, "addGame: recoverable error saving game", e)
+                updateRecoverableError(R.string.error_storage_save_failed)
+            } catch (e: UnrecoverablePersistenceException) {
+                Log.e(TAG, "addGame: fatal error saving game", e)
                 _state.value = AddGameScreenState.Error(
                     error = UnexpectedServiceException("Could not add game to collection", e),
                     previousResults = _state.value.results,
                     selectedPlatform = _state.value.selectedPlatform,
                     selectedCategory = _state.value.selectedCategory
                 )
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                Log.e(TAG, "addGame: unexpected error saving game", e)
+                _state.value = AddGameScreenState.Error(
+                    error = UnexpectedServiceException("An unexpected error occurred", e),
+                    previousResults = _state.value.results,
+                    selectedPlatform = _state.value.selectedPlatform,
+                    selectedCategory = _state.value.selectedCategory
+                )
             }
+        }
+    }
+
+    /**
+     * Clears the current recoverable error.
+     */
+    fun onRecoverableErrorConsumed() {
+        updateRecoverableError(null)
+    }
+
+    private fun updateRecoverableError(msgId: Int?) {
+        val current = _state.value
+        _state.value = when (current) {
+            is AddGameScreenState.Idle -> AddGameScreenState.Idle(
+                current.sourceQuery, current.results, current.selectedPlatform, current.selectedCategory, msgId
+            )
+            is AddGameScreenState.Typing -> AddGameScreenState.Typing(
+                current.results, current.selectedPlatform, current.selectedCategory, msgId
+            )
+            is AddGameScreenState.Searching -> AddGameScreenState.Searching(
+                current.results, current.selectedPlatform, current.selectedCategory, msgId
+            )
+            is AddGameScreenState.Error -> current
         }
     }
 

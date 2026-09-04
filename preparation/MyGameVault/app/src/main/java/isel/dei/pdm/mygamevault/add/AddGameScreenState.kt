@@ -1,5 +1,6 @@
 package isel.dei.pdm.mygamevault.add
 
+import androidx.annotation.StringRes
 import isel.dei.pdm.mygamevault.domain.Game
 import isel.dei.pdm.mygamevault.domain.Platform
 import isel.dei.pdm.mygamevault.domain.Platforms
@@ -10,11 +11,13 @@ import isel.dei.pdm.mygamevault.ports.SearchServiceException
  * @property results The list of games from the last successful search.
  * @property selectedPlatform The platform used for the search.
  * @property selectedCategory The category used for the search, or null for all.
+ * @property recoverableErrorMsgId An optional resource ID for a transient error.
  */
 sealed class AddGameScreenState(
     val results: List<Game>,
     val selectedPlatform: Platform,
-    val selectedCategory: Game.Category?
+    val selectedCategory: Game.Category?,
+    @StringRes val recoverableErrorMsgId: Int? = null
 ) {
     /**
      * The initial state, or when a search has finished and no typing is occurring.
@@ -24,8 +27,9 @@ sealed class AddGameScreenState(
         val sourceQuery: String? = null,
         results: List<Game> = emptyList(),
         selectedPlatform: Platform = Platforms.PS5,
-        selectedCategory: Game.Category? = null
-    ) : AddGameScreenState(results, selectedPlatform, selectedCategory)
+        selectedCategory: Game.Category? = null,
+        @StringRes recoverableErrorMsgId: Int? = null
+    ) : AddGameScreenState(results, selectedPlatform, selectedCategory, recoverableErrorMsgId)
 
     /**
      * When the user is actively typing in the search box.
@@ -33,8 +37,9 @@ sealed class AddGameScreenState(
     class Typing(
         results: List<Game>,
         selectedPlatform: Platform,
-        selectedCategory: Game.Category?
-    ) : AddGameScreenState(results, selectedPlatform, selectedCategory)
+        selectedCategory: Game.Category?,
+        @StringRes recoverableErrorMsgId: Int? = null
+    ) : AddGameScreenState(results, selectedPlatform, selectedCategory, recoverableErrorMsgId)
 
     /**
      * When a search is in progress.
@@ -42,11 +47,12 @@ sealed class AddGameScreenState(
     class Searching(
         results: List<Game>,
         selectedPlatform: Platform,
-        selectedCategory: Game.Category?
-    ) : AddGameScreenState(results, selectedPlatform, selectedCategory)
+        selectedCategory: Game.Category?,
+        @StringRes recoverableErrorMsgId: Int? = null
+    ) : AddGameScreenState(results, selectedPlatform, selectedCategory, recoverableErrorMsgId)
 
     /**
-     * When a search has failed.
+     * When a search has failed due to an unrecoverable error.
      * @property error The exception that caused the failure.
      * @property previousResults The results that were being displayed before the error occurred
      */

@@ -8,6 +8,7 @@ import isel.dei.pdm.mygamevault.domain.CollectionEntry
 import isel.dei.pdm.mygamevault.domain.Game
 import isel.dei.pdm.mygamevault.domain.Platforms
 import isel.dei.pdm.mygamevault.domain.PlayStatus
+import isel.dei.pdm.mygamevault.domain.toPlayTime
 import isel.dei.pdm.mygamevault.setTestContent
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -32,7 +33,7 @@ class CollectionEntryItemTests {
         platform = Platforms.PS5,
         playStatus = PlayStatus(
             state = PlayStatus.State.PLAYING,
-            timeSpent = 50.hours
+            timeSpent = 50.hours.toPlayTime()
         ),
         addedAt = LocalDate.now()
     )

@@ -19,7 +19,13 @@
     <string name="error_service_unavailable">Service is currently unavailable. Try again later.</string>
     <string name="error_rate_limit">Too many requests. Please wait a moment.</string>
     <string name="error_storage_access">Could not access local storage.</string>
+    <string name="error_storage_load_failed">Could not load game details.</string>
+    <string name="error_storage_save_failed">Could not save changes.</string>
+    <string name="error_storage_delete_failed">Could not remove game from collection.</string>
+    <string name="error_storage_transient_hint">Please try again.</string>
     <string name="error_generic">Something went wrong.</string>
+    <string name="retry_label">Retry</string>
+    <string name="back_to_collection_label">Back to Collection</string>
 
     <string name="preferences_title">API Configuration</string>
     <string name="preferences_client_id_label">IGDB Client ID</string>
@@ -42,4 +48,24 @@
     <string name="status_paused">Paused</string>
     <string name="status_dropped">Dropped</string>
     <string name="status_none">None</string>
+
+    <string name="game_details_back">Back</string>
+    <string name="game_details_screen_title">Game Details</string>
+    <string name="game_details_remove">Remove from collection</string>
+    <string name="game_details_remove_title">Remove Game</string>
+    <string name="game_details_remove_confirmation">Are you sure you want to remove this game from your collection?</string>
+    <string name="game_details_remove_confirm">Remove</string>
+    <string name="game_details_remove_dismiss">Cancel</string>
+    <string name="game_details_play_status_title">Play Status</string>
+    <string name="game_details_change_status">Change Status</string>
+    <string name="game_details_play_time_title">Play Time</string>
+    <string name="game_details_hours_label">Hours</string>
+    <string name="game_details_save_hours">Save hours</string>
+    <string name="game_details_edit_hours">Edit hours</string>
+    <string name="game_details_stop_playing">Stop Playing</string>
+    <string name="game_details_start_playing">Start Playing</string>
+    <string name="game_details_logging_active">Session in progress&#8230;</string>
+    <string name="game_details_cancel_edit">Cancel edit</string>
+    <string name="game_details_completed_runs_title">Completed Runs</string>
+    <string name="game_details_add_run">Add Run</string>
 </resources>

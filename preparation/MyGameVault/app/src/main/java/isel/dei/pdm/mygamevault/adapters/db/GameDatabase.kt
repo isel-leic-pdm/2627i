@@ -10,7 +10,7 @@ import androidx.room.TypeConverters
         PlatformEntity::class,
         CollectionEntryEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

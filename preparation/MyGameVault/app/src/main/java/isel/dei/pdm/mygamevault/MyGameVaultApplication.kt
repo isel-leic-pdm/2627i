@@ -33,7 +33,9 @@ class MyGameVaultApplication : Application(), DependenciesContainer {
             applicationContext,
             GameDatabase::class.java,
             DATABASE_NAME
-        ).build()
+        )
+        .fallbackToDestructiveMigration(true)
+        .build()
     }
 
     override val searchService: SearchService by lazy {

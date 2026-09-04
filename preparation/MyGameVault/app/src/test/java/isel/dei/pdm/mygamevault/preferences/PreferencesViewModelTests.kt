@@ -2,7 +2,7 @@ package isel.dei.pdm.mygamevault.preferences
 
 import isel.dei.pdm.mygamevault.MainDispatcherRule
 import isel.dei.pdm.mygamevault.ports.Secrets
-import isel.dei.pdm.mygamevault.ports.StorageAccessException
+import isel.dei.pdm.mygamevault.ports.RecoverablePersistenceException
 import isel.dei.pdm.mygamevault.adapters.fakes.FakeSecretsRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -116,7 +116,7 @@ class PreferencesViewModelTests {
 
     @Test
     fun `transition from Saving to Error on failed save`() = runTest(mainDispatcherRule.testDispatcher) {
-        val error = StorageAccessException("Disk full")
+        val error = RecoverablePersistenceException("Disk full")
         val repository = object : FakeSecretsRepository() {
             override suspend fun saveSecrets(secrets: Secrets): Result<Unit> {
                 delay(50.milliseconds)
@@ -140,7 +140,7 @@ class PreferencesViewModelTests {
 
     @Test
     fun `transition from Error to Original after 3 seconds timeout`() = runTest(mainDispatcherRule.testDispatcher) {
-        val error = StorageAccessException("Disk full")
+        val error = RecoverablePersistenceException("Disk full")
         val repository = object : FakeSecretsRepository() {
             override suspend fun saveSecrets(secrets: Secrets): Result<Unit> {
                 return Result.failure(error)

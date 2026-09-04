@@ -1,81 +1,76 @@
 package isel.dei.pdm.mygamevault.ui
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import isel.dei.pdm.mygamevault.add.AddGameScreen
 import isel.dei.pdm.mygamevault.add.AddGameViewModel
+import isel.dei.pdm.mygamevault.add.details.GameDetailsScreen
 import isel.dei.pdm.mygamevault.collection.MyCollectionScreen
 import isel.dei.pdm.mygamevault.collection.MyCollectionViewModel
+import isel.dei.pdm.mygamevault.collection.details.CollectionEntryScreen
+import isel.dei.pdm.mygamevault.collection.details.CollectionEntryViewModel
 import isel.dei.pdm.mygamevault.preferences.PreferencesScreen
 import isel.dei.pdm.mygamevault.preferences.PreferencesViewModel
 
 private data class NavigationItem(
     val route: AppRoute,
     val icon: ImageVector,
-    val label: String
+    val label: String,
 )
 
 private val navigationItems = listOf(
     NavigationItem(AppRoute.AddGame, Icons.Default.Add, "Add Game"),
     NavigationItem(AppRoute.MyCollection, Icons.AutoMirrored.Filled.LibraryBooks, "Collection"),
-    NavigationItem(AppRoute.Preferences, Icons.Default.Settings, "Preferences")
+    NavigationItem(AppRoute.Preferences, Icons.Default.Settings, "Preferences"),
 )
 
 @Composable
 fun AppScaffold(
-    addGameViewModel: AddGameViewModel,
-    preferencesViewModel: PreferencesViewModel,
-    myCollectionViewModel: MyCollectionViewModel,
+    dependencies: isel.dei.pdm.mygamevault.DependenciesContainer,
     modifier: Modifier = Modifier
 ) {
     val navigationState = rememberNavigationState(
         startRoute = AppRoute.MyCollection,
-        topLevelRoutes = navigationItems.map { it.route }.toSet()
+        topLevelRoutes = navigationItems.asSequence().map { it.route }.toSet()
     )
     val navigator = remember(navigationState) { Navigator(navigationState) }
 
     val entryProvider = entryProvider {
         entry<AppRoute.MyCollection> {
-            val state by myCollectionViewModel.state.collectAsStateWithLifecycle()
+            val viewModel: MyCollectionViewModel = viewModel(
+                factory = MyCollectionViewModel.factory(dependencies.collectionRepository)
+            )
             MyCollectionScreen(
-                state = state,
+                viewModel = viewModel,
                 onEntrySelected = { entry ->
-                    navigator.navigate(AppRoute.GameDetails(entry.game.id))
-                },
-                onFilterChange = myCollectionViewModel::onFilterChange
+                    navigator.navigate(AppRoute.EntryDetails(entry.game.id, entry.platform.id))
+                }
             )
         }
         entry<AppRoute.AddGame> {
-            val state by addGameViewModel.state.collectAsStateWithLifecycle()
-            val query by addGameViewModel.query.collectAsStateWithLifecycle()
+            val viewModel: AddGameViewModel = viewModel(
+                factory = AddGameViewModel.factory(dependencies.searchService, dependencies.collectionRepository)
+            )
             AddGameScreen(
-                state = state,
-                searchQuery = query,
-                onQueryChange = addGameViewModel::onQueryChange,
-                onPlatformChange = addGameViewModel::onPlatformChange,
-                onCategoryChange = addGameViewModel::onCategoryChange,
+                viewModel = viewModel,
                 onAddRequested = { game ->
-                    addGameViewModel.addGame(game, state.selectedPlatform)
+                    viewModel.addGame(game, viewModel.selectedPlatform.value)
                     navigator.navigate(AppRoute.MyCollection)
                 },
                 onDetailsRequested = { game ->
@@ -84,21 +79,27 @@ fun AppScaffold(
             )
         }
         entry<AppRoute.Preferences> {
-            val state by preferencesViewModel.state.collectAsStateWithLifecycle()
-            PreferencesScreen(
-                state = state,
-                onClientIdChange = preferencesViewModel::onClientIdChange,
-                onClientSecretChange = preferencesViewModel::onClientSecretChange,
-                onSave = preferencesViewModel::onSave
+            val viewModel: PreferencesViewModel = viewModel(
+                factory = PreferencesViewModel.factory(dependencies.secretsRepository)
+            )
+            PreferencesScreen(viewModel = viewModel)
+        }
+        entry<AppRoute.EntryDetails> { key ->
+            val viewModel: CollectionEntryViewModel = viewModel(
+                factory = CollectionEntryViewModel.factory(dependencies.collectionRepository)
+            )
+            CollectionEntryScreen(
+                viewModel = viewModel,
+                gameId = key.gameId,
+                platformId = key.platformId,
+                onBackRequested = { navigator.goBack() }
             )
         }
         entry<AppRoute.GameDetails> { key ->
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(
-                    text = "Game Details for ID: ${key.gameId}",
-                    style = MaterialTheme.typography.headlineMedium
-                )
-            }
+            GameDetailsScreen(
+                gameId = key.gameId,
+                onBackRequested = { navigator.goBack() }
+            )
         }
     }
 

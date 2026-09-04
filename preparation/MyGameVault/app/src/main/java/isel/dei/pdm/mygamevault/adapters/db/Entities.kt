@@ -11,6 +11,7 @@ import isel.dei.pdm.mygamevault.domain.NonBlankString
 import isel.dei.pdm.mygamevault.domain.Platform
 import isel.dei.pdm.mygamevault.domain.PlayStatus
 import isel.dei.pdm.mygamevault.domain.Uri
+import isel.dei.pdm.mygamevault.domain.toPlayTime
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.seconds
 
@@ -54,6 +55,7 @@ internal data class CollectionEntryEntity(
     val platformId: Long,
     val timeSpentSeconds: Long,
     val state: PlayStatus.State,
+    val completedRuns: Int,
     val addedAt: Long
 )
 
@@ -111,8 +113,9 @@ internal fun CollectionEntryWithDetails.toCollectionEntry() = CollectionEntry(
     game = game.toGame(),
     platform = platform.toPlatform(),
     playStatus = PlayStatus(
-        timeSpent = entry.timeSpentSeconds.seconds,
-        state = entry.state
+        timeSpent = entry.timeSpentSeconds.seconds.toPlayTime(),
+        state = entry.state,
+        completedRuns = entry.completedRuns
     ),
     addedAt = LocalDate.ofEpochDay(entry.addedAt)
 )
@@ -120,7 +123,8 @@ internal fun CollectionEntryWithDetails.toCollectionEntry() = CollectionEntry(
 internal fun CollectionEntry.toEntity() = CollectionEntryEntity(
     gameId = game.id,
     platformId = platform.id,
-    timeSpentSeconds = playStatus.timeSpent.inWholeSeconds,
+    timeSpentSeconds = playStatus.timeSpent.toDuration().inWholeSeconds,
     state = playStatus.state,
+    completedRuns = playStatus.completedRuns,
     addedAt = addedAt.toEpochDay()
 )

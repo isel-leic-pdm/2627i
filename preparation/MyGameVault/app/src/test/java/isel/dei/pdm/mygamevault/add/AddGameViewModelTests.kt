@@ -10,6 +10,7 @@ import isel.dei.pdm.mygamevault.domain.PlayStatus
 import isel.dei.pdm.mygamevault.ports.CollectionRepository
 import isel.dei.pdm.mygamevault.ports.SearchService
 import isel.dei.pdm.mygamevault.ports.ServiceUnavailableException
+import isel.dei.pdm.mygamevault.ports.UnexpectedServiceException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -216,7 +217,7 @@ class AddGameViewModelTests {
         }
 
     @Test
-    fun `search failure transitions to Error state and keeps old results`() =
+    fun `recoverable search failure transitions to Idle state with error message and keeps old results`() =
         runTest(mainDispatcherRule.testDispatcher) {
             // Arrange
             val initialResults = listOf(Game(1, "Old Game", null, coverUri = null as String?, null))
@@ -230,9 +231,29 @@ class AddGameViewModelTests {
             runCurrent()
             assertEquals(initialResults, sut.state.value.results)
 
-            // Step 2: Configure service to fail and trigger a new search
+            // Step 2: Configure service to fail with a recoverable error
             fakeService.errorToReturn = error
             sut.onQueryChange("New")
+            advanceTimeBy(beyondDebounceTimeout)
+            runCurrent()
+
+            // Assert
+            assertTrue(sut.state.value is AddGameScreenState.Idle)
+            val state = sut.state.value as AddGameScreenState.Idle
+            assertEquals(isel.dei.pdm.mygamevault.R.string.error_service_unavailable, state.recoverableErrorMsgId)
+            assertEquals(initialResults, state.results)
+        }
+
+    @Test
+    fun `unrecoverable search failure still transitions to Error state`() =
+        runTest(mainDispatcherRule.testDispatcher) {
+            // Arrange
+            val error = UnexpectedServiceException("Fatal")
+            val fakeService = FakeSearchService(errorToReturn = error)
+            val sut = AddGameViewModel(fakeService, FakeCollectionRepository())
+
+            // Act
+            sut.onQueryChange("Fail")
             advanceTimeBy(beyondDebounceTimeout)
             runCurrent()
 
@@ -240,7 +261,6 @@ class AddGameViewModelTests {
             assertTrue(sut.state.value is AddGameScreenState.Error)
             val errorState = sut.state.value as AddGameScreenState.Error
             assertEquals(error, errorState.error)
-            assertEquals(initialResults, errorState.results)
         }
 
     @Test
@@ -276,7 +296,7 @@ class AddGameViewModelTests {
     fun `typing after an error transitions back to Typing state`() =
         runTest(mainDispatcherRule.testDispatcher) {
             // Arrange
-            val fakeService = FakeSearchService(errorToReturn = ServiceUnavailableException())
+            val fakeService = FakeSearchService(errorToReturn = UnexpectedServiceException())
             val sut = AddGameViewModel(fakeService, FakeCollectionRepository())
 
             // Trigger error

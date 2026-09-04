@@ -24,8 +24,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,21 +37,6 @@ import isel.dei.pdm.mygamevault.ui.common.AsyncImage
 import isel.dei.pdm.mygamevault.ui.theme.MyGameVaultTheme
 import java.time.LocalDate
 
-internal const val GAME_LIST_ITEM_TAG = "GameListItem"
-internal const val GAME_NAME_TAG = "GameName"
-internal const val GAME_RELEASE_DATE_TAG = "GameReleaseDate"
-internal const val ADD_GAME_BUTTON_TAG = "AddGameButton"
-internal const val VIEW_DETAILS_BUTTON_TAG = "ViewDetailsButton"
-
-/**
- * A Composable that displays a single game in a list, optimized for the "Add Game" screen.
- *
- * @param game The game to display.
- * @param platform The platform the game is for.
- * @param onAddRequested The callback to be invoked when the user wants to add the game.
- * @param onDetailsRequested The callback to be invoked when the user wants to see the game details.
- * @param modifier The modifier to be applied to the layout.
- */
 @Composable
 fun GameListItem(
     game: Game,
@@ -104,7 +89,7 @@ fun GameListItem(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                
+
                 game.releaseDate?.let { date ->
                     Spacer(modifier = Modifier.size(2.dp))
                     Text(
@@ -141,19 +126,14 @@ fun GameListItem(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Finished State")
 @Composable
 fun GameListItemPreview() {
+    val sampleGame = Game(2, "The Legend of Zelda: Tears of the Kingdom", LocalDate.of(2023, 5, 12), "cache://totk", null)
     MyGameVaultTheme {
         GameListItem(
-            game = Game(
-                id = 1,
-                name = "Elden Ring",
-                releaseDate = LocalDate.of(2022, 2, 25),
-                coverUri = "cache://er_cover",
-                thumbnailUri = "cache://er_thumb"
-            ),
-            platform = Platforms.PS5,
+            game = sampleGame,
+            platform = Platforms.SWITCH,
             onAddRequested = {},
             onDetailsRequested = {}
         )

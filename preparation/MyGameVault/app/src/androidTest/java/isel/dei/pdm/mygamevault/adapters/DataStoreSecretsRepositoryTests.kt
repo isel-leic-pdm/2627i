@@ -8,9 +8,9 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.platform.app.InstrumentationRegistry
+import isel.dei.pdm.mygamevault.ports.RecoverablePersistenceException
 import isel.dei.pdm.mygamevault.ports.Secrets
-import isel.dei.pdm.mygamevault.ports.StorageAccessException
-import isel.dei.pdm.mygamevault.ports.UnexpectedPersistenceException
+import isel.dei.pdm.mygamevault.ports.UnrecoverablePersistenceException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -111,7 +111,7 @@ class DataStoreSecretsRepositoryTests {
     }
 
     @Test
-    fun saveSecrets_whenIOExceptionOccurs_returnsFailureWithStorageAccessException() = runTest {
+    fun saveSecrets_whenIOExceptionOccurs_returnsFailureWithRecoverablePersistenceException() = runTest {
         val failingDataStore = FakeDataStore(
             data = flowOf(emptyPreferences()),
             updateDataException = IOException("Disk full")
@@ -121,11 +121,11 @@ class DataStoreSecretsRepositoryTests {
         val result = sut.saveSecrets(Secrets("id", "secret"))
         
         assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull() is StorageAccessException)
+        assertTrue(result.exceptionOrNull() is RecoverablePersistenceException)
     }
 
     @Test
-    fun saveSecrets_whenGenericExceptionOccurs_returnsFailureWithUnexpectedPersistenceException() = runTest {
+    fun saveSecrets_whenGenericExceptionOccurs_returnsFailureWithUnrecoverablePersistenceException() = runTest {
         val failingDataStore = FakeDataStore(
             data = flowOf(emptyPreferences()),
             updateDataException = RuntimeException("Unexpected error")
@@ -135,7 +135,7 @@ class DataStoreSecretsRepositoryTests {
         val result = sut.saveSecrets(Secrets("id", "secret"))
         
         assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull() is UnexpectedPersistenceException)
+        assertTrue(result.exceptionOrNull() is UnrecoverablePersistenceException)
     }
 
     /**

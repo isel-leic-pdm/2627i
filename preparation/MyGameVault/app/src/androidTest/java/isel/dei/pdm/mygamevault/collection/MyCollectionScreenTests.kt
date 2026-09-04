@@ -31,7 +31,7 @@ class MyCollectionScreenTests {
     fun myCollectionScreen_whenLoading_displaysLoadingIndicator() {
         // Act
         composeTestRule.setTestContent {
-            MyCollectionScreen(
+            MyCollectionScreenView(
                 state = MyCollectionScreenState.Loading(),
                 onEntrySelected = {},
                 onFilterChange = {}
@@ -46,7 +46,7 @@ class MyCollectionScreenTests {
     fun myCollectionScreen_whenIdleAndNotEmpty_displaysList() {
         // Act
         composeTestRule.setTestContent {
-            MyCollectionScreen(
+            MyCollectionScreenView(
                 state = MyCollectionScreenState.Idle(listOf(sampleEntry)),
                 onEntrySelected = {},
                 onFilterChange = {}
@@ -62,7 +62,7 @@ class MyCollectionScreenTests {
     fun myCollectionScreen_whenIdleAndEmpty_displaysEmptyMessage() {
         // Act
         composeTestRule.setTestContent {
-            MyCollectionScreen(
+            MyCollectionScreenView(
                 state = MyCollectionScreenState.Idle(emptyList()),
                 onEntrySelected = {},
                 onFilterChange = {}
@@ -78,7 +78,7 @@ class MyCollectionScreenTests {
         // Arrange
         var selectedFilter: CollectionFilter? = null
         composeTestRule.setTestContent {
-            MyCollectionScreen(
+            MyCollectionScreenView(
                 state = MyCollectionScreenState.Idle(emptyList()),
                 onEntrySelected = {},
                 onFilterChange = { selectedFilter = it }
@@ -97,7 +97,7 @@ class MyCollectionScreenTests {
         // Arrange
         var selectedEntry: CollectionEntry? = null
         composeTestRule.setTestContent {
-            MyCollectionScreen(
+            MyCollectionScreenView(
                 state = MyCollectionScreenState.Idle(listOf(sampleEntry)),
                 onEntrySelected = { selectedEntry = it },
                 onFilterChange = {}

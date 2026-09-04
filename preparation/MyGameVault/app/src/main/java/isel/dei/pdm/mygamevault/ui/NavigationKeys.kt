@@ -15,5 +15,8 @@ sealed interface AppRoute : NavKey {
     data object Preferences : AppRoute
 
     @Serializable
+    data class EntryDetails(val gameId: Long, val platformId: Long) : AppRoute
+
+    @Serializable
     data class GameDetails(val gameId: Long) : AppRoute
 }
