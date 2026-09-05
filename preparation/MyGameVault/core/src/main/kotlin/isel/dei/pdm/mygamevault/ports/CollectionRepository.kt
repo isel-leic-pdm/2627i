@@ -43,6 +43,25 @@ interface CollectionRepository {
     suspend fun get(gameId: Long, platform: Platform): CollectionEntry?
 
     /**
+     * Gets a flow that emits the entry with an active play session, if any.
+     * @return The flow of the active session entry, or null if no session is active.
+     */
+    fun getActiveSession(): Flow<CollectionEntry?>
+
+    /**
+     * Starts a play session for the given game and platform.
+     * If a session is already active, it will be replaced.
+     * @param gameId The ID of the game to start the session for.
+     * @param platformId The ID of the platform the game is played on.
+     */
+    suspend fun startSession(gameId: Long, platformId: Long)
+
+    /**
+     * Stops the current active play session.
+     */
+    suspend fun stopSession()
+
+    /**
      * Gets a flow that emits the list of entries currently being played.
      * @return The flow of entry lists.
      */

@@ -12,6 +12,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -43,13 +44,20 @@ private val navigationItems = listOf(
 @Composable
 fun AppScaffold(
     dependencies: isel.dei.pdm.mygamevault.DependenciesContainer,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    initialRoute: AppRoute? = null
 ) {
     val navigationState = rememberNavigationState(
         startRoute = AppRoute.MyCollection,
         topLevelRoutes = navigationItems.asSequence().map { it.route }.toSet()
     )
     val navigator = remember(navigationState) { Navigator(navigationState) }
+
+    LaunchedEffect(initialRoute) {
+        if (initialRoute != null) {
+            navigator.navigate(initialRoute)
+        }
+    }
 
     val entryProvider = entryProvider {
         entry<AppRoute.MyCollection> {

@@ -79,4 +79,20 @@ internal interface GameDao {
     @Transaction
     @Query("SELECT * FROM collection_entries WHERE gameId = :gameId AND platformId = :platformId")
     suspend fun getEntry(gameId: Long, platformId: Long): CollectionEntryWithDetails?
+
+    @Transaction
+    @Query("SELECT * FROM collection_entries WHERE gameId = :gameId AND platformId = :platformId")
+    fun observeEntry(gameId: Long, platformId: Long): Flow<CollectionEntryWithDetails?>
+
+    @Upsert
+    suspend fun upsertActiveSession(session: ActiveSessionEntity)
+
+    @Query("DELETE FROM active_session")
+    suspend fun deleteActiveSession()
+
+    @Query("SELECT * FROM active_session LIMIT 1")
+    fun observeActiveSession(): Flow<ActiveSessionEntity?>
+
+    @Query("SELECT * FROM active_session LIMIT 1")
+    suspend fun getActiveSessionOnce(): ActiveSessionEntity?
 }

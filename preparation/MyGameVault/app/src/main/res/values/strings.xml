@@ -68,4 +68,9 @@
     <string name="game_details_cancel_edit">Cancel edit</string>
     <string name="game_details_completed_runs_title">Completed Runs</string>
     <string name="game_details_add_run">Add Run</string>
+
+    <string name="notification_channel_name">Play Session</string>
+    <string name="notification_channel_description">Notifications for active play sessions.</string>
+    <string name="notification_session_title">Active Session</string>
+    <string name="notification_session_content">You are currently playing %1$s.</string>
 </resources>

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -48,6 +49,9 @@ class MyCollectionViewModelTests {
         override suspend fun save(entry: CollectionEntry) { /* unused */ }
         override suspend fun delete(gameId: Long, platform: Platform) { /* unused */ }
         override suspend fun get(gameId: Long, platform: Platform): CollectionEntry? = null
+        override fun getActiveSession(): Flow<CollectionEntry?> = flowOf(null)
+        override suspend fun startSession(gameId: Long, platformId: Long) {}
+        override suspend fun stopSession() {}
         override fun getCurrentlyPlaying(): Flow<List<CollectionEntry>> = flow
         override fun searchByName(partialName: String, orderBy: CollectionRepository.OrderBy, limit: Int): Flow<List<CollectionEntry>> = flow
         override fun searchByPlatforms(platforms: Set<Platform>, orderBy: CollectionRepository.OrderBy, limit: Int): Flow<List<CollectionEntry>> = flow
@@ -152,6 +156,9 @@ class MyCollectionViewModelTests {
             override suspend fun save(entry: CollectionEntry) {}
             override suspend fun delete(gameId: Long, platform: Platform) {}
             override suspend fun get(gameId: Long, platform: Platform): CollectionEntry? = null
+            override fun getActiveSession(): Flow<CollectionEntry?> = flowOf(null)
+            override suspend fun startSession(gameId: Long, platformId: Long) {}
+            override suspend fun stopSession() {}
             override fun getCurrentlyPlaying(): Flow<List<CollectionEntry>> = getLatest()
             override fun searchByName(partialName: String, orderBy: CollectionRepository.OrderBy, limit: Int): Flow<List<CollectionEntry>> = getLatest()
             override fun searchByPlatforms(platforms: Set<Platform>, orderBy: CollectionRepository.OrderBy, limit: Int): Flow<List<CollectionEntry>> = getLatest()

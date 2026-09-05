@@ -2,6 +2,7 @@ package isel.dei.pdm.mygamevault.domain
 
 import java.time.LocalDate
 import kotlin.time.Duration
+import kotlin.time.Instant
 
 /**
  * Represents an entry in the user's game collection.
@@ -11,12 +12,14 @@ import kotlin.time.Duration
  * @property platform The platform the game is owned on.
  * @property playStatus The user's playing status for this game on this platform.
  * @property addedAt The date the game was added to the collection.
+ * @property sessionStartTime The time when the current play session started, or null if no session is active.
  */
 data class CollectionEntry(
     val game: Game,
     val platform: Platform,
     val playStatus: PlayStatus = PlayStatus(),
-    val addedAt: LocalDate = LocalDate.now()
+    val addedAt: LocalDate = LocalDate.now(),
+    val sessionStartTime: Instant? = null
 ) {
     /**
      * Updates the playing status of the entry.

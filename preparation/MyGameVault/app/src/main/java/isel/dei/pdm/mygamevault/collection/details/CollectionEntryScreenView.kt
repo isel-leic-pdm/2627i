@@ -73,6 +73,7 @@ import isel.dei.pdm.mygamevault.ui.common.AsyncImage
 import isel.dei.pdm.mygamevault.ui.common.PlayStatusTag
 import isel.dei.pdm.mygamevault.ui.theme.MyGameVaultTheme
 import java.time.LocalDate
+import kotlin.time.Clock
 
 internal const val COLLECTION_ENTRY_SCREEN_TAG = "CollectionEntryScreen"
 
@@ -580,13 +581,13 @@ fun CollectionEntryScreenLoggingPreview() {
         game = Game(1, "Elden Ring", LocalDate.of(2022, 2, 25), "cache://er", null),
         platform = Platforms.PS5,
         playStatus = PlayStatus(state = PlayStatus.State.PLAYING),
-        addedAt = LocalDate.now()
+        addedAt = LocalDate.of(2024, 1, 1),
+        sessionStartTime = Clock.System.now()
     )
     MyGameVaultTheme {
         CollectionEntryScreenView(
             state = CollectionEntryScreenState.Logging(
-                entry = sampleEntry,
-                startTime = java.time.Instant.now()
+                entry = sampleEntry
             ),
             onBackRequested = {},
             onRemoveRequested = {},

@@ -12,6 +12,7 @@ import isel.dei.pdm.mygamevault.domain.Platform
 import isel.dei.pdm.mygamevault.domain.PlayStatus
 import isel.dei.pdm.mygamevault.domain.Uri
 import isel.dei.pdm.mygamevault.domain.toPlayTime
+import kotlin.time.Instant
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.seconds
 
@@ -57,6 +58,24 @@ internal data class CollectionEntryEntity(
     val state: PlayStatus.State,
     val completedRuns: Int,
     val addedAt: Long
+)
+
+@Entity(
+    tableName = "active_session",
+    foreignKeys = [
+        ForeignKey(
+            entity = CollectionEntryEntity::class,
+            parentColumns = ["gameId", "platformId"],
+            childColumns = ["gameId", "platformId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
+internal data class ActiveSessionEntity(
+    @PrimaryKey val id: Int = 1,
+    val gameId: Long,
+    val platformId: Long,
+    val startTimeSeconds: Long
 )
 
 /**
@@ -109,7 +128,7 @@ internal fun Platform.toEntity() = PlatformEntity(
     logoUri = logoUri?.value
 )
 
-internal fun CollectionEntryWithDetails.toCollectionEntry() = CollectionEntry(
+internal fun CollectionEntryWithDetails.toCollectionEntry(sessionStartTime: Instant? = null) = CollectionEntry(
     game = game.toGame(),
     platform = platform.toPlatform(),
     playStatus = PlayStatus(
@@ -117,7 +136,8 @@ internal fun CollectionEntryWithDetails.toCollectionEntry() = CollectionEntry(
         state = entry.state,
         completedRuns = entry.completedRuns
     ),
-    addedAt = LocalDate.ofEpochDay(entry.addedAt)
+    addedAt = LocalDate.ofEpochDay(entry.addedAt),
+    sessionStartTime = sessionStartTime
 )
 
 internal fun CollectionEntry.toEntity() = CollectionEntryEntity(

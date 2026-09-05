@@ -176,7 +176,7 @@ fun AddGameScreenView(
  * A Composable that displays a list of games resulting from a search.
  */
 @Composable
-private fun GameListFromSearch(
+fun GameListFromSearch(
     searchQuery: String,
     onQueryChange: (String) -> Unit,
     selectedPlatform: Platform,

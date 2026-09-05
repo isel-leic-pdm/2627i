@@ -1,6 +1,7 @@
 package isel.dei.pdm.mygamevault
 
 import android.app.Application
+import android.util.Log
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import io.ktor.client.HttpClient
@@ -18,7 +19,10 @@ import isel.dei.pdm.mygamevault.adapters.RoomCollectionRepository
 import isel.dei.pdm.mygamevault.adapters.createFileCachedImageLoader
 import isel.dei.pdm.mygamevault.adapters.createIgdbImageLoader
 import isel.dei.pdm.mygamevault.adapters.db.GameDatabase
+import isel.dei.pdm.mygamevault.infrastructure.SessionNotificationManager
 import isel.dei.pdm.mygamevault.ui.common.ImageLoader
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 private const val PREFERENCES_DATA_STORE_NAME = "preferences"
@@ -27,6 +31,7 @@ private const val DATABASE_NAME = "game-vault-db"
 class MyGameVaultApplication : Application(), DependenciesContainer {
 
     private val dataStore by preferencesDataStore(name = PREFERENCES_DATA_STORE_NAME)
+    private val applicationScope = MainScope()
 
     private val database by lazy {
         Room.databaseBuilder(
@@ -55,7 +60,26 @@ class MyGameVaultApplication : Application(), DependenciesContainer {
     }
 
     override val collectionRepository: CollectionRepository by lazy {
-        RoomCollectionRepository(database.gameDao())
+        RoomCollectionRepository(database)
+    }
+
+    private val sessionNotificationManager by lazy {
+        SessionNotificationManager(this)
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        sessionNotificationManager.createNotificationChannel()
+        applicationScope.launch {
+            collectionRepository.getActiveSession().collect { entry ->
+                Log.d(APP_TAG, "Active session collected: game=${entry?.game?.name()}, startTime=${entry?.sessionStartTime}")
+                if (entry != null) {
+                    sessionNotificationManager.showSessionNotification(entry)
+                } else {
+                    sessionNotificationManager.cancelSessionNotification()
+                }
+            }
+        }
     }
 
     override val imageLoader: ImageLoader by lazy {

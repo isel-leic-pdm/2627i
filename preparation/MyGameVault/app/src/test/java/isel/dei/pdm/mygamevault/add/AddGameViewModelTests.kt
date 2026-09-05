@@ -70,6 +70,9 @@ class AddGameViewModelTests {
         override suspend fun save(entry: CollectionEntry) { lastSavedEntry = entry }
         override suspend fun delete(gameId: Long, platform: Platform) {}
         override suspend fun get(gameId: Long, platform: Platform): CollectionEntry? = null
+        override fun getActiveSession(): Flow<CollectionEntry?> = flowOf(null)
+        override suspend fun startSession(gameId: Long, platformId: Long) {}
+        override suspend fun stopSession() {}
         override fun getCurrentlyPlaying(): Flow<List<CollectionEntry>> = flowOf(emptyList())
         override fun getLatest(limit: Int): Flow<List<CollectionEntry>> = flowOf(emptyList())
         override fun searchByName(partialName: String, orderBy: CollectionRepository.OrderBy, limit: Int): Flow<List<CollectionEntry>> = flowOf(emptyList())

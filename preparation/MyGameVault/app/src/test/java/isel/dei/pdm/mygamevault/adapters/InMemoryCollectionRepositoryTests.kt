@@ -4,13 +4,11 @@ import isel.dei.pdm.mygamevault.domain.CollectionEntry
 import isel.dei.pdm.mygamevault.domain.Game
 import isel.dei.pdm.mygamevault.domain.Platforms
 import isel.dei.pdm.mygamevault.domain.PlayStatus
-import isel.dei.pdm.mygamevault.ports.CollectionRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.LocalDate
 
@@ -103,5 +101,17 @@ class InMemoryCollectionRepositoryTests {
         
         val results = sut.getLatest().first()
         assertEquals(20, results.size)
+    }
+
+    @Test
+    fun `getActiveSession returns entry with sessionStartTime`() = runTest {
+        val sut = InMemoryCollectionRepository()
+        sut.save(testEntry)
+        sut.startSession(testEntry.game.id, testEntry.platform.id)
+        
+        val activeSession = sut.getActiveSession().first()
+        assertNotNull(activeSession)
+        assertEquals(testEntry.game.id, activeSession?.game?.id)
+        assertNotNull(activeSession?.sessionStartTime)
     }
 }

@@ -2,7 +2,6 @@ package isel.dei.pdm.mygamevault.collection.details
 
 import androidx.annotation.StringRes
 import isel.dei.pdm.mygamevault.domain.CollectionEntry
-import java.time.Instant
 
 /**
  * Represents the state of the Collection Entry screen.
@@ -26,12 +25,10 @@ sealed interface CollectionEntryScreenState {
     /**
      * The screen is in the logging state, meaning a play session is in progress.
      * @property entry The collection entry being displayed.
-     * @property startTime The time when the play session started.
      * @property recoverableErrorMsgId An optional resource ID for a transient error.
      */
     data class Logging(
         val entry: CollectionEntry,
-        val startTime: Instant,
         @StringRes val recoverableErrorMsgId: Int? = null
     ) : CollectionEntryScreenState
 

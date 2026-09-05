@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlin.time.Clock
+import kotlin.time.Instant
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * In-memory implementation of the [CollectionRepository].
@@ -23,6 +26,8 @@ class InMemoryCollectionRepository : CollectionRepository {
     }
 
     private val entries = MutableStateFlow<Map<EntryKey, CollectionEntry>>(emptyMap())
+    private data class ActiveSessionInfo(val gameId: Long, val platformId: Long, val startTime: Instant)
+    private val activeSession = MutableStateFlow<ActiveSessionInfo?>(null)
 
     private data class EntryKey(val gameId: Long, val platformAbbreviation: String)
 
@@ -45,9 +50,45 @@ class InMemoryCollectionRepository : CollectionRepository {
     override suspend fun get(gameId: Long, platform: Platform): CollectionEntry? {
         Log.d(TAG, "get: gameId = $gameId, platformId = ${platform.id}")
         val key = EntryKey(gameId, platform.abbreviation())
-        return entries.first()[key].also {
-            Log.d(TAG, "get: successfully retrieved ${if (it != null) "entry" else "null"}")
+        val entry = entries.first()[key]
+        val session = activeSession.value
+        return if (entry != null && session != null && 
+            session.gameId == gameId && session.platformId == platform.id) {
+            entry.copy(sessionStartTime = session.startTime)
+        } else {
+            entry.also {
+                Log.d(TAG, "get: successfully retrieved ${if (it != null) "entry" else "null"}")
+            }
         }
+    }
+
+    override fun getActiveSession(): Flow<CollectionEntry?> {
+        Log.d(TAG, "getActiveSession")
+        return kotlinx.coroutines.flow.combine(entries, activeSession) { entriesMap, session ->
+            session?.let {
+                val entry = entriesMap.values.find { it.game.id == session.gameId && it.platform.id == session.platformId }
+                entry?.copy(sessionStartTime = session.startTime)
+            }
+        }
+    }
+
+    override suspend fun startSession(gameId: Long, platformId: Long) {
+        Log.d(TAG, "startSession: gameId = $gameId, platformId = $platformId")
+        stopSession()
+        activeSession.value = ActiveSessionInfo(gameId, platformId, Clock.System.now())
+    }
+
+    override suspend fun stopSession() {
+        Log.d(TAG, "stopSession")
+        val session = activeSession.value
+        if (session != null) {
+            val duration = (Clock.System.now().epochSeconds - session.startTime.epochSeconds).seconds
+            val entry = entries.value.values.find { it.game.id == session.gameId && it.platform.id == session.platformId }
+            if (entry != null) {
+                save(entry.addPlayTime(duration))
+            }
+        }
+        activeSession.value = null
     }
 
     override fun getLatest(limit: Int): Flow<List<CollectionEntry>> {

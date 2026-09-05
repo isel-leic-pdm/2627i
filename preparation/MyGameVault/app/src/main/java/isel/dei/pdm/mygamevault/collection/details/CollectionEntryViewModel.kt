@@ -17,9 +17,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.time.Duration
-import java.time.Instant
-import kotlin.time.toKotlinDuration
 
 /**
  * ViewModel for the Game Details screen.
@@ -49,7 +46,11 @@ class CollectionEntryViewModel(
             try {
                 val entry = repository.get(gameId, platform)
                 if (entry != null) {
-                    _state.value = CollectionEntryScreenState.Idle(entry)
+                    _state.value = if (entry.sessionStartTime != null) {
+                        CollectionEntryScreenState.Logging(entry)
+                    } else {
+                        CollectionEntryScreenState.Idle(entry)
+                    }
                 } else {
                     Log.e(TAG, "fetchEntryDetails: entry not found")
                     _state.value = CollectionEntryScreenState.FatalError(
@@ -85,18 +86,25 @@ class CollectionEntryViewModel(
      * it automatically increments the runs to 1 to satisfy domain invariants.
      */
     fun updateStatus(newState: PlayStatus.State) {
-        val entry = when (val currentState = _state.value) {
+        val currentState = _state.value
+        val entry = when (currentState) {
             is CollectionEntryScreenState.Idle -> currentState.entry
-            is CollectionEntryScreenState.Logging -> {
-                val duration =
-                    Duration.between(currentState.startTime, Instant.now()).toKotlinDuration()
-                currentState.entry.addPlayTime(duration)
-            }
+            is CollectionEntryScreenState.Logging -> currentState.entry
             else -> null
         }
 
         entry?.let {
-            saveEntry(it.updateStatus(newState))
+            viewModelScope.launch {
+                try {
+                    if (currentState is CollectionEntryScreenState.Logging) {
+                        repository.stopSession()
+                    }
+                    val currentEntry = repository.get(it.game.id, it.platform) ?: it
+                    saveEntry(currentEntry.updateStatus(newState))
+                } catch (e: Exception) {
+                    Log.e(TAG, "updateStatus: error", e)
+                }
+            }
         }
     }
 
@@ -143,16 +151,17 @@ class CollectionEntryViewModel(
         if (currentState is CollectionEntryScreenState.Idle) {
             Log.d(TAG, "startLogging: starting session")
             val entry = currentState.entry
-            val effectiveEntry = if (entry.playStatus.state != PlayStatus.State.PLAYING) {
-                entry.updateStatus(PlayStatus.State.PLAYING)
-            } else {
-                entry
+            viewModelScope.launch {
+                try {
+                    if (entry.playStatus.state != PlayStatus.State.PLAYING) {
+                        repository.save(entry.updateStatus(PlayStatus.State.PLAYING))
+                    }
+                    repository.startSession(entry.game.id, entry.platform.id)
+                    fetchEntryDetails(entry.game.id, entry.platform.id)
+                } catch (e: Exception) {
+                    Log.e(TAG, "startLogging: error", e)
+                }
             }
-            
-            if (effectiveEntry != entry) {
-                saveEntry(effectiveEntry)
-            }
-            _state.value = CollectionEntryScreenState.Logging(effectiveEntry, Instant.now())
         }
     }
 
@@ -164,9 +173,16 @@ class CollectionEntryViewModel(
     fun stopLogging() {
         val currentState = _state.value
         if (currentState is CollectionEntryScreenState.Logging) {
-            val duration = Duration.between(currentState.startTime, Instant.now()).toKotlinDuration()
-            Log.d(TAG, "stopLogging: stopping session, duration = $duration")
-            saveEntry(currentState.entry.addPlayTime(duration))
+            Log.d(TAG, "stopLogging: stopping session")
+            val entry = currentState.entry
+            viewModelScope.launch {
+                try {
+                    repository.stopSession()
+                    fetchEntryDetails(entry.game.id, entry.platform.id)
+                } catch (e: Exception) {
+                    Log.e(TAG, "stopLogging: error", e)
+                }
+            }
         }
     }
 

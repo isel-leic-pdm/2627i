@@ -1,8 +1,10 @@
 package isel.dei.pdm.mygamevault.adapters
 
 import android.util.Log
+import androidx.room.withTransaction
 import isel.dei.pdm.mygamevault.MyGameVaultApplication
-import isel.dei.pdm.mygamevault.adapters.db.GameDao
+import isel.dei.pdm.mygamevault.adapters.db.ActiveSessionEntity
+import isel.dei.pdm.mygamevault.adapters.db.GameDatabase
 import isel.dei.pdm.mygamevault.adapters.db.toCollectionEntry
 import isel.dei.pdm.mygamevault.adapters.db.toEntity
 import isel.dei.pdm.mygamevault.domain.CollectionEntry
@@ -15,14 +17,22 @@ import android.database.sqlite.SQLiteDatabaseLockedException
 import android.database.sqlite.SQLiteFullException
 import android.database.sqlite.SQLiteTableLockedException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlin.time.Clock
+import kotlin.time.Instant
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Room-based implementation of the [CollectionRepository].
  */
 internal class RoomCollectionRepository(
-    private val gameDao: GameDao
+    private val database: GameDatabase
 ) : CollectionRepository {
+
+    private val gameDao = database.gameDao()
 
     private companion object {
         val TAG = MyGameVaultApplication.buildTag("RoomCollectionRepository")
@@ -60,13 +70,86 @@ internal class RoomCollectionRepository(
     override suspend fun get(gameId: Long, platform: Platform): CollectionEntry? {
         Log.d(TAG, "get: gameId = $gameId, platformId = ${platform.id}")
         return try {
-            gameDao.getEntry(gameId, platform.id)?.toCollectionEntry().also {
+            val entryWithDetails = gameDao.getEntry(gameId, platform.id)
+            val session = gameDao.getActiveSessionOnce()
+            
+            entryWithDetails?.toCollectionEntry(
+                sessionStartTime = if (session != null && session.gameId == gameId && session.platformId == platform.id) {
+                    Instant.fromEpochSeconds(session.startTimeSeconds)
+                } else null
+            ).also {
                 Log.d(TAG, "get: successfully retrieved ${if (it != null) "entry" else "null"}")
             }
         } catch (e: Exception) {
             if (e is kotlinx.coroutines.CancellationException) throw e
             Log.e(TAG, "get: error occurred", e)
             throw mapToPersistenceException("Error getting entry", e)
+        }
+    }
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    override fun getActiveSession(): Flow<CollectionEntry?> {
+        Log.d(TAG, "getActiveSession observation started")
+        return gameDao.observeActiveSession()
+            .distinctUntilChanged()
+            .flatMapLatest { session ->
+                if (session == null) {
+                    flowOf(null)
+                } else {
+                    gameDao.observeEntry(session.gameId, session.platformId).map { entryWithDetails ->
+                        entryWithDetails?.toCollectionEntry(
+                            sessionStartTime = Instant.fromEpochSeconds(session.startTimeSeconds)
+                        )
+                    }
+                }
+            }
+            .distinctUntilChanged()
+    }
+
+    override suspend fun startSession(gameId: Long, platformId: Long) {
+        Log.d(TAG, "startSession: gameId = $gameId, platformId = $platformId")
+        try {
+            database.withTransaction {
+                stopSession()
+                gameDao.upsertActiveSession(
+                    ActiveSessionEntity(
+                        gameId = gameId,
+                        platformId = platformId,
+                        startTimeSeconds = Clock.System.now().epochSeconds
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
+            Log.e(TAG, "startSession: error occurred", e)
+            throw mapToPersistenceException("Error starting session", e)
+        }
+    }
+
+    override suspend fun stopSession() {
+        Log.d(TAG, "stopSession")
+        try {
+            database.withTransaction {
+                val active = gameDao.getActiveSessionOnce()
+                if (active != null) {
+                    val duration = (Clock.System.now().epochSeconds - active.startTimeSeconds).seconds
+                    Log.d(TAG, "stopSession: found active session, duration = $duration")
+                    val entryWithDetails = gameDao.getEntry(active.gameId, active.platformId)
+                    if (entryWithDetails != null) {
+                        val entry = entryWithDetails.toCollectionEntry().addPlayTime(duration)
+                        gameDao.saveEntry(
+                            game = entry.game.toEntity(),
+                            platform = entry.platform.toEntity(),
+                            entry = entry.toEntity()
+                        )
+                    }
+                }
+                gameDao.deleteActiveSession()
+            }
+        } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
+            Log.e(TAG, "stopSession: error occurred", e)
+            throw mapToPersistenceException("Error stopping session", e)
         }
     }
 

@@ -1,5 +1,9 @@
 package isel.dei.pdm.mygamevault.collection.details
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,6 +22,14 @@ fun CollectionEntryScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(gameId, platformId) {
         viewModel.fetchEntryDetails(gameId, platformId)
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { _ ->
+        // We start logging even if permission is denied, 
+        // the notification just won't show.
+        viewModel.startLogging()
     }
 
     val currentState = state
@@ -47,7 +59,11 @@ fun CollectionEntryScreen(
                 if (currentState is CollectionEntryScreenState.Logging) {
                     viewModel.stopLogging()
                 } else {
-                    viewModel.startLogging()
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        viewModel.startLogging()
+                    }
                 }
             },
             onHoursEditRequested = viewModel::updateHours,

@@ -8,7 +8,8 @@ import androidx.room.TypeConverters
     entities = [
         GameEntity::class,
         PlatformEntity::class,
-        CollectionEntryEntity::class
+        CollectionEntryEntity::class,
+        ActiveSessionEntity::class
     ],
     version = 2,
     exportSchema = false
