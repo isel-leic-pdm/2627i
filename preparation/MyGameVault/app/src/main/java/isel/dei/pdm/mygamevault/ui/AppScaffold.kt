@@ -37,7 +37,7 @@ private data class NavigationItem(
 
 private val navigationItems = listOf(
     NavigationItem(AppRoute.AddGame, Icons.Default.Add, "Add Game"),
-    NavigationItem(AppRoute.MyCollection, Icons.AutoMirrored.Filled.LibraryBooks, "Collection"),
+    NavigationItem(AppRoute.MyCollection(), Icons.AutoMirrored.Filled.LibraryBooks, "Collection"),
     NavigationItem(AppRoute.Preferences, Icons.Default.Settings, "Preferences"),
 )
 
@@ -48,7 +48,7 @@ fun AppScaffold(
     initialRoute: AppRoute? = null
 ) {
     val navigationState = rememberNavigationState(
-        startRoute = AppRoute.MyCollection,
+        startRoute = AppRoute.MyCollection(),
         topLevelRoutes = navigationItems.asSequence().map { it.route }.toSet()
     )
     val navigator = remember(navigationState) { Navigator(navigationState) }
@@ -60,10 +60,15 @@ fun AppScaffold(
     }
 
     val entryProvider = entryProvider {
-        entry<AppRoute.MyCollection> {
+        entry<AppRoute.MyCollection> { key ->
             val viewModel: MyCollectionViewModel = viewModel(
                 factory = MyCollectionViewModel.factory(dependencies.collectionRepository)
             )
+            LaunchedEffect(key) {
+                if (key.resetFilter) {
+                    viewModel.onFilterResetRequested(key.navigationId)
+                }
+            }
             MyCollectionScreen(
                 viewModel = viewModel,
                 onEntrySelected = { entry ->
@@ -79,7 +84,12 @@ fun AppScaffold(
                 viewModel = viewModel,
                 onAddRequested = { game ->
                     viewModel.addGame(game, viewModel.selectedPlatform.value)
-                    navigator.navigate(AppRoute.MyCollection)
+                    navigator.navigate(
+                        AppRoute.MyCollection(
+                            resetFilter = true,
+                            navigationId = System.currentTimeMillis().toString()
+                        )
+                    )
                 },
                 onDetailsRequested = { game ->
                     navigator.navigate(AppRoute.GameDetails(game.id))

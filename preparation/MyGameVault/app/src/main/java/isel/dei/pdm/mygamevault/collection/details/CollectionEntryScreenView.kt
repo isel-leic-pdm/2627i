@@ -74,6 +74,7 @@ import isel.dei.pdm.mygamevault.ui.common.PlayStatusTag
 import isel.dei.pdm.mygamevault.ui.theme.MyGameVaultTheme
 import java.time.LocalDate
 import kotlin.time.Clock
+import kotlin.time.Instant
 
 internal const val COLLECTION_ENTRY_SCREEN_TAG = "CollectionEntryScreen"
 
@@ -223,7 +224,7 @@ private fun CollectionEntryContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(8.dp)
     ) {
         Column(
             modifier = Modifier
@@ -243,9 +244,9 @@ private fun CollectionEntryContent(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // --- Main Section: Image and Stats Row ---
             Row(
@@ -302,7 +303,7 @@ private fun CollectionEntryContent(
                 }
                 MetadataItem(
                     icon = Icons.Default.Event,
-                    label = stringResource(R.string.added_on_label, entry.addedAt.toString())
+                    label = stringResource(R.string.added_on_label, entry.addedAt.toString().substringBefore('T'))
                 )
             }
         }
@@ -557,8 +558,7 @@ fun CollectionEntryScreenPreview() {
     val sampleEntry = CollectionEntry(
         game = Game(1, "Elden Ring", LocalDate.of(2022, 2, 25), "cache://er", null),
         platform = Platforms.PS5,
-        playStatus = PlayStatus(state = PlayStatus.State.PLAYING),
-        addedAt = LocalDate.now()
+        playStatus = PlayStatus(state = PlayStatus.State.PLAYING)
     )
     MyGameVaultTheme {
         CollectionEntryScreenView(
@@ -581,7 +581,6 @@ fun CollectionEntryScreenLoggingPreview() {
         game = Game(1, "Elden Ring", LocalDate.of(2022, 2, 25), "cache://er", null),
         platform = Platforms.PS5,
         playStatus = PlayStatus(state = PlayStatus.State.PLAYING),
-        addedAt = LocalDate.of(2024, 1, 1),
         sessionStartTime = Clock.System.now()
     )
     MyGameVaultTheme {
@@ -606,8 +605,7 @@ fun CollectionEntryScreenRecoverableErrorPreview() {
     val sampleEntry = CollectionEntry(
         game = Game(1, "Elden Ring", LocalDate.of(2022, 2, 25), "cache://er", null),
         platform = Platforms.PS5,
-        playStatus = PlayStatus(state = PlayStatus.State.PLAYING),
-        addedAt = LocalDate.now()
+        playStatus = PlayStatus(state = PlayStatus.State.PLAYING)
     )
     MyGameVaultTheme {
         CollectionEntryScreenView(

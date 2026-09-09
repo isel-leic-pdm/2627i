@@ -21,9 +21,15 @@ import androidx.savedstate.compose.serialization.serializers.MutableStateSeriali
  */
 class Navigator(private val navigationState: NavigationState) {
     fun navigate(route: AppRoute) {
-        if (route in navigationState.backStacks.keys) {
+        val topLevelMatch = navigationState.backStacks.keys.find { it::class == route::class }
+        if (topLevelMatch != null) {
             // This is a top level route, just switch to it
-            navigationState.topLevelRoute = route
+            navigationState.topLevelRoute = topLevelMatch
+            if (route is AppRoute.MyCollection && route.resetFilter) {
+                val stack = navigationState.backStacks[topLevelMatch]
+                stack?.clear()
+                stack?.add(route)
+            }
         } else {
             navigationState.backStacks[navigationState.topLevelRoute]?.add(route)
         }
@@ -35,7 +41,7 @@ class Navigator(private val navigationState: NavigationState) {
         val currentRoute = currentStack.last()
 
         // If we're at the base of the current route, go back to the start route stack.
-        if (currentRoute == navigationState.topLevelRoute) {
+        if (currentRoute::class == navigationState.topLevelRoute::class) {
             if (navigationState.topLevelRoute != navigationState.startRoute) {
                 navigationState.topLevelRoute = navigationState.startRoute
             }

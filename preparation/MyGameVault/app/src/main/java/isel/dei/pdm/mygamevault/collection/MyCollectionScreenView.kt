@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -26,6 +27,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -56,8 +59,26 @@ fun MyCollectionScreenView(
     state: MyCollectionScreenState,
     onEntrySelected: (CollectionEntry) -> Unit,
     onFilterChange: (CollectionFilter) -> Unit,
+    onLoadNextPage: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val listState = rememberLazyListState()
+
+    // Trigger pagination when reaching the end of the list
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            val layoutInfo = listState.layoutInfo
+            val totalItemsCount = layoutInfo.totalItemsCount
+            val lastVisibleItemIndex = (layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) + 1
+            totalItemsCount > 0 && lastVisibleItemIndex >= totalItemsCount - 5
+        }
+            .collect { shouldLoadMore ->
+                if (shouldLoadMore) {
+                    onLoadNextPage()
+                }
+            }
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize().testTag(MY_COLLECTION_SCREEN_TAG),
     ) { innerPadding ->
@@ -125,6 +146,7 @@ fun MyCollectionScreenView(
                     }
                 } else {
                     LazyColumn(
+                        state = listState,
                         modifier = Modifier
                             .fillMaxSize()
                             .testTag(COLLECTION_LIST_TAG)
@@ -135,11 +157,30 @@ fun MyCollectionScreenView(
                                 onClick = { onEntrySelected(entry) }
                             )
                         }
+
+                        if (state.hasMore) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (state.isLoadingMore) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier
+                                                .size(32.dp)
+                                                .testTag("PaginationLoadingTag")
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
 
-            if (state is MyCollectionScreenState.Loading) {
+            if (state is MyCollectionScreenState.Loading && !state.isLoadingMore) {
                 CircularProgressIndicator(modifier = Modifier.testTag(COLLECTION_LOADING_TAG))
             }
         }
@@ -182,14 +223,14 @@ fun MyCollectionScreenPreview() {
     val sampleEntry = CollectionEntry(
         game = Game(1, "Elden Ring", LocalDate.of(2022, 2, 25), "cache://er", null),
         platform = Platforms.PS5,
-        playStatus = PlayStatus(state = PlayStatus.State.PLAYING),
-        addedAt = LocalDate.now()
+        playStatus = PlayStatus(state = PlayStatus.State.PLAYING)
     )
     MyGameVaultTheme {
         MyCollectionScreenView(
             state = MyCollectionScreenState.Idle(listOf(sampleEntry)),
             onEntrySelected = {},
-            onFilterChange = {}
+            onFilterChange = {},
+            onLoadNextPage = {}
         )
     }
 }

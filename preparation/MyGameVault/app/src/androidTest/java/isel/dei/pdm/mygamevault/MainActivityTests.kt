@@ -1,6 +1,7 @@
 package isel.dei.pdm.mygamevault
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
@@ -8,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.platform.app.InstrumentationRegistry
+import isel.dei.pdm.mygamevault.add.ADD_GAME_BUTTON_TAG
 import isel.dei.pdm.mygamevault.add.ADD_GAME_SCREEN_TAG
 import isel.dei.pdm.mygamevault.collection.MY_COLLECTION_SCREEN_TAG
 import isel.dei.pdm.mygamevault.ports.Secrets
@@ -60,6 +62,92 @@ class MainActivityTests {
 
         // Assert: Result is displayed
         composeTestRule.onNodeWithText("Elden Ring").assertIsDisplayed()
+    }
+
+    @Test
+    fun addingGame_resetsCollectionFilterToLatest() {
+        // 1. Start on Collection and select "Playing" filter
+        composeTestRule.onNodeWithText("Playing").performClick()
+        composeTestRule.onNodeWithText("Playing").assertIsSelected()
+
+        // 2. Navigate to Add Game
+        composeTestRule.onNodeWithText("Add Game").performClick()
+        composeTestRule.onNodeWithTag(ADD_GAME_SCREEN_TAG).assertIsDisplayed()
+
+        // 3. Search for a game
+        composeTestRule.onNodeWithTag(SEARCH_BAR_TAG).performTextInput("Elden")
+        
+        // Wait for results
+        composeTestRule.waitUntil(timeoutMillis = 7000) {
+            composeTestRule.onAllNodesWithText("Elden Ring").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // 4. Add the game
+        composeTestRule.onNodeWithTag(ADD_GAME_BUTTON_TAG).performClick()
+
+        // 5. Assert: Back on Collection and "Latest" is selected
+        composeTestRule.onNodeWithTag(MY_COLLECTION_SCREEN_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Latest").assertIsSelected()
+    }
+
+    @Test
+    fun navigation_preservesCollectionFilter() {
+        // 1. Start on Collection and select "Playing" filter
+        composeTestRule.onNodeWithText("Playing").performClick()
+        composeTestRule.onNodeWithText("Playing").assertIsSelected()
+
+        // 2. Navigate to Add Game via bottom bar
+        composeTestRule.onNodeWithText("Add Game").performClick()
+        composeTestRule.onNodeWithTag(ADD_GAME_SCREEN_TAG).assertIsDisplayed()
+
+        // 3. Navigate back to Collection via bottom bar
+        composeTestRule.onNodeWithText("Collection").performClick()
+
+        // 4. Assert: Still on "Playing"
+        composeTestRule.onNodeWithTag(MY_COLLECTION_SCREEN_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Playing").assertIsSelected()
+    }
+
+    @Test
+    fun navigation_preservesCollectionFilter_evenAfterAnAdd() {
+        // 1. Navigate to Add Game and add a game
+        composeTestRule.onNodeWithText("Add Game").performClick()
+        composeTestRule.onNodeWithTag(SEARCH_BAR_TAG).performTextInput("Elden")
+        composeTestRule.waitUntil(timeoutMillis = 7000) {
+            composeTestRule.onAllNodesWithText("Elden Ring").fetchSemanticsNodes().isNotEmpty()
+        }
+        composeTestRule.onNodeWithTag(ADD_GAME_BUTTON_TAG).performClick()
+
+        // 2. Back on Collection, "Latest" should be selected. Change it to "Playing".
+        composeTestRule.onNodeWithTag(MY_COLLECTION_SCREEN_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Latest").assertIsSelected()
+        composeTestRule.onNodeWithText("Playing").performClick()
+        composeTestRule.onNodeWithText("Playing").assertIsSelected()
+
+        // 3. Navigate away via bottom bar
+        composeTestRule.onNodeWithText("Preferences").performClick()
+        composeTestRule.onNodeWithTag(PREFERENCES_SCREEN_TAG).assertIsDisplayed()
+
+        // 4. Navigate back to Collection via bottom bar
+        composeTestRule.onNodeWithText("Collection").performClick()
+
+        // 5. Assert: Still on "Playing"
+        composeTestRule.onNodeWithTag(MY_COLLECTION_SCREEN_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Playing").assertIsSelected()
+    }
+
+    @Test
+    fun navigation_preservesCollectionFilter_evenWhenClickingCurrentTab() {
+        // 1. Start on Collection and select "Playing" filter
+        composeTestRule.onNodeWithText("Playing").performClick()
+        composeTestRule.onNodeWithText("Playing").assertIsSelected()
+
+        // 2. Click "Collection" again on the bottom bar
+        composeTestRule.onNodeWithText("Collection").performClick()
+
+        // 3. Assert: Still on "Playing"
+        composeTestRule.onNodeWithTag(MY_COLLECTION_SCREEN_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithText("Playing").assertIsSelected()
     }
 
     @Test

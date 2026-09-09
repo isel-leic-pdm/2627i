@@ -1,6 +1,6 @@
 package isel.dei.pdm.mygamevault.domain
 
-import java.time.LocalDate
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Instant
 
@@ -18,7 +18,7 @@ data class CollectionEntry(
     val game: Game,
     val platform: Platform,
     val playStatus: PlayStatus = PlayStatus(),
-    val addedAt: LocalDate = LocalDate.now(),
+    val addedAt: Instant = Clock.System.now(),
     val sessionStartTime: Instant? = null
 ) {
     /**

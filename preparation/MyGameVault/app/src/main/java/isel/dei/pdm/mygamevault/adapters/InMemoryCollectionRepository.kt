@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlin.time.Clock
 import kotlin.time.Instant
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * In-memory implementation of the [CollectionRepository].
@@ -82,7 +82,7 @@ class InMemoryCollectionRepository : CollectionRepository {
         Log.d(TAG, "stopSession")
         val session = activeSession.value
         if (session != null) {
-            val duration = (Clock.System.now().epochSeconds - session.startTime.epochSeconds).seconds
+            val duration = (Clock.System.now().toEpochMilliseconds() - session.startTime.toEpochMilliseconds()).milliseconds
             val entry = entries.value.values.find { it.game.id == session.gameId && it.platform.id == session.platformId }
             if (entry != null) {
                 save(entry.addPlayTime(duration))
@@ -91,36 +91,39 @@ class InMemoryCollectionRepository : CollectionRepository {
         activeSession.value = null
     }
 
-    override fun getLatest(limit: Int): Flow<List<CollectionEntry>> {
-        Log.d(TAG, "getLatest: limit = $limit")
-        return searchInternal(null, emptySet(), emptySet(), CollectionRepository.OrderBy.ADDED_AT, limit)
+    override fun getLatest(skip: Int, top: Int): Flow<List<CollectionEntry>> {
+        Log.d(TAG, "getLatest: skip = $skip, top = $top")
+        return searchInternal(null, emptySet(), emptySet(), CollectionRepository.OrderBy.ADDED_AT, skip, top)
     }
 
     override fun searchByName(
         partialName: String,
         orderBy: CollectionRepository.OrderBy,
-        limit: Int
+        skip: Int,
+        top: Int
     ): Flow<List<CollectionEntry>> {
-        Log.d(TAG, "searchByName: partialName = \"$partialName\", orderBy = $orderBy, limit = $limit")
-        return searchInternal(partialName, emptySet(), emptySet(), orderBy, limit)
+        Log.d(TAG, "searchByName: partialName = \"$partialName\", orderBy = $orderBy, skip = $skip, top = $top")
+        return searchInternal(partialName, emptySet(), emptySet(), orderBy, skip, top)
     }
 
     override fun searchByPlatforms(
         platforms: Set<Platform>,
         orderBy: CollectionRepository.OrderBy,
-        limit: Int
+        skip: Int,
+        top: Int
     ): Flow<List<CollectionEntry>> {
-        Log.d(TAG, "searchByPlatforms: platforms = ${platforms.map { it.id }}, orderBy = $orderBy, limit = $limit")
-        return searchInternal(null, platforms, emptySet(), orderBy, limit)
+        Log.d(TAG, "searchByPlatforms: platforms = ${platforms.map { it.id }}, orderBy = $orderBy, skip = $skip, top = $top")
+        return searchInternal(null, platforms, emptySet(), orderBy, skip, top)
     }
 
     override fun searchByStates(
         states: Set<PlayStatus.State>,
         orderBy: CollectionRepository.OrderBy,
-        limit: Int
+        skip: Int,
+        top: Int
     ): Flow<List<CollectionEntry>> {
-        Log.d(TAG, "searchByStates: states = $states, orderBy = $orderBy, limit = $limit")
-        return searchInternal(null, emptySet(), states, orderBy, limit)
+        Log.d(TAG, "searchByStates: states = $states, orderBy = $orderBy, skip = $skip, top = $top")
+        return searchInternal(null, emptySet(), states, orderBy, skip, top)
     }
 
     private fun searchInternal(
@@ -128,25 +131,33 @@ class InMemoryCollectionRepository : CollectionRepository {
         platforms: Set<Platform>,
         states: Set<PlayStatus.State>,
         orderBy: CollectionRepository.OrderBy,
-        limit: Int
+        skip: Int,
+        top: Int
     ): Flow<List<CollectionEntry>> = entries.map { entry ->
-        val cappedLimit = limit.coerceAtMost(MAX_LIMIT)
+        val cappedTop = top.coerceAtMost(MAX_LIMIT)
         entry.values.asSequence().filter {
             val nameMatch = partialName == null || 
                 it.game.name.contains(partialName, ignoreCase = true)
             val platformMatch = platforms.isEmpty() || it.platform in platforms
             val stateMatch = states.isEmpty() || it.playStatus.state in states
             nameMatch && platformMatch && stateMatch
-        }.sortedWith(
-            comparator = compareBy<CollectionEntry> { it.platform.name() }
-                .thenBy { it.playStatus.state.ordinal }
-                .thenBy {
-                    when (orderBy) {
-                        CollectionRepository.OrderBy.NAME -> it.game.name()
-                        CollectionRepository.OrderBy.RELEASE_DATE -> it.game.releaseDate?.toEpochDay() ?: 0L
-                        CollectionRepository.OrderBy.ADDED_AT -> it.addedAt.toEpochDay()
-                    }
+        }.sortedWith { a, b ->
+            when (orderBy) {
+                CollectionRepository.OrderBy.NAME ->
+                    a.game.name().compareTo(b.game.name())
+
+                CollectionRepository.OrderBy.RELEASE_DATE -> {
+                    val dateA = a.game.releaseDate?.toEpochDay() ?: 0L
+                    val dateB = b.game.releaseDate?.toEpochDay() ?: 0L
+                    dateB.compareTo(dateA) // Descending
                 }
-        ).take(cappedLimit).toList()
+
+                CollectionRepository.OrderBy.ADDED_AT ->
+                    b.addedAt.compareTo(a.addedAt) // Descending
+            }
+        }
+            .drop(skip)
+            .take(cappedTop)
+            .toList()
     }
 }

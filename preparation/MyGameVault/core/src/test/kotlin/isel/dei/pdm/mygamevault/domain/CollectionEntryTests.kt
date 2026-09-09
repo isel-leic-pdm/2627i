@@ -1,9 +1,12 @@
 package isel.dei.pdm.mygamevault.domain
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.LocalDate
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Instant
 
 class CollectionEntryTests {
 
@@ -18,24 +21,26 @@ class CollectionEntryTests {
     @Test
     fun `collection entry holds its properties`() {
         val status = PlayStatus(state = PlayStatus.State.FINISHED, completedRuns = 1)
-        val addedDate = LocalDate.of(2024, 1, 1)
+        val addedTime = Instant.fromEpochSeconds(1704067200)
         val entry = CollectionEntry(
             game = sampleGame,
             platform = Platforms.PS5,
             playStatus = status,
-            addedAt = addedDate
+            addedAt = addedTime
         )
 
         assertEquals(sampleGame, entry.game)
         assertEquals(Platforms.PS5, entry.platform)
         assertEquals(status, entry.playStatus)
-        assertEquals(addedDate, entry.addedAt)
+        assertEquals(addedTime, entry.addedAt)
     }
 
     @Test
-    fun `collection entry has current date by default`() {
+    fun `collection entry has current time by default`() {
         val entry = CollectionEntry(sampleGame, Platforms.PS5)
-        assertEquals(LocalDate.now(), entry.addedAt)
+        val now = Clock.System.now()
+        val diff = now.epochSeconds - entry.addedAt.epochSeconds
+        assertTrue(diff in 0..5)
     }
 
     @Test

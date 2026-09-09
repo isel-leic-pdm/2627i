@@ -7,6 +7,9 @@ import isel.dei.pdm.mygamevault.domain.NonBlankString
 import isel.dei.pdm.mygamevault.domain.Platforms
 import isel.dei.pdm.mygamevault.domain.PlayStatus
 import isel.dei.pdm.mygamevault.domain.toPlayTime
+import isel.dei.pdm.mygamevault.ports.CollectionRepository
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -85,19 +88,118 @@ class RoomCollectionRepositoryTests {
     }
 
     @Test
-    fun getLatest_returns_limited_results() = runTest {
-        // Arrange: Insert 25 games
+    fun searchByName_supports_pagination() = runTest {
+        // Arrange: Insert 10 games with "Game" in their name
+        for (i in 1..10) {
+            val game = testGame.copy(id = i.toLong(), name = NonBlankString("Game $i"))
+            val entry = CollectionEntry(game, Platforms.PS5, addedAt = Instant.fromEpochSeconds(i.toLong()))
+            sut.save(entry)
+        }
+
+        // Act: Get page 2 (skip 5, top 5)
+        // Pass ADDED_AT to match the DAO's fixed ordering
+        val results = sut.searchByName(partialName = "Game", orderBy = CollectionRepository.OrderBy.ADDED_AT, skip = 5, top = 5)
+            .first { it.size == 5 }
+
+        // Assert
+        assertEquals(5, results.size)
+        assertEquals(5L, results[0].game.id)
+        assertEquals(1L, results[4].game.id)
+    }
+
+    @Test
+    fun getLatest_returns_results_in_descending_order() = runTest {
+        // Arrange: Insert 25 games with increasing added timestamps
         for (i in 1..25) {
             val game = testGame.copy(id = i.toLong(), name = NonBlankString("Game $i"))
-            val entry = CollectionEntry(game, Platforms.PS5, addedAt = LocalDate.of(2024, 1, i))
+            val entry = CollectionEntry(game, Platforms.PS5, addedAt = Instant.fromEpochSeconds(i.toLong()))
             sut.save(entry)
         }
         
         // Act
-        val results = sut.getLatest().first { it.size == 20 }
+        val results = sut.getLatest(skip = 0, top = 10).first { it.size == 10 }
 
         // Assert
-        assertEquals(20, results.size)
+        assertEquals(10, results.size)
+        // Newest should be first (Game 25, added at epoch second 25)
+        assertEquals(25L, results[0].game.id)
+        assertEquals(Instant.fromEpochSeconds(25), results[0].addedAt)
+        // Second should be Game 24
+        assertEquals(24L, results[1].game.id)
+    }
+
+    @Test
+    fun getLatest_supports_pagination() = runTest {
+        // Arrange: Insert 10 games
+        for (i in 1..10) {
+            val game = testGame.copy(id = i.toLong(), name = NonBlankString("Game $i"))
+            val entry = CollectionEntry(game, Platforms.PS5, addedAt = Instant.fromEpochSeconds(i.toLong()))
+            sut.save(entry)
+        }
+        
+        // Act: Get page 2 (skip 5, top 5)
+        // Order is descending: 10, 9, 8, 7, 6, [5, 4, 3, 2, 1]
+        val results = sut.getLatest(skip = 5, top = 5).first { it.size == 5 }
+
+        // Assert
+        assertEquals(5, results.size)
+        assertEquals(5L, results[0].game.id)
+        assertEquals(1L, results[4].game.id)
+    }
+
+    @Test
+    fun getLatest_respects_time_precision() = runTest {
+        // Arrange: Save two games on the same day but different times
+        val baseTime = Instant.fromEpochSeconds(1704067200) // 2024-01-01 00:00:00 UTC
+        val earlierTime = baseTime
+        val laterTime = baseTime.plus(60.seconds)
+        
+        val earlierEntry = testEntry.copy(
+            game = testGame.copy(id = 1),
+            addedAt = earlierTime
+        )
+        val laterEntry = testEntry.copy(
+            game = testGame.copy(id = 2),
+            addedAt = laterTime
+        )
+        
+        sut.save(earlierEntry)
+        sut.save(laterEntry)
+        
+        // Act
+        val results = sut.getLatest().first { it.size == 2 }
+        
+        // Assert: Later game should be first
+        assertEquals(2L, results[0].game.id)
+        assertEquals(1L, results[1].game.id)
+    }
+
+    @Test
+    fun getLatest_ignores_platform_grouping() = runTest {
+        // Arrange: Save an older game on PS5 and a newer game on PC
+        val olderTime = Instant.fromEpochSeconds(1000)
+        val newerTime = Instant.fromEpochSeconds(2000)
+        
+        val olderEntry = testEntry.copy(
+            game = testGame.copy(id = 1),
+            platform = Platforms.PS5,
+            addedAt = olderTime
+        )
+        val newerEntry = testEntry.copy(
+            game = testGame.copy(id = 2),
+            platform = Platforms.PC,
+            addedAt = newerTime
+        )
+        
+        sut.save(olderEntry)
+        sut.save(newerEntry)
+        
+        // Act
+        val results = sut.getLatest().first { it.size == 2 }
+        
+        // Assert: Newer game (PC) should be first despite platform name sorting
+        assertEquals(2L, results[0].game.id)
+        assertEquals(1L, results[1].game.id)
     }
 
     @Test
@@ -122,6 +224,59 @@ class RoomCollectionRepositoryTests {
         assertEquals(2, results.size)
         assertTrue(results.any { it.playStatus.state == PlayStatus.State.FINISHED })
         assertTrue(results.any { it.playStatus.state == PlayStatus.State.PLATINUM })
+    }
+
+    @Test
+    fun searchByStates_supports_pagination() = runTest {
+        // Arrange: Insert 10 playing games
+        for (i in 1..10) {
+            val game = testGame.copy(id = i.toLong())
+            val entry = CollectionEntry(
+                game = game, 
+                platform = Platforms.PS5, 
+                playStatus = PlayStatus(state = PlayStatus.State.PLAYING),
+                addedAt = Instant.fromEpochSeconds(i.toLong())
+            )
+            sut.save(entry)
+        }
+
+        // Act: Get page 2
+        val results = sut.searchByStates(
+            states = setOf(PlayStatus.State.PLAYING), 
+            orderBy = CollectionRepository.OrderBy.ADDED_AT,
+            skip = 5, 
+            top = 5
+        ).first { it.size == 5 }
+
+        // Assert
+        assertEquals(5, results.size)
+        assertEquals(5L, results[0].game.id)
+    }
+
+    @Test
+    fun searchByPlatforms_supports_pagination() = runTest {
+        // Arrange: Insert 10 games on PS5
+        for (i in 1..10) {
+            val game = testGame.copy(id = i.toLong())
+            val entry = CollectionEntry(
+                game = game, 
+                platform = Platforms.PS5, 
+                addedAt = Instant.fromEpochSeconds(i.toLong())
+            )
+            sut.save(entry)
+        }
+
+        // Act: Get page 2
+        val results = sut.searchByPlatforms(
+            platforms = setOf(Platforms.PS5), 
+            orderBy = CollectionRepository.OrderBy.ADDED_AT,
+            skip = 5, 
+            top = 5
+        ).first { it.size == 5 }
+
+        // Assert
+        assertEquals(5, results.size)
+        assertEquals(5L, results[0].game.id)
     }
 
     @Test

@@ -22,8 +22,8 @@ internal class Converters {
     fun toLocalDate(value: Long?): LocalDate? = value?.let { LocalDate.ofEpochDay(it) }
 
     @TypeConverter
-    fun fromInstant(value: Instant?): Long? = value?.epochSeconds
+    fun fromInstant(value: Instant?): Long? = value?.toEpochMilliseconds()
 
     @TypeConverter
-    fun toInstant(value: Long?): Instant? = value?.let { Instant.fromEpochSeconds(it) }
+    fun toInstant(value: Long?): Instant? = value?.let { Instant.fromEpochMilliseconds(it) }
 }
