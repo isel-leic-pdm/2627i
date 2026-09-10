@@ -1,10 +1,14 @@
 package isel.dei.pdm.mygamevault.collection
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.printToLog
 import isel.dei.pdm.mygamevault.domain.CollectionEntry
 import isel.dei.pdm.mygamevault.domain.Game
 import isel.dei.pdm.mygamevault.domain.Platforms
@@ -23,8 +27,7 @@ class MyCollectionScreenTests {
     private val sampleEntry = CollectionEntry(
         game = Game(1, "Elden Ring", LocalDate.of(2022, 2, 25), "cache://er", null),
         platform = Platforms.PS5,
-        playStatus = PlayStatus(state = PlayStatus.State.PLAYING),
-        addedAt = LocalDate.now()
+        playStatus = PlayStatus(state = PlayStatus.State.PLAYING)
     )
 
     @Test
@@ -34,7 +37,8 @@ class MyCollectionScreenTests {
             MyCollectionScreenView(
                 state = MyCollectionScreenState.Loading(),
                 onEntrySelected = {},
-                onFilterChange = {}
+                onFilterChange = {},
+                onLoadNextPage = {}
             )
         }
 
@@ -49,7 +53,8 @@ class MyCollectionScreenTests {
             MyCollectionScreenView(
                 state = MyCollectionScreenState.Idle(listOf(sampleEntry)),
                 onEntrySelected = {},
-                onFilterChange = {}
+                onFilterChange = {},
+                onLoadNextPage = {}
             )
         }
 
@@ -65,7 +70,8 @@ class MyCollectionScreenTests {
             MyCollectionScreenView(
                 state = MyCollectionScreenState.Idle(emptyList()),
                 onEntrySelected = {},
-                onFilterChange = {}
+                onFilterChange = {},
+                onLoadNextPage = {}
             )
         }
 
@@ -81,7 +87,8 @@ class MyCollectionScreenTests {
             MyCollectionScreenView(
                 state = MyCollectionScreenState.Idle(emptyList()),
                 onEntrySelected = {},
-                onFilterChange = { selectedFilter = it }
+                onFilterChange = { selectedFilter = it },
+                onLoadNextPage = {}
             )
         }
 
@@ -100,7 +107,8 @@ class MyCollectionScreenTests {
             MyCollectionScreenView(
                 state = MyCollectionScreenState.Idle(listOf(sampleEntry)),
                 onEntrySelected = { selectedEntry = it },
-                onFilterChange = {}
+                onFilterChange = {},
+                onLoadNextPage = {}
             )
         }
 
@@ -109,5 +117,32 @@ class MyCollectionScreenTests {
 
         // Assert
         assertEquals(sampleEntry, selectedEntry)
+    }
+
+    @Test
+    fun myCollectionScreen_whenLoadingMore_displaysBottomIndicator() {
+        // Arrange
+        val state = MyCollectionScreenState.Loading(
+            entries = listOf(sampleEntry),
+            hasMore = true,
+            isLoadingMore = true
+        )
+
+        // Act
+        composeTestRule.setTestContent {
+            MyCollectionScreenView(
+                state = state,
+                onEntrySelected = {},
+                onFilterChange = {},
+                onLoadNextPage = {}
+            )
+        }
+
+        // Assert
+        // Full screen loader should NOT be displayed
+        composeTestRule.onNodeWithTag(COLLECTION_LOADING_TAG).assertDoesNotExist()
+        
+        // Pagination loader should be displayed
+        composeTestRule.onNodeWithTag("PaginationLoadingTag").assertIsDisplayed()
     }
 }

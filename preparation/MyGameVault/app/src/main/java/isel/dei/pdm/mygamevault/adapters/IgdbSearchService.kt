@@ -11,6 +11,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import isel.dei.pdm.mygamevault.MyGameVaultApplication
 import isel.dei.pdm.mygamevault.domain.Game
+import isel.dei.pdm.mygamevault.domain.GameDetails
 import isel.dei.pdm.mygamevault.domain.NonBlankString
 import isel.dei.pdm.mygamevault.domain.Platform
 import isel.dei.pdm.mygamevault.ports.NoConnectivityException
@@ -90,6 +91,44 @@ class IgdbSearchService(
         // while ensuring that cancellation is propagated.
         if (e is CancellationException) throw e
         Log.wtf(TAG, "search: Unexpected error occurred", e)
+        Result.failure(UnexpectedServiceException("Unexpected error", e))
+    }
+
+    override suspend fun fetchGameDetails(gameId: Long): Result<GameDetails?> = try {
+        val secrets = secretsRepository.secrets.first()
+            ?: Result.failure<GameDetails?>(UnauthenticatedException("API credentials not configured")).let { return it }
+
+        Log.d(TAG, "fetchGameDetails: started for gameId = $gameId")
+
+        val apicalypseQuery = "fields name, first_release_date, cover.url, summary, involved_companies.company.name, involved_companies.developer, involved_companies.publisher, genres.name; where id = $gameId;"
+
+        val response = httpClient.post("https://api.igdb.com/v4/games") {
+            header("Client-ID", secrets.clientId)
+            header("Authorization", "Bearer ${secrets.clientSecret}")
+            contentType(ContentType.Application.Json)
+            setBody(apicalypseQuery)
+        }
+
+        Log.d(TAG, "fetchGameDetails: API returned status ${response.status}")
+
+        when (response.status) {
+            HttpStatusCode.OK -> {
+                val gamesDto: List<IgdbGame> = response.body()
+                Result.success(gamesDto.firstOrNull()?.toGameDetails())
+            }
+            HttpStatusCode.Unauthorized, HttpStatusCode.Forbidden ->
+                Result.failure(UnauthenticatedException("Invalid credentials"))
+            HttpStatusCode.TooManyRequests ->
+                Result.failure(RateLimitExceededException("Rate limit reached"))
+            else ->
+                Result.failure(ServiceUnavailableException("API returned ${response.status}"))
+        }
+    } catch (e: IOException) {
+        Log.e(TAG, "fetchGameDetails: Network error occurred", e)
+        Result.failure(NoConnectivityException("Network error", e))
+    } catch (e: Exception) {
+        if (e is CancellationException) throw e
+        Log.wtf(TAG, "fetchGameDetails: Unexpected error occurred", e)
         Result.failure(UnexpectedServiceException("Unexpected error", e))
     }
 }

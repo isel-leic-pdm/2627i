@@ -11,45 +11,45 @@ import kotlinx.coroutines.flow.Flow
 internal interface GameDao {
     /**
      * Searches for entries in the collection where the game name contains [partialName].
-     * Limits the result to [limit] entries, ordered by acquisition date.
+     * Limits the result to [top] entries, starting at [skip], ordered by acquisition date.
      */
     @Query("""
         SELECT * FROM collection_entries
         WHERE gameId IN (SELECT id FROM games WHERE name LIKE '%' || :partialName || '%')
-        ORDER BY addedAt DESC LIMIT :limit
+        ORDER BY addedAt DESC LIMIT :top OFFSET :skip
     """)
-    fun searchByName(partialName: String, limit: Int): Flow<List<CollectionEntryWithDetails>>
+    fun searchByName(partialName: String, skip: Int, top: Int): Flow<List<CollectionEntryWithDetails>>
 
     /**
      * Searches for entries in the collection that belong to the given [platformIds].
-     * Limits the result to [limit] entries, ordered by acquisition date.
+     * Limits the result to [top] entries, starting at [skip], ordered by acquisition date.
      */
     @Query("""
         SELECT * FROM collection_entries 
         WHERE platformId IN (:platformIds)
-        ORDER BY addedAt DESC LIMIT :limit
+        ORDER BY addedAt DESC LIMIT :top OFFSET :skip
     """)
-    fun searchByPlatforms(platformIds: Set<Long>, limit: Int): Flow<List<CollectionEntryWithDetails>>
+    fun searchByPlatforms(platformIds: Set<Long>, skip: Int, top: Int): Flow<List<CollectionEntryWithDetails>>
 
     /**
      * Searches for entries in the collection that are in one of the given [states].
-     * Limits the result to [limit] entries, ordered by acquisition date.
+     * Limits the result to [top] entries, starting at [skip], ordered by acquisition date.
      */
     @Query("""
         SELECT * FROM collection_entries 
         WHERE state IN (:states)
-        ORDER BY addedAt DESC LIMIT :limit
+        ORDER BY addedAt DESC LIMIT :top OFFSET :skip
     """)
-    fun searchByStates(states: Set<PlayStatus.State>, limit: Int): Flow<List<CollectionEntryWithDetails>>
+    fun searchByStates(states: Set<PlayStatus.State>, skip: Int, top: Int): Flow<List<CollectionEntryWithDetails>>
 
     /**
-     * Returns the latest [limit] entries in the collection.
+     * Returns the latest entries in the collection.
      */
     @Query("""
         SELECT * FROM collection_entries 
-        ORDER BY addedAt DESC LIMIT :limit
+        ORDER BY addedAt DESC LIMIT :top OFFSET :skip
     """)
-    fun searchLatest(limit: Int): Flow<List<CollectionEntryWithDetails>>
+    fun searchLatest(skip: Int, top: Int): Flow<List<CollectionEntryWithDetails>>
 
     @Query("SELECT COUNT(*) FROM collection_entries")
     suspend fun count(): Int

@@ -26,6 +26,7 @@ fun MyCollectionScreen(
             state = state,
             onEntrySelected = onEntrySelected,
             onFilterChange = viewModel::onFilterChange,
+            onLoadNextPage = viewModel::onLoadNextPage,
         )
     }
 }

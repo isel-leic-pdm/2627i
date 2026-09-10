@@ -41,3 +41,19 @@ data class Game(
         thumbnailUri?.let { Uri(it) }
     )
 }
+
+/**
+ * Represents the full set of information shown on the details screen.
+ * @property game The basic game information.
+ * @property description A summary or description of the game.
+ * @property developers The developers of the game.
+ * @property publishers The publishers of the game.
+ * @property genres The genres of the game.
+ */
+data class GameDetails(
+    val game: Game,
+    val description: String?,
+    val developers: List<String>,
+    val publishers: List<String>,
+    val genres: List<String>
+)

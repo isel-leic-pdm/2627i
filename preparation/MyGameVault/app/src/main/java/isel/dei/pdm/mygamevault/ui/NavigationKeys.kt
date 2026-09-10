@@ -6,7 +6,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed interface AppRoute : NavKey {
     @Serializable
-    data object MyCollection : AppRoute
+    data class MyCollection(
+        val resetFilter: Boolean = false,
+        val navigationId: String = ""
+    ) : AppRoute
     
     @Serializable
     data object AddGame : AppRoute

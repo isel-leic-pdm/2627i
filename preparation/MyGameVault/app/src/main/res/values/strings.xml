@@ -38,6 +38,7 @@
     <string name="my_collection_header">My Collection</string>
     <string name="collection_empty_message">Nothing to see here.</string>
     <string name="collection_filter_latest">Latest</string>
+    <string name="clear_search_description">Clear search</string>
     <string name="added_on_label">Added on: %1$s</string>
     <string name="hours_spent_label">%1$d h</string>
 
@@ -68,6 +69,12 @@
     <string name="game_details_cancel_edit">Cancel edit</string>
     <string name="game_details_completed_runs_title">Completed Runs</string>
     <string name="game_details_add_run">Add Run</string>
+
+    <string name="details_released_label">Released</string>
+    <string name="details_developer_label">Developer</string>
+    <string name="details_publisher_label">Publisher</string>
+    <string name="details_genre_label">Genre</string>
+    <string name="details_description_label">Description</string>
 
     <string name="notification_channel_name">Play Session</string>
     <string name="notification_channel_description">Notifications for active play sessions.</string>

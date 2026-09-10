@@ -135,6 +135,30 @@ class AddGameScreenTests {
     }
 
     @Test
+    fun onQueryChange_whenClearButtonClicked_isInvokedWithEmptyString() {
+        // Arrange
+        var query = "Elden"
+        composeTestRule.setTestContent {
+            AddGameScreenView(
+                state = AddGameScreenState.Idle(sourceQuery = "Elden"),
+                searchQuery = query,
+                onQueryChange = { query = it },
+                onPlatformChange = {},
+                onCategoryChange = {},
+                onAddRequested = {},
+                onDetailsRequested = {},
+                onRecoverableErrorConsumed = {}
+            )
+        }
+
+        // Act
+        composeTestRule.onNodeWithTag("ClearSearchButton").performClick()
+
+        // Assert
+        assertEquals("", query)
+    }
+
+    @Test
     fun gameList_whenIdleWithResults_displaysAllGames() {
         // Arrange
         val games = listOf(

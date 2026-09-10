@@ -75,7 +75,7 @@ internal data class ActiveSessionEntity(
     @PrimaryKey val id: Int = 1,
     val gameId: Long,
     val platformId: Long,
-    val startTimeSeconds: Long
+    val startTimeMillis: Long
 )
 
 /**
@@ -136,7 +136,7 @@ internal fun CollectionEntryWithDetails.toCollectionEntry(sessionStartTime: Inst
         state = entry.state,
         completedRuns = entry.completedRuns
     ),
-    addedAt = LocalDate.ofEpochDay(entry.addedAt),
+    addedAt = Instant.fromEpochMilliseconds(entry.addedAt),
     sessionStartTime = sessionStartTime
 )
 
@@ -146,5 +146,5 @@ internal fun CollectionEntry.toEntity() = CollectionEntryEntity(
     timeSpentSeconds = playStatus.timeSpent.toDuration().inWholeSeconds,
     state = playStatus.state,
     completedRuns = playStatus.completedRuns,
-    addedAt = addedAt.toEpochDay()
+    addedAt = addedAt.toEpochMilliseconds()
 )

@@ -3,6 +3,7 @@ package isel.dei.pdm.mygamevault.add
 import isel.dei.pdm.mygamevault.MainDispatcherRule
 import isel.dei.pdm.mygamevault.domain.CollectionEntry
 import isel.dei.pdm.mygamevault.domain.Game
+import isel.dei.pdm.mygamevault.domain.GameDetails
 import isel.dei.pdm.mygamevault.domain.NonBlankString
 import isel.dei.pdm.mygamevault.domain.Platform
 import isel.dei.pdm.mygamevault.domain.Platforms
@@ -63,6 +64,10 @@ class AddGameViewModelTests {
                 Result.success(resultsToReturn)
             }
         }
+
+        override suspend fun fetchGameDetails(gameId: Long): Result<GameDetails?> {
+            return Result.success(null)
+        }
     }
 
     private class FakeCollectionRepository : CollectionRepository {
@@ -74,10 +79,10 @@ class AddGameViewModelTests {
         override suspend fun startSession(gameId: Long, platformId: Long) {}
         override suspend fun stopSession() {}
         override fun getCurrentlyPlaying(): Flow<List<CollectionEntry>> = flowOf(emptyList())
-        override fun getLatest(limit: Int): Flow<List<CollectionEntry>> = flowOf(emptyList())
-        override fun searchByName(partialName: String, orderBy: CollectionRepository.OrderBy, limit: Int): Flow<List<CollectionEntry>> = flowOf(emptyList())
-        override fun searchByPlatforms(platforms: Set<Platform>, orderBy: CollectionRepository.OrderBy, limit: Int): Flow<List<CollectionEntry>> = flowOf(emptyList())
-        override fun searchByStates(states: Set<PlayStatus.State>, orderBy: CollectionRepository.OrderBy, limit: Int): Flow<List<CollectionEntry>> = flowOf(emptyList())
+        override fun getLatest(skip: Int, top: Int): Flow<List<CollectionEntry>> = flowOf(emptyList())
+        override fun searchByName(partialName: String, orderBy: CollectionRepository.OrderBy, skip: Int, top: Int): Flow<List<CollectionEntry>> = flowOf(emptyList())
+        override fun searchByPlatforms(platforms: Set<Platform>, orderBy: CollectionRepository.OrderBy, skip: Int, top: Int): Flow<List<CollectionEntry>> = flowOf(emptyList())
+        override fun searchByStates(states: Set<PlayStatus.State>, orderBy: CollectionRepository.OrderBy, skip: Int, top: Int): Flow<List<CollectionEntry>> = flowOf(emptyList())
     }
 
     @Test
@@ -136,7 +141,7 @@ class AddGameViewModelTests {
         }
 
     @Test
-    fun `clearing query transitions to Idle state and clears results after debounce`() =
+    fun `clearing query transitions to Idle state immediately and clears results`() =
         runTest(mainDispatcherRule.testDispatcher) {
             // Arrange: Start with some results
             val initialResults =
@@ -153,14 +158,7 @@ class AddGameViewModelTests {
             // Act
             sut.onQueryChange("")
 
-            // Assert: Still Typing before debounce
-            assertTrue(sut.state.value is AddGameScreenState.Typing)
-
-            // Act: Advance time
-            advanceTimeBy(beyondDebounceTimeout)
-            runCurrent()
-
-            // Assert
+            // Assert: Transitions to Idle immediately
             assertTrue(sut.state.value is AddGameScreenState.Idle)
             val state = sut.state.value as AddGameScreenState.Idle
             assertEquals(null, state.sourceQuery)
@@ -173,7 +171,7 @@ class AddGameViewModelTests {
         }
 
     @Test
-    fun `whitespace query does not trigger search and clears results`() =
+    fun `whitespace query transitions to Idle immediately and clears results`() =
         runTest(mainDispatcherRule.testDispatcher) {
             // Arrange
             val initialResults =
@@ -187,8 +185,6 @@ class AddGameViewModelTests {
 
             // Act
             viewModel.onQueryChange("   ")
-            advanceTimeBy(beyondDebounceTimeout)
-            runCurrent()
 
             // Assert
             assertTrue(viewModel.state.value is AddGameScreenState.Idle)

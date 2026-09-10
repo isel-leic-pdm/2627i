@@ -82,11 +82,20 @@ class AddGameViewModel(
     fun onQueryChange(newQuery: String) {
         Log.d(TAG, "onQueryChange: newQuery = \"$newQuery\"")
         _query.value = newQuery
-        _state.value = AddGameScreenState.Typing(
-            results = _state.value.results,
-            selectedPlatform = _selectedPlatform.value,
-            selectedCategory = _selectedCategory.value
-        )
+        if (newQuery.isBlank()) {
+            _state.value = AddGameScreenState.Idle(
+                sourceQuery = null,
+                results = emptyList(),
+                selectedPlatform = _selectedPlatform.value,
+                selectedCategory = _selectedCategory.value
+            )
+        } else {
+            _state.value = AddGameScreenState.Typing(
+                results = _state.value.results,
+                selectedPlatform = _selectedPlatform.value,
+                selectedCategory = _selectedCategory.value
+            )
+        }
     }
 
     /**

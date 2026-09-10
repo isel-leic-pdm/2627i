@@ -22,6 +22,7 @@ import androidx.navigation3.ui.NavDisplay
 import isel.dei.pdm.mygamevault.add.AddGameScreen
 import isel.dei.pdm.mygamevault.add.AddGameViewModel
 import isel.dei.pdm.mygamevault.add.details.GameDetailsScreen
+import isel.dei.pdm.mygamevault.add.details.GameDetailsViewModel
 import isel.dei.pdm.mygamevault.collection.MyCollectionScreen
 import isel.dei.pdm.mygamevault.collection.MyCollectionViewModel
 import isel.dei.pdm.mygamevault.collection.details.CollectionEntryScreen
@@ -37,7 +38,7 @@ private data class NavigationItem(
 
 private val navigationItems = listOf(
     NavigationItem(AppRoute.AddGame, Icons.Default.Add, "Add Game"),
-    NavigationItem(AppRoute.MyCollection, Icons.AutoMirrored.Filled.LibraryBooks, "Collection"),
+    NavigationItem(AppRoute.MyCollection(), Icons.AutoMirrored.Filled.LibraryBooks, "Collection"),
     NavigationItem(AppRoute.Preferences, Icons.Default.Settings, "Preferences"),
 )
 
@@ -48,7 +49,7 @@ fun AppScaffold(
     initialRoute: AppRoute? = null
 ) {
     val navigationState = rememberNavigationState(
-        startRoute = AppRoute.MyCollection,
+        startRoute = AppRoute.MyCollection(),
         topLevelRoutes = navigationItems.asSequence().map { it.route }.toSet()
     )
     val navigator = remember(navigationState) { Navigator(navigationState) }
@@ -60,10 +61,15 @@ fun AppScaffold(
     }
 
     val entryProvider = entryProvider {
-        entry<AppRoute.MyCollection> {
+        entry<AppRoute.MyCollection> { key ->
             val viewModel: MyCollectionViewModel = viewModel(
                 factory = MyCollectionViewModel.factory(dependencies.collectionRepository)
             )
+            LaunchedEffect(key) {
+                if (key.resetFilter) {
+                    viewModel.onFilterResetRequested(key.navigationId)
+                }
+            }
             MyCollectionScreen(
                 viewModel = viewModel,
                 onEntrySelected = { entry ->
@@ -79,7 +85,12 @@ fun AppScaffold(
                 viewModel = viewModel,
                 onAddRequested = { game ->
                     viewModel.addGame(game, viewModel.selectedPlatform.value)
-                    navigator.navigate(AppRoute.MyCollection)
+                    navigator.navigate(
+                        AppRoute.MyCollection(
+                            resetFilter = true,
+                            navigationId = System.currentTimeMillis().toString()
+                        )
+                    )
                 },
                 onDetailsRequested = { game ->
                     navigator.navigate(AppRoute.GameDetails(game.id))
@@ -104,8 +115,11 @@ fun AppScaffold(
             )
         }
         entry<AppRoute.GameDetails> { key ->
+            val viewModel: GameDetailsViewModel = viewModel(
+                factory = GameDetailsViewModel.factory(key.gameId, dependencies.searchService)
+            )
             GameDetailsScreen(
-                gameId = key.gameId,
+                viewModel = viewModel,
                 onBackRequested = { navigator.goBack() }
             )
         }

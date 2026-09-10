@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlin.time.Clock
 import kotlin.time.Instant
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Room-based implementation of the [CollectionRepository].
@@ -75,7 +75,7 @@ internal class RoomCollectionRepository(
             
             entryWithDetails?.toCollectionEntry(
                 sessionStartTime = if (session != null && session.gameId == gameId && session.platformId == platform.id) {
-                    Instant.fromEpochSeconds(session.startTimeSeconds)
+                    Instant.fromEpochMilliseconds(session.startTimeMillis)
                 } else null
             ).also {
                 Log.d(TAG, "get: successfully retrieved ${if (it != null) "entry" else "null"}")
@@ -98,7 +98,7 @@ internal class RoomCollectionRepository(
                 } else {
                     gameDao.observeEntry(session.gameId, session.platformId).map { entryWithDetails ->
                         entryWithDetails?.toCollectionEntry(
-                            sessionStartTime = Instant.fromEpochSeconds(session.startTimeSeconds)
+                            sessionStartTime = Instant.fromEpochMilliseconds(session.startTimeMillis)
                         )
                     }
                 }
@@ -115,7 +115,7 @@ internal class RoomCollectionRepository(
                     ActiveSessionEntity(
                         gameId = gameId,
                         platformId = platformId,
-                        startTimeSeconds = Clock.System.now().epochSeconds
+                        startTimeMillis = Clock.System.now().toEpochMilliseconds()
                     )
                 )
             }
@@ -132,7 +132,7 @@ internal class RoomCollectionRepository(
             database.withTransaction {
                 val active = gameDao.getActiveSessionOnce()
                 if (active != null) {
-                    val duration = (Clock.System.now().epochSeconds - active.startTimeSeconds).seconds
+                    val duration = (Clock.System.now().toEpochMilliseconds() - active.startTimeMillis).milliseconds
                     Log.d(TAG, "stopSession: found active session, duration = $duration")
                     val entryWithDetails = gameDao.getEntry(active.gameId, active.platformId)
                     if (entryWithDetails != null) {
@@ -153,36 +153,51 @@ internal class RoomCollectionRepository(
         }
     }
 
-    override fun getLatest(limit: Int): Flow<List<CollectionEntry>> {
-        Log.d(TAG, "getLatest: limit = $limit")
-        return performSearch(gameDao.searchLatest(limit.coerceAtMost(MAX_LIMIT)), CollectionRepository.OrderBy.ADDED_AT)
+    override fun getLatest(skip: Int, top: Int): Flow<List<CollectionEntry>> {
+        Log.d(TAG, "getLatest: skip = $skip, top = $top")
+        return performSearch(
+            gameDao.searchLatest(skip, top.coerceAtMost(MAX_LIMIT)),
+            CollectionRepository.OrderBy.ADDED_AT
+        )
     }
 
     override fun searchByName(
         partialName: String,
         orderBy: CollectionRepository.OrderBy,
-        limit: Int
+        skip: Int,
+        top: Int
     ): Flow<List<CollectionEntry>> {
-        Log.d(TAG, "searchByName: partialName = \"$partialName\", orderBy = $orderBy, limit = $limit")
-        return performSearch(gameDao.searchByName(partialName, limit.coerceAtMost(MAX_LIMIT)), orderBy)
+        Log.d(TAG, "searchByName: partialName = \"$partialName\", orderBy = $orderBy, skip = $skip, top = $top")
+        return performSearch(
+            gameDao.searchByName(partialName, skip, top.coerceAtMost(MAX_LIMIT)),
+            orderBy
+        )
     }
 
     override fun searchByPlatforms(
         platforms: Set<Platform>,
         orderBy: CollectionRepository.OrderBy,
-        limit: Int
+        skip: Int,
+        top: Int
     ): Flow<List<CollectionEntry>> {
-        Log.d(TAG, "searchByPlatforms: platforms = ${platforms.map { it.id }}, orderBy = $orderBy, limit = $limit")
-        return performSearch(gameDao.searchByPlatforms(platforms.map { it.id }.toSet(), limit.coerceAtMost(MAX_LIMIT)), orderBy)
+        Log.d(TAG, "searchByPlatforms: platforms = ${platforms.map { it.id }}, orderBy = $orderBy, skip = $skip, top = $top")
+        return performSearch(
+            gameDao.searchByPlatforms(platforms.map { it.id }.toSet(), skip, top.coerceAtMost(MAX_LIMIT)),
+            orderBy
+        )
     }
 
     override fun searchByStates(
         states: Set<PlayStatus.State>,
         orderBy: CollectionRepository.OrderBy,
-        limit: Int
+        skip: Int,
+        top: Int
     ): Flow<List<CollectionEntry>> {
-        Log.d(TAG, "searchByStates: states = $states, orderBy = $orderBy, limit = $limit")
-        return performSearch(gameDao.searchByStates(states, limit.coerceAtMost(MAX_LIMIT)), orderBy)
+        Log.d(TAG, "searchByStates: states = $states, orderBy = $orderBy, skip = $skip, top = $top")
+        return performSearch(
+            gameDao.searchByStates(states, skip, top.coerceAtMost(MAX_LIMIT)),
+            orderBy
+        )
     }
 
     private fun performSearch(
@@ -190,17 +205,21 @@ internal class RoomCollectionRepository(
         orderBy: CollectionRepository.OrderBy
     ): Flow<List<CollectionEntry>> = baseFlow.map { list ->
         list.map { it.toCollectionEntry() }
-            .sortedWith(
-                compareBy<CollectionEntry> { it.platform.name() }
-                    .thenBy { it.playStatus.state.ordinal }
-                    .thenBy {
-                        when (orderBy) {
-                            CollectionRepository.OrderBy.NAME -> it.game.name()
-                            CollectionRepository.OrderBy.RELEASE_DATE -> it.game.releaseDate?.toEpochDay() ?: 0L
-                            CollectionRepository.OrderBy.ADDED_AT -> it.addedAt.toEpochDay()
-                        }
+            .sortedWith { a, b ->
+                when (orderBy) {
+                    CollectionRepository.OrderBy.NAME ->
+                        a.game.name().compareTo(b.game.name())
+
+                    CollectionRepository.OrderBy.RELEASE_DATE -> {
+                        val dateA = a.game.releaseDate?.toEpochDay() ?: 0L
+                        val dateB = b.game.releaseDate?.toEpochDay() ?: 0L
+                        dateB.compareTo(dateA) // Descending
                     }
-            )
+
+                    CollectionRepository.OrderBy.ADDED_AT ->
+                        b.addedAt.compareTo(a.addedAt) // Descending
+                }
+            }
     }
 
     private fun mapToPersistenceException(message: String, e: Exception) = when (e) {

@@ -136,8 +136,7 @@ fun CollectionEntryItemPlayingPreview() {
         playStatus = PlayStatus(
             state = PlayStatus.State.PLAYING,
             timeSpent = 45.hours.toPlayTime()
-        ),
-        addedAt = LocalDate.now()
+        )
     )
     MyGameVaultTheme {
         CollectionEntryItem(
@@ -157,8 +156,7 @@ fun CollectionEntryItemFinishedPreview() {
             state = PlayStatus.State.FINISHED,
             timeSpent = 120.hours.toPlayTime(),
             completedRuns = 1
-        ),
-        addedAt = LocalDate.of(2023, 6, 1)
+        )
     )
     MyGameVaultTheme {
         CollectionEntryItem(

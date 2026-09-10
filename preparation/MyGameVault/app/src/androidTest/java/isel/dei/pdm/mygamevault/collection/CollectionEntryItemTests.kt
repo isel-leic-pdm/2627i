@@ -34,8 +34,7 @@ class CollectionEntryItemTests {
         playStatus = PlayStatus(
             state = PlayStatus.State.PLAYING,
             timeSpent = 50.hours.toPlayTime()
-        ),
-        addedAt = LocalDate.now()
+        )
     )
 
     @Test
