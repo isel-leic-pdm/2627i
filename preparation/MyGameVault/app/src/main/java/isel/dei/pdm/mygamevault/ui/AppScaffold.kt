@@ -22,6 +22,7 @@ import androidx.navigation3.ui.NavDisplay
 import isel.dei.pdm.mygamevault.add.AddGameScreen
 import isel.dei.pdm.mygamevault.add.AddGameViewModel
 import isel.dei.pdm.mygamevault.add.details.GameDetailsScreen
+import isel.dei.pdm.mygamevault.add.details.GameDetailsViewModel
 import isel.dei.pdm.mygamevault.collection.MyCollectionScreen
 import isel.dei.pdm.mygamevault.collection.MyCollectionViewModel
 import isel.dei.pdm.mygamevault.collection.details.CollectionEntryScreen
@@ -114,8 +115,11 @@ fun AppScaffold(
             )
         }
         entry<AppRoute.GameDetails> { key ->
+            val viewModel: GameDetailsViewModel = viewModel(
+                factory = GameDetailsViewModel.factory(key.gameId, dependencies.searchService)
+            )
             GameDetailsScreen(
-                gameId = key.gameId,
+                viewModel = viewModel,
                 onBackRequested = { navigator.goBack() }
             )
         }

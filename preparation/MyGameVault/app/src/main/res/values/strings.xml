@@ -70,6 +70,12 @@
     <string name="game_details_completed_runs_title">Completed Runs</string>
     <string name="game_details_add_run">Add Run</string>
 
+    <string name="details_released_label">Released</string>
+    <string name="details_developer_label">Developer</string>
+    <string name="details_publisher_label">Publisher</string>
+    <string name="details_genre_label">Genre</string>
+    <string name="details_description_label">Description</string>
+
     <string name="notification_channel_name">Play Session</string>
     <string name="notification_channel_description">Notifications for active play sessions.</string>
     <string name="notification_session_title">Active Session</string>

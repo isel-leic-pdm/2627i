@@ -1,6 +1,7 @@
 package isel.dei.pdm.mygamevault.adapters.fakes
 
 import isel.dei.pdm.mygamevault.domain.Game
+import isel.dei.pdm.mygamevault.domain.GameDetails
 import isel.dei.pdm.mygamevault.domain.NonBlankString
 import isel.dei.pdm.mygamevault.domain.Platform
 import isel.dei.pdm.mygamevault.ports.SearchService
@@ -36,5 +37,23 @@ class FakeSearchService : SearchService {
         delay(500.milliseconds)
         val result = games.filter { it.name.value.contains(partialName.value, ignoreCase = true) }
         return Result.success(result)
+    }
+
+    override suspend fun fetchGameDetails(gameId: Long): Result<GameDetails?> {
+        delay(500.milliseconds)
+        val game = games.find { it.id == gameId }
+        return if (game != null) {
+            Result.success(
+                GameDetails(
+                    game = game,
+                    description = "This is a fake description for ${game.name.value}.",
+                    developers = listOf("Fake Developer"),
+                    publishers = listOf("Fake Publisher"),
+                    genres = listOf("Action", "RPG")
+                )
+            )
+        } else {
+            Result.success(null)
+        }
     }
 }

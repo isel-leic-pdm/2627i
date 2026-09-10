@@ -10,6 +10,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import isel.dei.pdm.mygamevault.domain.Game
+import isel.dei.pdm.mygamevault.domain.GameDetails
 import isel.dei.pdm.mygamevault.domain.Platforms
 import isel.dei.pdm.mygamevault.ports.NoConnectivityException
 import isel.dei.pdm.mygamevault.domain.NonBlankString
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -256,5 +258,70 @@ class IgdbSearchServiceTests {
         // Assert
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is UnexpectedServiceException)
+    }
+
+    @Test
+    fun `fetchGameDetails returns mapped details when API succeeds`() = runTest {
+        // Arrange
+        val mockEngine = MockEngine { _ ->
+            respond(
+                content = """
+                    [
+                        {
+                            "id": 123,
+                            "name": "Elden Ring",
+                            "summary": "Epic RPG",
+                            "involved_companies": [
+                                { "developer": true, "publisher": false, "company": { "name": "FromSoftware" } },
+                                { "developer": false, "publisher": true, "company": { "name": "Bandai Namco" } }
+                            ],
+                            "genres": [ { "name": "RPG" } ]
+                        }
+                    ]
+                """.trimIndent(),
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+        val httpClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
+        }
+        val service = IgdbSearchService(httpClient, FakeSecretsRepository("id", "token"))
+
+        // Act
+        val result = service.fetchGameDetails(123)
+
+        // Assert
+        assertTrue(result.isSuccess)
+        val details = result.getOrThrow()
+        assertNotNull(details)
+        assertEquals("Elden Ring", details!!.game.name())
+        assertEquals("Epic RPG", details.description)
+        assertEquals(listOf("FromSoftware"), details.developers)
+        assertEquals(listOf("Bandai Namco"), details.publishers)
+        assertEquals(listOf("RPG"), details.genres)
+    }
+
+    @Test
+    fun `fetchGameDetails returns null when API returns empty list`() = runTest {
+        // Arrange
+        val mockEngine = MockEngine { _ ->
+            respond(
+                content = "[]",
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+        val httpClient = HttpClient(mockEngine) {
+            install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
+        }
+        val service = IgdbSearchService(httpClient, FakeSecretsRepository("id", "token"))
+
+        // Act
+        val result = service.fetchGameDetails(999)
+
+        // Assert
+        assertTrue(result.isSuccess)
+        assertEquals(null, result.getOrThrow())
     }
 }

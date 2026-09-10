@@ -3,6 +3,7 @@ package isel.dei.pdm.mygamevault.add
 import isel.dei.pdm.mygamevault.MainDispatcherRule
 import isel.dei.pdm.mygamevault.domain.CollectionEntry
 import isel.dei.pdm.mygamevault.domain.Game
+import isel.dei.pdm.mygamevault.domain.GameDetails
 import isel.dei.pdm.mygamevault.domain.NonBlankString
 import isel.dei.pdm.mygamevault.domain.Platform
 import isel.dei.pdm.mygamevault.domain.Platforms
@@ -62,6 +63,10 @@ class AddGameViewModelTests {
             } else {
                 Result.success(resultsToReturn)
             }
+        }
+
+        override suspend fun fetchGameDetails(gameId: Long): Result<GameDetails?> {
+            return Result.success(null)
         }
     }
 
