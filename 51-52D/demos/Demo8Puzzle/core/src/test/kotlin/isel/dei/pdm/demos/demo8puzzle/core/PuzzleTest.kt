@@ -7,10 +7,10 @@ class PuzzleTest {
     @Test
     fun `Puzzle initialization and access`() {
         val puzzle = Puzzle(1, 2, 3, 4, 5, 6, 7, 8, 0)
-        assertEquals(Tile(1), puzzle[0])
-        assertEquals(Tile(1), puzzle[0, 0])
-        assertEquals(Tile(3), puzzle[0, 2])
-        assertEquals(Tile(4), puzzle[1, 0])
+        assertEquals(1, puzzle[0]?.value)
+        assertEquals(1, puzzle[0, 0]?.value)
+        assertEquals(3, puzzle[0, 2]?.value)
+        assertEquals(4, puzzle[1, 0]?.value)
         assertEquals(null, puzzle[8])
         assertEquals(null, puzzle[2, 2])
     }
@@ -61,10 +61,24 @@ class PuzzleTest {
 
     @Test
     fun `shuffle produces non-solved solvable puzzle`() {
-        val shuffled = solvedPuzzle.shuffle(50)
+        val shuffled = solvedPuzzle.shuffle()
         assertFalse(shuffled.isSolved())
-        // Verify tile count
+        assertTrue(shuffled.isSolvable())
         assertEquals(9, shuffled.count())
         assertEquals(1, shuffled.count { it == null })
+    }
+
+    @Test
+    fun `inversions calculation and solvability check`() {
+        // Solved puzzle has 0 inversions and is solvable
+        assertEquals(0, solvedPuzzle.inversions())
+        assertTrue(solvedPuzzle.isSolvable())
+
+        // 1 2 3
+        // 4 5 6
+        // 8 7 _ -> 1 inversion (8 > 7), unsolvable
+        val unsolvable = Puzzle(1, 2, 3, 4, 5, 6, 8, 7, 0)
+        assertEquals(1, unsolvable.inversions())
+        assertFalse(unsolvable.isSolvable())
     }
 }

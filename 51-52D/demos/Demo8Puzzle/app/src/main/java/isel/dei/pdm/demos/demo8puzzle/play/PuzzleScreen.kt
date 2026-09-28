@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,6 +32,7 @@ import isel.dei.pdm.demos.demo8puzzle.ui.theme.Demo8PuzzleTheme
 const val START_BUTTON_TAG = "StartButton"
 const val RESET_BUTTON_TAG = "ResetButton"
 const val SOLVE_BUTTON_TAG = "SolveButton"
+const val CONGRATS_MESSAGE_TAG = "CongratsMessage"
 
 /**
  * Root composable for the play screen.
@@ -62,7 +64,8 @@ private fun PuzzleScreenContent(
     onTileClicked: (Tile) -> Unit,
     onStart: () -> Unit,
     onReset: () -> Unit,
-    onSolve: () -> Unit
+    onSolve: () -> Unit,
+
 ) {
     val configuration = LocalConfiguration.current
     if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -151,7 +154,6 @@ private fun PuzzleControls(
     onReset: () -> Unit,
     onSolve: () -> Unit
 ) {
-    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     when (state) {
         is PuzzleScreenState.Idle -> {
             Button(
@@ -162,48 +164,45 @@ private fun PuzzleControls(
             }
         }
         is PuzzleScreenState.Solving -> {
-            if (isLandscape) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+            RowOrColumn {
+                Button(
+                    onClick = onReset,
+                    modifier = Modifier.testTag(RESET_BUTTON_TAG)
                 ) {
-                    Button(
-                        onClick = onReset,
-                        modifier = Modifier.testTag(RESET_BUTTON_TAG)
-                    ) {
-                        Text(text = stringResource(id = R.string.reset_button), fontSize = 24.sp)
-                    }
-                    Button(
-                        onClick = onSolve,
-                        modifier = Modifier.testTag(SOLVE_BUTTON_TAG)
-                    ) {
-                        Text(text = stringResource(id = R.string.solve_button), fontSize = 24.sp)
-                    }
+                    Text(text = stringResource(id = R.string.reset_button), fontSize = 24.sp)
                 }
-            } else {
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Button(
-                        onClick = onReset,
-                        modifier = Modifier.testTag(RESET_BUTTON_TAG)
-                    ) {
-                        Text(text = stringResource(id = R.string.reset_button), fontSize = 24.sp)
-                    }
-                    Button(
-                        onClick = onSolve,
-                        modifier = Modifier.testTag(SOLVE_BUTTON_TAG)
-                    ) {
-                        Text(text = stringResource(id = R.string.solve_button), fontSize = 24.sp)
-                    }
+                Button(
+                    onClick = onSolve,
+                    modifier = Modifier.testTag(SOLVE_BUTTON_TAG)
+                ) {
+                    Text(text = stringResource(id = R.string.solve_button), fontSize = 24.sp)
                 }
             }
         }
         is PuzzleScreenState.Solved -> {
-            Button(
-                onClick = onReset,
-                modifier = Modifier.testTag(RESET_BUTTON_TAG)
-            ) {
-                Text(text = stringResource(id = R.string.reset_button), fontSize = 24.sp)
-            }
+            Text(
+                text = stringResource(id = R.string.puzzle_solved_message),
+                fontSize = 24.sp,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.testTag(CONGRATS_MESSAGE_TAG)
+            )
+        }
+    }
+}
+
+@Composable
+private fun RowOrColumn(content: @Composable () -> Unit){
+    val configuration = LocalConfiguration.current
+    if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            content()
+        }
+    } else {
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            content()
         }
     }
 }

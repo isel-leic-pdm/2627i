@@ -1,85 +1,89 @@
 package isel.dei.pdm.demos.demo8puzzle.play
 
-import isel.dei.pdm.demos.demo8puzzle.core.Tile
 import isel.dei.pdm.demos.demo8puzzle.core.solvedPuzzle
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
+import kotlin.time.Duration.Companion.milliseconds
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class PuzzleScreenViewModelTest {
+
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
 
     @Test
     fun `initial state is Idle`() {
-        val viewModel = PuzzleScreenViewModel()
-        val state = viewModel.state
+        // Arrange & Act
+        val sut = PuzzleScreenViewModel()
+
+        // Assert
+        val state = sut.state
         assertTrue(state is PuzzleScreenState.Idle)
         assertEquals(solvedPuzzle, state.puzzle)
     }
 
     @Test
     fun `start from Idle transitions to Solving`() {
-        val viewModel = PuzzleScreenViewModel()
-        viewModel.start()
-        val state = viewModel.state
+        // Arrange
+        val sut = PuzzleScreenViewModel()
+
+        // Act
+        sut.start()
+
+        // Assert
+        val state = sut.state
         assertTrue(state is PuzzleScreenState.Solving)
     }
 
     @Test
     fun `moveTile in Solving state updates puzzle state`() {
-        val viewModel = PuzzleScreenViewModel()
-        viewModel.start()
-        val initialState = viewModel.state as PuzzleScreenState.Solving
+        // Arrange
+        val sut = PuzzleScreenViewModel()
+        sut.start()
+        val initialState = sut.state as PuzzleScreenState.Solving
 
-        val nullIdx = initialState.puzzle.indexOf(null)
-        val row = nullIdx / 3
-        val col = nullIdx % 3
-        val tileToMove: Tile = when {
-            row > 0 -> initialState.puzzle[row - 1, col]
-            row < 2 -> initialState.puzzle[row + 1, col]
-            col > 0 -> initialState.puzzle[row, col - 1]
-            else -> initialState.puzzle[row, col + 1]
-        }!!
+        // Act
+        val tileToMove = initialState.puzzle.getMoveableTiles().shuffled().first()
+        sut.moveTile(tileToMove)
 
-        viewModel.moveTile(tileToMove)
-
-        val newState = viewModel.state
+        // Assert
+        val newState = sut.state
         assertEquals(initialState.puzzle.move(tileToMove), newState.puzzle)
     }
 
     @Test
     fun `reset from Solving state transitions to Idle`() {
-        val viewModel = PuzzleScreenViewModel()
-        viewModel.start()
-        assertTrue(viewModel.state is PuzzleScreenState.Solving)
+        // Arrange
+        val sut = PuzzleScreenViewModel()
+        sut.start()
 
-        viewModel.reset()
-        val state = viewModel.state
+        // Act
+        sut.reset()
+
+        // Assert
+        val state = sut.state
         assertTrue(state is PuzzleScreenState.Idle)
         assertEquals(solvedPuzzle, state.puzzle)
     }
 
     @Test
-    fun `reset from Solved state transitions to Idle`() {
-        val viewModel = PuzzleScreenViewModel()
+    fun `state auto resets from Solved to Idle after timeout`() = runTest {
+        // Arrange
+        val viewModel = PuzzleScreenViewModel(solvedTimeoutMs = 100L)
         viewModel.start()
-        viewModel.solve()
-        assertTrue(viewModel.state is PuzzleScreenState.Solved)
 
-        viewModel.reset()
+        // Act
+        viewModel.solve()
+        advanceTimeBy(150L.milliseconds)
+
+        // Assert
         val state = viewModel.state
         assertTrue(state is PuzzleScreenState.Idle)
-        assertEquals(solvedPuzzle, state.puzzle)
-    }
-
-    @Test
-    fun `solve from Solving state transitions to Solved`() {
-        val viewModel = PuzzleScreenViewModel()
-        viewModel.start()
-        assertTrue(viewModel.state is PuzzleScreenState.Solving)
-
-        viewModel.solve()
-        val state = viewModel.state
-        assertTrue(state is PuzzleScreenState.Solved)
         assertEquals(solvedPuzzle, state.puzzle)
     }
 }

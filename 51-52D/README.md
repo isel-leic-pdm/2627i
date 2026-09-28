@@ -103,4 +103,37 @@
   * [Prodigi - Curso de PDM - M09 - ViewModel](https://www.youtube.com/watch?v=9vYmkeg72vg&list=PL8XxoCaL3dBhS-THuPazx0BSAswof6wqh&index=10)
 * Lectures videos from Prof. Paulo Pereira (in Portuguese)
   * [Aula 03 (21/09/2026)](https://www.youtube.com/watch?v=L8VyU_gUitE&list=PLX4G3J1kqg4U&index=3)
-  * Aula 04 (25/09/2026) _(brevemente)_
+  * [Aula 04 parte 1](https://www.youtube.com/watch?v=vi3Op-yXoso&list=PLX4G3J1kqg4U&index=4) e [Aula 04 parte 2](https://www.youtube.com/watch?v=Poaa_8qwg3k&list=PLX4G3J1kqg4U&index=5) (25/09/2026)
+
+### Week 4 (28/09/2026) - Building a UI in Android: concurrency model (introduction)
+* Android concurrency model
+  * Implementation of change notification methods in the lifecycle
+  * Execution in handlers of events
+* Kotlin Concurrency Model (revisions)
+  * Thread vs coroutine
+  * Suspending functions, coroutines, scopes and dispatchers
+* ViewModel, revisited
+  * ViewModel as the host of the execution: viewModelScope
+* Architecting the UI
+  * Support for multiple orientations: LocalConfiguration.current.orientation
+* Application resources, introduction
+  * Multilingual text
+
+#### Resources
+* [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html)
+* [ViewModel overview | Android Developers](https://developer.android.com/topic/libraries/architecture/viewmodel)
+  * [Use Kotlin coroutines with lifecycle-aware components | Android Developers](https://developer.android.com/topic/libraries/architecture/coroutines#viewmodelscope) 
+* [Prodigi - Curso de PDM - M08 - Modelo de Concorrência](https://www.youtube.com/watch?v=QShOCxQc6oI&list=PL8XxoCaL3dBhS-THuPazx0BSAswof6wqh&index=9)
+* [Application resources | Android Developers](https://developer.android.com/guide/topics/resources/providing-resources)
+* Lectures videos from Prof. Paulo Pereira (in Portuguese)
+  * Aula 05 (28/09/2026)
+  * Aula 06 (02/10/2026)
+
+### Week 5 (05/10/2026) - Monitoring of the course's assignment
+* Students will need to record a video of up to 7 minutes presenting their application.
+* The presentation includes the indication
+  * of the features already implemented
+  * of the main decisions taken
+  * of the strategy for verifying correctness
+  * planning the execution of the missing tasks
+  

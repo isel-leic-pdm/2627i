@@ -13,6 +13,9 @@ import isel.dei.pdm.demos.demo8puzzle.ui.theme.Demo8PuzzleTheme
 const val APP_TAG = "Demo8PuzzleApp"
 fun buildLLogTag(className: String) = "$APP_TAG.$className"
 
+/**
+ * The activity used to host the puzzle screen.
+ */
 class MainActivity : ComponentActivity() {
 
     private val viewModel by viewModels<PuzzleScreenViewModel>()

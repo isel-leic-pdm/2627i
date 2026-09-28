@@ -91,14 +91,15 @@ class PuzzleScreenTests {
 
         // Assert
         composeTestRule.onNodeWithTag(START_BUTTON_TAG).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(RESET_BUTTON_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(RESET_BUTTON_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(SOLVE_BUTTON_TAG).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(CONGRATS_MESSAGE_TAG).assertIsDisplayed()
     }
 
     @Test
-    fun clicking_reset_in_solved_state_transitions_to_idle_state() {
+    fun solved_state_auto_resets_to_idle_after_timeout() {
         // Arrange
-        val viewModel = PuzzleScreenViewModel()
+        val viewModel = PuzzleScreenViewModel(solvedTimeoutMs = 100L)
         composeTestRule.setContent {
             Demo8PuzzleTheme {
                 PuzzleScreen(viewModel = viewModel)
@@ -107,13 +108,17 @@ class PuzzleScreenTests {
         composeTestRule.onNodeWithTag(START_BUTTON_TAG).performClick()
         composeTestRule.onNodeWithTag(SOLVE_BUTTON_TAG).performClick()
 
-        // Act
-        composeTestRule.onNodeWithTag(RESET_BUTTON_TAG).performClick()
-
         // Assert
+        composeTestRule.onNodeWithTag(CONGRATS_MESSAGE_TAG).assertIsDisplayed()
+
+        // Wait for auto-reset timeout
+        composeTestRule.waitUntil(timeoutMillis = 1000L) {
+            viewModel.state is PuzzleScreenState.Idle
+        }
+
+        // Assert back in Idle state
         composeTestRule.onNodeWithTag(START_BUTTON_TAG).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(RESET_BUTTON_TAG).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(SOLVE_BUTTON_TAG).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(CONGRATS_MESSAGE_TAG).assertDoesNotExist()
     }
 
     @Test
