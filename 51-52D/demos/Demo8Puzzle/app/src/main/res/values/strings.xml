@@ -3,4 +3,5 @@
     <string name="start_button">Start</string>
     <string name="reset_button">Reset</string>
     <string name="solve_button">Solve</string>
+    <string name="puzzle_solved_message">Congratulations! Puzzle solved!</string>
 </resources>

@@ -3,4 +3,5 @@
     <string name="start_button">Iniciar</string>
     <string name="reset_button">Reiniciar</string>
     <string name="solve_button">Resolver</string>
+    <string name="puzzle_solved_message">Parabéns! Puzzle resolvido!</string>
 </resources>
