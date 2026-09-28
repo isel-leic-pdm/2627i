@@ -35,7 +35,7 @@ fun CrowdTallyScreen() {
 
     var state by remember { mutableStateOf(CrowdTallyInfo(0, 10)) }
     var isEdit by remember { mutableStateOf(false) }
-    var error: Exception? by remember { mutableStateOf(null) }
+    var error: String? by remember { mutableStateOf(null) }
     CounterTheme() {
         Log.d("CounterTheme", "Recomposition")
         Scaffold() { innerPadding ->
@@ -50,7 +50,7 @@ fun CrowdTallyScreen() {
                             state = state.changeCapacity(it)
                             isEdit = false
                         } catch (e: Exception) {
-                            error = e
+                            error = e.toString()
                         }
                     },
                     modifier = Modifier.padding(innerPadding)

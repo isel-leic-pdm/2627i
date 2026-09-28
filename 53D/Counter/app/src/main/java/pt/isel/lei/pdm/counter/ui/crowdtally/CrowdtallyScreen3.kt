@@ -12,11 +12,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import kotlinx.coroutines.newSingleThreadContext
 import pt.isel.lei.pdm.counter.domain.CrowdTallyInfo
 import pt.isel.lei.pdm.counter.domain.changeMax
 import pt.isel.lei.pdm.counter.domain.decrement
@@ -25,53 +27,31 @@ import pt.isel.lei.pdm.counter.ui.theme.CounterTheme
 
 
 @Composable
-fun CrowdTallyScreen() {
-    var state by rememberSaveable { mutableStateOf(CrowdTallyInfo(0, 10)) }
-    var isEdit by rememberSaveable { mutableStateOf(false) }
-    var errorMsg by rememberSaveable { mutableStateOf("") }
+fun CrowdTallyScreen3(viewModel: CrowdTallyViewModel) {
 
-    CounterTheme {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Column(
-                modifier = Modifier.padding(innerPadding)
-            ) {
-                if (isEdit) {
-                    Box()
-                    {
-                        CrowdTallyMaxEditor(
-                            arg = state,
-                            onNewMax = {
-                                try {
-                                    state = state.changeMax(it)
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Column(
+            modifier = Modifier.padding(innerPadding)
+        ) {
 
-                                } catch (e: Exception) {
-                                    errorMsg = e.toString()
-                                    return@CrowdTallyMaxEditor
-                                }
-                                isEdit = false
-                                errorMsg = ""
-                            }
-                        )
-                        if (errorMsg.isNotEmpty())
-                            Text(text = errorMsg, color = Color.Red)
-                    }
+            when (val curr = viewModel.screenState) {
+                is CrowdTallyViewState.Counting -> {
 
-                } else {
                     Box(modifier = Modifier.fillMaxSize()) {
                         CrowdTallyView(
-                            state = state,
+                            state = curr.info,
                             increment = {
-                                state = state.increment()
-                                Log.d("CrowdTallyScreen", "Increment ${state.counter}")
+                                viewModel.increment()
+                                Log.d("CrowdTallyScreen", "Increment ${curr.info.counter}")
                             },
                             decrement = {
-                                state = state.decrement()
-                                Log.d("CrowdTallyScreen", "Decrement ${state.counter}")
+                                viewModel.decrement()
+                                Log.d("CrowdTallyScreen", "Decrement ${curr.info.counter}")
                             }
                         )
                         Button(
                             onClick = {
-                                isEdit = true
+                                viewModel.startEditor()
                             },
                             modifier = Modifier.align(Alignment.TopEnd)
                         ) {
@@ -80,8 +60,22 @@ fun CrowdTallyScreen() {
                     }
                 }
 
-
+                is CrowdTallyViewState.Editor -> {
+                    Box()
+                    {
+                        CrowdTallyMaxEditor(
+                            arg = curr.info,
+                            onNewMax = {
+                                viewModel.changeMax(it)
+                            }
+                        )
+                        if (curr.errorMsg.isNotEmpty())
+                            Text(text = curr.errorMsg, color = Color.Red)
+                    }
+                }
             }
+
+
         }
     }
 }

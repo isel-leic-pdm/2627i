@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,11 +33,33 @@ sealed interface CrowdTallyScreenViewState {
 
 }
 
+private val viewStateSaver: Saver<CrowdTallyScreenViewState, List<Any>> = Saver(
+    save = { inst ->
+        when (inst) {
+            is CrowdTallyScreenViewState.Editor -> {
+                listOf(false, inst.info, inst.errorMsg)
+            }
+
+            is CrowdTallyScreenViewState.Counting -> {
+                listOf(true, inst.info)
+            }
+        }
+    },
+    restore = { data ->
+        if (data[0] as Boolean) {
+            CrowdTallyScreenViewState.Counting(data[1] as CrowdTallyInfo)
+        } else {
+            CrowdTallyScreenViewState.Editor(data[1] as CrowdTallyInfo, data[2] as String)
+
+        }
+    }
+)
+
 @Composable
 fun CrowdTallyScreen2() {
 
     var screenState: CrowdTallyScreenViewState by
-    remember {
+    rememberSaveable(stateSaver = viewStateSaver) {
         mutableStateOf(
             CrowdTallyScreenViewState.Counting(
                 CrowdTallyInfo(0, 10)

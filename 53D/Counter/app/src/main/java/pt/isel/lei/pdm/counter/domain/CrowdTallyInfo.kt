@@ -1,12 +1,14 @@
 package pt.isel.lei.pdm.counter.domain
 
-import androidx.compose.runtime.retain.retain
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 
+@Parcelize
 data class CrowdTallyInfo(
     val counter: Int,
     val maxCounter: Int
-) {
+) : Parcelable {
     init {
         require(maxCounter > 0)
     }
@@ -15,6 +17,7 @@ data class CrowdTallyInfo(
         get() = counter > 0
     val canIncrement
         get() = counter < maxCounter
+
 }
 
 fun CrowdTallyInfo.increment() =

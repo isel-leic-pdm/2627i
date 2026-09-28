@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,15 +33,19 @@ import pt.isel.lei.pdm.counter.ui.counter.CounterScreen
 import pt.isel.lei.pdm.counter.ui.counter.CounterView
 import pt.isel.lei.pdm.counter.ui.crowdtally.CrowdTallyScreen
 import pt.isel.lei.pdm.counter.ui.crowdtally.CrowdTallyScreen2
+import pt.isel.lei.pdm.counter.ui.crowdtally.CrowdTallyScreen3
+import pt.isel.lei.pdm.counter.ui.crowdtally.CrowdTallyViewModel
 
 class MainActivity : LoggingActivity() {
+    val vm by viewModels<CrowdTallyViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         setContent {
-            // CrowdTallyScreen()
-            CrowdTallyScreen2()
+            //CrowdTallyScreen()
+            CrowdTallyScreen3(vm)
         }
     }
 }

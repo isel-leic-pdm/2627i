@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.parcelize)
+
 }
 
 android {
@@ -11,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "pt.isel.lei.pdm.counter"
-        minSdk = 24
+        minSdk = 34
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"

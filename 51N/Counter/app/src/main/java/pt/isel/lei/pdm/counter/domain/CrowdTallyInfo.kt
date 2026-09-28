@@ -1,9 +1,12 @@
 package pt.isel.lei.pdm.counter.domain
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class CrowdTallyInfo(
     val count: Int,
     val capacity: Int,
-) {
+) : Parcelable {
     init {
         require(capacity >= 0){
             "capacity can't be negative"

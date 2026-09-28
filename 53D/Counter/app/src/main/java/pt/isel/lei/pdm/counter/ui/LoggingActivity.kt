@@ -9,8 +9,8 @@ open class LoggingActivity : ComponentActivity() {
     val className
         get() = this::class.simpleName
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         Log.d(className, "onCreate")
     }
 
@@ -42,5 +42,15 @@ open class LoggingActivity : ComponentActivity() {
     override fun onDestroy() {
         Log.d(className, "onDestroy")
         super.onDestroy()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+//        outState.putInt("a int", 123)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+//        savedInstanceState.getInt("a int")
     }
 }

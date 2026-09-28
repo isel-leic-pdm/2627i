@@ -11,10 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Modifier.Companion
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
@@ -29,7 +31,7 @@ fun CrowdTallyMaxEditor(
     modifier: Modifier = Modifier
 ) {
     Log.d("CrowdTallyMaxEditor", "Recomposition")
-    var state by remember { mutableStateOf(arg.maxCounter) }
+    var state by rememberSaveable { mutableStateOf(arg.maxCounter) }
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -49,11 +51,15 @@ fun CrowdTallyMaxEditor(
                 fontSize = 100.sp,
                 textAlign = TextAlign.Center
             ),
+            modifier = Modifier.testTag(TestTags.CrowdTally.EditorTextBox)
         )
 
-        Button(onClick = {
-            onNewMax(state)
-        }) {
+        Button(
+            onClick = {
+                onNewMax(state)
+            },
+            modifier = Modifier.testTag(TestTags.CrowdTally.EditorSaveButton)
+        ) {
             Text("Save")
         }
     }
