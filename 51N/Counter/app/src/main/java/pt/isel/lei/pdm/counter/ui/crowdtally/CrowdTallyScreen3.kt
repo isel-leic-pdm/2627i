@@ -27,108 +27,47 @@ import pt.isel.lei.pdm.counter.domain.increment
 import pt.isel.lei.pdm.counter.ui.theme.CounterTheme
 
 
-sealed interface CrowdTallyScreenViewState {
-    data class Configuration(val info: CrowdTallyInfo) : CrowdTallyScreenViewState
-    data class Counting(val info: CrowdTallyInfo) : CrowdTallyScreenViewState
-    data class ConfigurationError(val error: String, val info: CrowdTallyInfo) :
-        CrowdTallyScreenViewState
-    //data object Error : CrowdTallyScreenViewState
-}
-
-private val viewStateSaver: Saver<CrowdTallyScreenViewState, List<Any>> = Saver(
-    save = { data ->
-        when (data) {
-            is CrowdTallyScreenViewState.Configuration ->
-                listOf(0, data.info)
-
-            is CrowdTallyScreenViewState.Counting ->
-                listOf(1, data.info)
-
-            is CrowdTallyScreenViewState.ConfigurationError ->
-                listOf(2, data.error, data.info)
-        }
-    },
-    restore = { data ->
-        val state = data[0] as Int
-
-        if (state == 0) {
-            CrowdTallyScreenViewState.Configuration(data[1] as CrowdTallyInfo)
-        } else if (state == 1) {
-            CrowdTallyScreenViewState.Counting(data[1] as CrowdTallyInfo)
-
-        } else if (state == 2) {
-            CrowdTallyScreenViewState.ConfigurationError(
-                data[1] as String,
-                data[2] as CrowdTallyInfo
-            )
-
-        } else
-            throw IllegalStateException("Invalid state")
-    }
-)
-
-
 @Composable
-fun CrowdTallyScreen2() {
+fun CrowdTallyScreen3(vm: CrowdTallyViewModel) {
     Log.d("CrowdTallyScreen", "recomposition")
 
-    var screenState: CrowdTallyScreenViewState by rememberSaveable(
-        stateSaver = viewStateSaver
-    ) {
-        mutableStateOf(
-            CrowdTallyScreenViewState.Counting(CrowdTallyInfo(0, 10))
-        )
-    }
+
 
     CounterTheme() {
         Log.d("CounterTheme", "Recomposition")
         Scaffold() { innerPadding ->
             Log.d("Scaffold", "Recomposition")
-            when (val state = screenState) {
-                is CrowdTallyScreenViewState.Configuration -> {
+            when (val state = vm.screenState) {
+                is CrowdTallyScreenState.Configuration -> {
 
                     CrowdTallyMaxConfiguratorContent(
                         state.info,
                         { newCapacity ->
-                            try {
-                                screenState = CrowdTallyScreenViewState.Counting(
-                                    state.info.changeCapacity(newCapacity)
-                                )
-                            } catch (e: Exception) {
-                                screenState = CrowdTallyScreenViewState.ConfigurationError(
-                                    e.toString(), state.info
-                                )
-                            }
+                            vm.changeToNewCapacity(newCapacity)
 
                         },
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
 
-                is CrowdTallyScreenViewState.Counting -> {
+                is CrowdTallyScreenState.Counting -> {
                     Box()
                     {
 
                         CrowdTallyContent(
                             state = state.info,
                             increment = {
-                                screenState = CrowdTallyScreenViewState.Counting(
-                                    state.info.increment()
-                                )
+                                vm.increment()
                             },
                             decrement = {
-                                screenState = CrowdTallyScreenViewState.Counting(
-                                    state.info.decrement()
-                                )
+                                vm.decrement()
                             },
                             modifier = Modifier.padding(innerPadding)
                         )
 
                         Button(
                             onClick = {
-                                screenState = CrowdTallyScreenViewState.Configuration(
-                                    state.info
-                                )
+                                vm.startConfiguration()
                             },
                             modifier = Modifier.align(Alignment.TopEnd)
                         ) {
@@ -138,7 +77,7 @@ fun CrowdTallyScreen2() {
 
                 }
 
-                is CrowdTallyScreenViewState.ConfigurationError -> {
+                is CrowdTallyScreenState.ConfigurationError -> {
 
                     Column(
                         modifier = Modifier
@@ -152,9 +91,7 @@ fun CrowdTallyScreen2() {
                             textAlign = TextAlign.Center,
                         )
                         Button(onClick = {
-                            screenState = CrowdTallyScreenViewState.Configuration(
-                                state.info
-                            )
+                            vm.startConfiguration()
                         }) {
                             Text("Dismiss")
                         }

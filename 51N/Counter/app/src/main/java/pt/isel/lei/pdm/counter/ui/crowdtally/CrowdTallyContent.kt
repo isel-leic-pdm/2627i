@@ -12,10 +12,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pt.isel.lei.pdm.counter.domain.CrowdTallyInfo
+import pt.isel.lei.pdm.counter.ui.TestTags
 
 @Composable
 fun CrowdTallyContent(
@@ -36,6 +38,7 @@ fun CrowdTallyContent(
             modifier = Modifier
                 .width(100.dp)
                 .height(100.dp)
+                .testTag(TestTags.CrowdTally.DECREMENT_BUTTON)
         ) {
             Text(
                 text = "\uD83D\uDC4E",
@@ -46,7 +49,10 @@ fun CrowdTallyContent(
         Text(
             text = "${state.count}",
             fontSize = 60.sp,
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier
+                .padding(12.dp)
+                .testTag(TestTags.CrowdTally.COUNTER_TEXT)
+
         )
         Button(
             enabled = state.canIncrement,
@@ -57,6 +63,8 @@ fun CrowdTallyContent(
             modifier = Modifier
                 .width(100.dp)
                 .height(100.dp)
+                .testTag(TestTags.CrowdTally.INCREMENT_BUTTON)
+
         ) {
             Text(
                 text = "\uD83D\uDC4D",

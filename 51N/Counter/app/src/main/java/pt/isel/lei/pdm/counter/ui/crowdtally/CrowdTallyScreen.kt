@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,13 +30,15 @@ import pt.isel.lei.pdm.counter.domain.decrement
 import pt.isel.lei.pdm.counter.domain.increment
 import pt.isel.lei.pdm.counter.ui.theme.CounterTheme
 
+
+
 @Composable
 fun CrowdTallyScreen() {
     Log.d("CrowdTallyScreen", "recomposition")
 
-    var state by remember { mutableStateOf(CrowdTallyInfo(0, 10)) }
-    var isEdit by remember { mutableStateOf(false) }
-    var error: String? by remember { mutableStateOf(null) }
+    var state by rememberSaveable { mutableStateOf(CrowdTallyInfo(0, 10)) }
+    var isEdit by rememberSaveable { mutableStateOf(false) }
+    var error: String? by rememberSaveable { mutableStateOf(null) }
     CounterTheme() {
         Log.d("CounterTheme", "Recomposition")
         Scaffold() { innerPadding ->
