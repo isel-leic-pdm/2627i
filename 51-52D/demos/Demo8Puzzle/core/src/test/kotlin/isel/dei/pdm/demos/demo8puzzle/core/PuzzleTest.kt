@@ -47,4 +47,24 @@ class PuzzleTest {
         assertEquals(Tile(1), list[0])
         assertEquals(null, list[8])
     }
+
+    @Test
+    fun `solvedPuzzle is solved`() {
+        assertTrue(solvedPuzzle.isSolved())
+    }
+
+    @Test
+    fun `unsolved puzzle isNotSolved`() {
+        val puzzle = Puzzle(1, 2, 3, 4, 5, 6, 7, 0, 8)
+        assertFalse(puzzle.isSolved())
+    }
+
+    @Test
+    fun `shuffle produces non-solved solvable puzzle`() {
+        val shuffled = solvedPuzzle.shuffle(50)
+        assertFalse(shuffled.isSolved())
+        // Verify tile count
+        assertEquals(9, shuffled.count())
+        assertEquals(1, shuffled.count { it == null })
+    }
 }

@@ -1,9 +1,12 @@
-package isel.dei.pdm.demos.demo8puzzle.ui
+package isel.dei.pdm.demos.demo8puzzle.play
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import isel.dei.pdm.demos.demo8puzzle.core.MAX_TILE_VALUE
+import isel.dei.pdm.demos.demo8puzzle.core.MIN_TILE_VALUE
 import isel.dei.pdm.demos.demo8puzzle.core.Puzzle
 import isel.dei.pdm.demos.demo8puzzle.core.Tile
 import isel.dei.pdm.demos.demo8puzzle.ui.theme.Demo8PuzzleTheme
@@ -30,7 +33,7 @@ class PuzzleBoardTests {
         // Act & Assert
         composeTestRule.onNodeWithTag(PUZZLE_BOARD_TAG).assertIsDisplayed()
         
-        for (value in 1..8) {
+        for (value in MIN_TILE_VALUE..MAX_TILE_VALUE) {
             composeTestRule.onNodeWithTag(puzzleTileTag(value)).assertIsDisplayed()
         }
         composeTestRule.onNodeWithTag(EMPTY_PUZZLE_TILE_TAG).assertIsDisplayed()
@@ -57,6 +60,25 @@ class PuzzleBoardTests {
 
         // Assert
         assertNotNull(clickedValue)
-        assertEquals(expectedTile, clickedValue)
+        assertEquals(expectedTile.value, clickedValue?.value)
+    }
+
+    @Test
+    fun board_tiles_are_disabled_when_enabled_is_false() {
+        // Arrange
+        val puzzle = Puzzle(1, 2, 3, 4, 5, 6, 7, 8, 0)
+        composeTestRule.setContent {
+            Demo8PuzzleTheme {
+                PuzzleBoard(
+                    puzzle = puzzle,
+                    enabled = false
+                )
+            }
+        }
+
+        // Act & Assert
+        for (value in MIN_TILE_VALUE..MAX_TILE_VALUE) {
+            composeTestRule.onNodeWithTag(puzzleTileTag(value)).assertIsNotEnabled()
+        }
     }
 }

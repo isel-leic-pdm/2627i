@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.demo8puzzle.ui
+package isel.dei.pdm.demos.demo8puzzle.play
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals

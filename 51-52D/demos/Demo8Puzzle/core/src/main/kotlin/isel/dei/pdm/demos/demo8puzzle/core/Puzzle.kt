@@ -81,4 +81,29 @@ class Puzzle(private val tiles: List<Tile?>) : Iterable<Tile?> {
     override fun hashCode(): Int = tiles.hashCode()
 
     override fun toString(): String = tiles.toString()
+
+    /**
+     * Shuffles the puzzle by making random valid moves to ensure it remains solvable.
+     */
+    fun shuffle(numberOfMoves: Int = 100): Puzzle {
+        var current = this
+        repeat(numberOfMoves) {
+            val nullIndex = current.tiles.indexOf(null)
+            val row = nullIndex / BOARD_SIDE
+            val col = nullIndex % BOARD_SIDE
+            val adjacentTiles = mutableListOf<Tile>()
+            if (row > 0) current[row - 1, col]?.let { adjacentTiles.add(it) }
+            if (row < BOARD_SIDE - 1) current[row + 1, col]?.let { adjacentTiles.add(it) }
+            if (col > 0) current[row, col - 1]?.let { adjacentTiles.add(it) }
+            if (col < BOARD_SIDE - 1) current[row, col + 1]?.let { adjacentTiles.add(it) }
+            if (adjacentTiles.isNotEmpty()) {
+                current = current.move(adjacentTiles.random())
+            }
+        }
+        return if (current.isSolved()) current.shuffle(numberOfMoves) else current
+    }
 }
+
+val solvedPuzzle = Puzzle(1, 2, 3, 4, 5, 6, 7, 8, 0)
+
+fun Puzzle.isSolved(): Boolean = this == solvedPuzzle

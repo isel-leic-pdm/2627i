@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.demo8puzzle.ui
+package isel.dei.pdm.demos.demo8puzzle.play
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,27 +19,34 @@ import androidx.compose.ui.unit.sp
 import isel.dei.pdm.demos.demo8puzzle.core.Tile
 import isel.dei.pdm.demos.demo8puzzle.ui.theme.Demo8PuzzleTheme
 
+/**
+ * Tags used to identify the tiles for testing purposes.
+ */
 const val EMPTY_PUZZLE_TILE_TAG = "EmptyPuzzleTile"
 fun puzzleTileTag(value: Int) = "PuzzleTile-$value"
 
 @Composable
-fun PuzzleTile(tile: Tile?, onTileClicked: (Tile) -> Unit = { }) {
+fun PuzzleTile(tile: Tile?, onTileClicked: (Tile) -> Unit = { }, enabled: Boolean = true) {
     if (tile != null) {
-        PuzzleTileWithValue(tile = tile, onClick = { onTileClicked(tile) })
+        PuzzleTileWithValue(tile = tile, onClick = { onTileClicked(tile) }, enabled = enabled)
     } else {
         EmptyPuzzleTile()
     }
 }
 
 @Composable
-private fun PuzzleTileWithValue(tile: Tile, onClick: () -> Unit) {
+private fun PuzzleTileWithValue(
+    tile: Tile,
+    onClick: () -> Unit,
+    enabled: Boolean = true
+) {
     val shape = MaterialTheme.shapes.small
     Box(
         modifier = Modifier
             .size(80.dp)
             .testTag(puzzleTileTag(tile.value))
             .clip(shape)
-            .clickable(onClick = onClick)
+            .clickable(onClick = onClick, enabled = enabled)
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.outline,
