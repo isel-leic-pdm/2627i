@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">NasaApod</string>
+    <string name="app_lang">Language</string>
+    <string name="app_lang_pt">Portuguese</string>
+    <string name="app_lang_en">English</string>
+    <string name="new_str">new string</string>
+    <string name="app_increment">increment</string>
+</resources>

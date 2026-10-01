@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NasaApod</string>
+    <string name="app_lang">Idioma</string>
+    <string name="app_lang_pt">Português</string>
+    <string name="app_lang_en">Inglês</string>
+    <string name="new_str">nova string</string>
+    <string name="app_increment">incrementar</string>
+</resources>
