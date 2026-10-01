@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">NasaApod</string>
+    <string name="lang_pt">Portuguese</string>
+    <string name="lang_en">English</string>
+    <string name="lang">Language</string>
+    <string name="xpto">asdasdasd</string>
 </resources>
