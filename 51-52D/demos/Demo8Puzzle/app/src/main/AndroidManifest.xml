@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Demo8Puzzle">
         <activity
-            android:name=".MainActivity"
+            android:name=".play.PlayActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Demo8Puzzle"

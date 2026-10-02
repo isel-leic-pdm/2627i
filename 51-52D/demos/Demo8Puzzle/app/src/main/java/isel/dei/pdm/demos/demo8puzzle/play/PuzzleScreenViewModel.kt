@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import isel.dei.pdm.demos.demo8puzzle.buildLLogTag
 import isel.dei.pdm.demos.demo8puzzle.core.Puzzle
 import isel.dei.pdm.demos.demo8puzzle.core.Tile
 import isel.dei.pdm.demos.demo8puzzle.core.isSolved

@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.demo8puzzle
+package isel.dei.pdm.demos.demo8puzzle.play
 
 import android.os.Bundle
 import android.util.Log
@@ -6,8 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import isel.dei.pdm.demos.demo8puzzle.play.PuzzleScreen
-import isel.dei.pdm.demos.demo8puzzle.play.PuzzleScreenViewModel
 import isel.dei.pdm.demos.demo8puzzle.ui.theme.Demo8PuzzleTheme
 
 const val APP_TAG = "Demo8PuzzleApp"
@@ -16,7 +14,7 @@ fun buildLLogTag(className: String) = "$APP_TAG.$className"
 /**
  * The activity used to host the puzzle screen.
  */
-class MainActivity : ComponentActivity() {
+class PlayActivity : ComponentActivity() {
 
     private val viewModel by viewModels<PuzzleScreenViewModel>()
 
