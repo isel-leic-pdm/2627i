@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import isel.dei.pdm.demos.demo8puzzle.play.PlayActivity
 import isel.dei.pdm.demos.demo8puzzle.play.buildLLogTag
 import isel.dei.pdm.demos.demo8puzzle.ui.theme.Demo8PuzzleTheme
 
@@ -21,7 +22,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Demo8PuzzleTheme {
-                MainScreen(onNavigateToPlay = { /* TODO */ })
+                MainScreen(onPlay = { PlayActivity.navigateFrom(this) })
             }
         }
     }

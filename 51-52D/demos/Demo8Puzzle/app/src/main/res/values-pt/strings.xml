@@ -9,4 +9,5 @@
     <string name="about_logo_description">Logótipo PDM ISEL</string>
     <string name="about_description">Aplicação de demonstração para a disciplina de PDM da ISEL</string>
     <string name="about_github_button">no GitHub</string>
+    <string name="about_button">Sobre</string>
 </resources>

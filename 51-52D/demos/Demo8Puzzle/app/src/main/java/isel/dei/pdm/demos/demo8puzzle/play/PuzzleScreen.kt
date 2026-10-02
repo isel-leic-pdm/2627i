@@ -2,6 +2,7 @@ package isel.dei.pdm.demos.demo8puzzle.play
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,9 +10,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,20 +41,51 @@ const val START_BUTTON_TAG = "StartButton"
 const val RESET_BUTTON_TAG = "ResetButton"
 const val SOLVE_BUTTON_TAG = "SolveButton"
 const val CONGRATS_MESSAGE_TAG = "CongratsMessage"
+const val ABOUT_BUTTON_TAG = "AboutButton"
 
 /**
  * Root composable for the play screen.
  * @param viewModel The view model for this screen.
+ * @param onAbout Callback for when the user clicks the About icon in the top bar.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PuzzleScreen(viewModel: PuzzleScreenViewModel) {
-    PuzzleScreenContent(
-        state = viewModel.state,
-        onTileClicked = { viewModel.moveTile(it) },
-        onStart = { viewModel.start() },
-        onReset = { viewModel.reset() },
-        onSolve = { viewModel.solve() }
-    )
+fun PuzzleScreen(
+    viewModel: PuzzleScreenViewModel,
+    onAbout: () -> Unit = { }
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = stringResource(id = R.string.app_name)) },
+                actions = {
+                    IconButton(
+                        onClick = onAbout,
+                        modifier = Modifier.testTag(ABOUT_BUTTON_TAG)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = stringResource(id = R.string.about_button)
+                        )
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            PuzzleScreenContent(
+                state = viewModel.state,
+                onTileClicked = { viewModel.moveTile(it) },
+                onStart = { viewModel.start() },
+                onReset = { viewModel.reset() },
+                onSolve = { viewModel.solve() }
+            )
+        }
+    }
 }
 
 /**

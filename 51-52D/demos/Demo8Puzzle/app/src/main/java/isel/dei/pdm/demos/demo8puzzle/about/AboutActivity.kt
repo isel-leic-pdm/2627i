@@ -1,5 +1,6 @@
 package isel.dei.pdm.demos.demo8puzzle.about
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -14,6 +15,13 @@ import isel.dei.pdm.demos.demo8puzzle.ui.theme.Demo8PuzzleTheme
 class AboutActivity : ComponentActivity() {
 
     private val logTag = buildLLogTag(this::class.java.simpleName)
+
+    companion object {
+        fun navigateFrom(origin: ComponentActivity) {
+            val msg = Intent(origin, AboutActivity::class.java)
+            origin.startActivity(msg)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

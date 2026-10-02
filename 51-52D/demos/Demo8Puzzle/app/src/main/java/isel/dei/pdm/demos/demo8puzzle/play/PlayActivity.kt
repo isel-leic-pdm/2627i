@@ -1,11 +1,13 @@
 package isel.dei.pdm.demos.demo8puzzle.play
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import isel.dei.pdm.demos.demo8puzzle.about.AboutActivity
 import isel.dei.pdm.demos.demo8puzzle.ui.theme.Demo8PuzzleTheme
 
 const val APP_TAG = "Demo8PuzzleApp"
@@ -20,13 +22,24 @@ class PlayActivity : ComponentActivity() {
 
     private val logTag = buildLLogTag(this::class.java.simpleName)
 
+    companion object {
+        fun navigateFrom(origin: ComponentActivity) {
+            val msg = Intent(origin, PlayActivity::class.java)
+            origin.startActivity(msg)
+        }
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.v(logTag, "onCreate() on ${hashCode()}")
         enableEdgeToEdge()
         setContent {
             Demo8PuzzleTheme {
-                PuzzleScreen(viewModel = viewModel)
+                PuzzleScreen(
+                    viewModel = viewModel,
+                    onAbout = { AboutActivity.navigateFrom(this) }
+                )
             }
         }
     }

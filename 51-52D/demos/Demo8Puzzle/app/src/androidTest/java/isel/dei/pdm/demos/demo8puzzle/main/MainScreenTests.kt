@@ -19,7 +19,7 @@ class MainScreenTests {
         // Arrange & Act
         composeTestRule.setContent {
             Demo8PuzzleTheme {
-                MainScreen(onNavigateToPlay = { })
+                MainScreen(onPlay = { })
             }
         }
 
@@ -34,7 +34,7 @@ class MainScreenTests {
         var navigateToPlayCalled = false
         composeTestRule.setContent {
             Demo8PuzzleTheme {
-                MainScreen(onNavigateToPlay = { navigateToPlayCalled = true })
+                MainScreen(onPlay = { navigateToPlayCalled = true })
             }
         }
 

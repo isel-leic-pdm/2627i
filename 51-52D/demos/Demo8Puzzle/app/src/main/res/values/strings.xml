@@ -9,4 +9,5 @@
     <string name="about_logo_description">PDM ISEL logo</string>
     <string name="about_description">Demo application for ISEL\'s PDM course</string>
     <string name="about_github_button">on GitHub</string>
+    <string name="about_button">About</string>
 </resources>

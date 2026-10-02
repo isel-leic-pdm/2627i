@@ -30,10 +30,10 @@ const val TOUCH_TO_PLAY_BUTTON_TAG = "TouchToPlayButton"
 
 /**
  * The main screen root composable.
- * @param onNavigateToPlay the callback to be invoked when the user intends to start playing.
+ * @param onPlay the callback to be invoked when the user intends to start playing.
  */
 @Composable
-fun MainScreen(onNavigateToPlay: () -> Unit) {
+fun MainScreen(onPlay: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -50,7 +50,7 @@ fun MainScreen(onNavigateToPlay: () -> Unit) {
         )
         Spacer(modifier = Modifier.height(32.dp))
         Button(
-            onClick = onNavigateToPlay,
+            onClick = onPlay,
             modifier = Modifier.testTag(TOUCH_TO_PLAY_BUTTON_TAG)
         ) {
             Text(
@@ -65,6 +65,6 @@ fun MainScreen(onNavigateToPlay: () -> Unit) {
 @Composable
 fun MainScreenPreview() {
     Demo8PuzzleTheme {
-        MainScreen(onNavigateToPlay = { })
+        MainScreen(onPlay = { })
     }
 }
