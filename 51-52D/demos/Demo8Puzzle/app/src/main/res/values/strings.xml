@@ -4,4 +4,9 @@
     <string name="reset_button">Reset</string>
     <string name="solve_button">Solve</string>
     <string name="puzzle_solved_message">Congratulations! Puzzle solved!</string>
+    <string name="touch_to_play">Touch to play</string>
+    <string name="main_image_description">8 puzzle image</string>
+    <string name="about_logo_description">PDM ISEL logo</string>
+    <string name="about_description">Demo application for ISEL\'s PDM course</string>
+    <string name="about_github_button">on GitHub</string>
 </resources>

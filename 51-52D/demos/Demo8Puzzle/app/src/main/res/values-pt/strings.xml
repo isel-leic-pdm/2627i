@@ -4,4 +4,9 @@
     <string name="reset_button">Reiniciar</string>
     <string name="solve_button">Resolver</string>
     <string name="puzzle_solved_message">Parabéns! Puzzle resolvido!</string>
+    <string name="touch_to_play">Toque para jogar</string>
+    <string name="main_image_description">Imagem do puzzle de 8</string>
+    <string name="about_logo_description">Logótipo PDM ISEL</string>
+    <string name="about_description">Aplicação de demonstração para a disciplina de PDM da ISEL</string>
+    <string name="about_github_button">no GitHub</string>
 </resources>
