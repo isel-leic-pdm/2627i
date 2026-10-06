@@ -126,8 +126,8 @@
 * [Prodigi - Curso de PDM - M08 - Modelo de Concorrência](https://www.youtube.com/watch?v=QShOCxQc6oI&list=PL8XxoCaL3dBhS-THuPazx0BSAswof6wqh&index=9)
 * [Application resources | Android Developers](https://developer.android.com/guide/topics/resources/providing-resources)
 * Lectures videos from Prof. Paulo Pereira (in Portuguese)
-  * Aula 05 (28/09/2026)
-  * Aula 06 (02/10/2026)
+  * [Aula 05 (28/09/2026)](https://www.youtube.com/watch?v=sBfRiKKL58o&list=PLX4G3J1kqg4U&index=6)
+  * [Aula 06 (02/10/2026)](https://www.youtube.com/watch?v=D6-tiD_DVbo&list=PLX4G3J1kqg4U&index=7)
 
 ### Week 5 (05/10/2026) - Monitoring of the course's assignment
 * Students will need to record a video of up to 7 minutes presenting their application.
