@@ -36,7 +36,7 @@ fun ApodImageView(
     ) {
         Box() {
             AsyncImage(
-                model = data.url,
+                model = data.imageUrl,
                 contentDescription = "",
                 modifier = Modifier.fillMaxWidth().heightIn(min = 100.dp),
                 contentScale = ContentScale.FillWidth,

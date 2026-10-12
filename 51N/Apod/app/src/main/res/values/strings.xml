@@ -4,4 +4,9 @@
     <string name="lang_en">English</string>
     <string name="lang">Language</string>
     <string name="xpto">asdasdasd</string>
+    <string name="no_content">No content</string>
+    <string name="loading">Loading</string>
+    <string name="refres">refresh</string>
+    <string name="refresh">refresh</string>
+    <string name="title_activity_details">DetailsActivity</string>
 </resources>

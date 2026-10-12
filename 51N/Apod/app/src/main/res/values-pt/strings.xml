@@ -3,4 +3,8 @@
     <string name="lang_pt">Português</string>
     <string name="lang_en">Inglês</string>
     <string name="lang">Idioma</string>
+    <string name="no_content">No content</string>
+    <string name="loading">Loading</string>
+    <string name="refres">refresh</string>
+    <string name="refresh">refresh</string>
 </resources>

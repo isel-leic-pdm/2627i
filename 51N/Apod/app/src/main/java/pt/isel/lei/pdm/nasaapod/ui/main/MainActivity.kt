@@ -1,25 +1,19 @@
 package pt.isel.lei.pdm.nasaapod.ui.main
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.ViewModelProvider
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.core.net.toUri
 import pt.isel.lei.pdm.nasaapod.DependencyContainer
-import pt.isel.lei.pdm.nasaapod.mock.MockNasaApodService
+import pt.isel.lei.pdm.nasaapod.domain.ApodImage
+import pt.isel.lei.pdm.nasaapod.ui.ActivityBase
 import pt.isel.lei.pdm.nasaapod.ui.common.viewModelInit
-import pt.isel.lei.pdm.nasaapod.ui.test.LangTestScreen
-import pt.isel.lei.pdm.nasaapod.ui.theme.NasaApodTheme
+import pt.isel.lei.pdm.nasaapod.ui.details.DetailsActivity
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ActivityBase() {
 
     /*
     val vm by viewModels<MainViewModel>(factoryProducer = {
@@ -40,6 +34,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    val vm2 by viewModels<MainViewModel2> {
+        viewModelInit {
+            MainViewModel2((application as DependencyContainer).nasaService)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -48,12 +48,22 @@ class MainActivity : ComponentActivity() {
 
             //LangTestScreen()
             //
-            MainScreen(
-                vm
+            //MainScreen(
+            //    vm
+            //)
+            MainScreen2(
+                vm = vm2,
+                onNasaImageClicked = ::navigateToDetails
             )
 
             // */
         }
+    }
+
+
+
+    fun navigateToDetails(image: ApodImage) {
+        DetailsActivity.navigate(this, image)
     }
 }
 

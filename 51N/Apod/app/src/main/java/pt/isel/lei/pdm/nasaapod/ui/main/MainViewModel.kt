@@ -5,27 +5,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
 import pt.isel.lei.pdm.nasaapod.domain.ApodImage
-import pt.isel.lei.pdm.nasaapod.mock.MockApodImages
-import pt.isel.lei.pdm.nasaapod.mock.MockNasaApodService
 import pt.isel.lei.pdm.nasaapod.service.NasaApodService
-import pt.isel.lei.pdm.nasaapod.ui.common.viewModelInit
+import pt.isel.lei.pdm.nasaapod.ui.ViewModelBase
 
 class MainViewModel(
     val nasaApodService: NasaApodService
-) : ViewModel() {
+) : ViewModelBase() {
+    var todayImage: ApodImage? by mutableStateOf(null)
+        private set
 
-    val todayImage: ApodImage
-        get() = image
-    private var image: ApodImage by mutableStateOf(???)
 
-    fun refresh(){
-        viewModelScope.launch {
-            image = nasaApodService.getTodaysImage()
-        }
+
+    init {
+        refresh()
     }
+
+    fun refresh() = safeCall{
+        todayImage = nasaApodService.getTodaysImage()
+    }
+
+
 }
 
 class MainViewModelFactory(
