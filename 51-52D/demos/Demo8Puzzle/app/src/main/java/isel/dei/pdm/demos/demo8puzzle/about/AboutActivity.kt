@@ -2,22 +2,22 @@ package isel.dei.pdm.demos.demo8puzzle.about
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import isel.dei.pdm.demos.demo8puzzle.play.buildLLogTag
+import androidx.core.net.toUri
+import isel.dei.pdm.demos.demo8puzzle.shared.BaseActivity
 import isel.dei.pdm.demos.demo8puzzle.ui.theme.Demo8PuzzleTheme
 
-/**
- * The activity that corresponds to the About screen
- */
-class AboutActivity : ComponentActivity() {
 
-    private val logTag = buildLLogTag(this::class.java.simpleName)
+/**
+ * The activity that corresponds to the About screen.
+ * It displays information about the app and the context in which it was created.
+ */
+class AboutActivity : BaseActivity() {
 
     companion object {
-        fun navigateFrom(origin: ComponentActivity) {
+        fun navigate(origin: ComponentActivity) {
             val msg = Intent(origin, AboutActivity::class.java)
             origin.startActivity(msg)
         }
@@ -25,27 +25,19 @@ class AboutActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.v(logTag, "onCreate() on ${hashCode()}")
         enableEdgeToEdge()
         setContent {
             Demo8PuzzleTheme {
-                AboutScreen(onNavigateToGitHub = { /* TODO */ })
+                AboutScreen(onNavigateToGitHub = ::navigateToGitHub)
             }
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        Log.v(logTag, "onStart() on ${hashCode()}")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.v(logTag, "onStop() on ${hashCode()}")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.v(logTag, "onDestroy() on ${hashCode()}")
+    private fun navigateToGitHub() {
+        val url = "https://github.com/isel-leic-pdm"
+        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+        intent.resolveActivity(packageManager)?.let {
+            startActivity(intent)
+        }
     }
 }

@@ -1,6 +1,5 @@
 package isel.dei.pdm.demos.demo8puzzle.play
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,6 +9,8 @@ import isel.dei.pdm.demos.demo8puzzle.core.Puzzle
 import isel.dei.pdm.demos.demo8puzzle.core.Tile
 import isel.dei.pdm.demos.demo8puzzle.core.isSolved
 import isel.dei.pdm.demos.demo8puzzle.core.solvedPuzzle
+import isel.dei.pdm.demos.demo8puzzle.shared.BaseViewModel
+import isel.dei.pdm.demos.demo8puzzle.shared.log
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -34,14 +35,9 @@ sealed class PuzzleScreenState {
  */
 class PuzzleScreenViewModel(
     private val solvedTimeoutMs: Long = SOLVED_TIMEOUT_MS
-) : ViewModel() {
+) : BaseViewModel() {
 
-    private val logTag = buildLLogTag(this::class.java.simpleName)
     private var idleTransitionJob: Job? = null
-
-    init {
-        Log.v(logTag, "init on ${hashCode()}")
-    }
 
     /**
      * The current state of the screen's state machine.
@@ -59,10 +55,10 @@ class PuzzleScreenViewModel(
     fun moveTile(tile: Tile) {
         val current = state
         if (current is PuzzleScreenState.Solving) {
-            Log.v(logTag, "moving tile $tile")
+            log("Moving tile $tile")
             val newPuzzle = current.puzzle.move(tile)
             state = if (newPuzzle.isSolved()) {
-                Log.v(logTag, "Transitioning to Solved")
+                log("Transitioning to Solved")
                 PuzzleScreenState.Solved(newPuzzle).also { scheduleTransitionToIdle() }
             } else {
                 PuzzleScreenState.Solving(newPuzzle)
@@ -77,7 +73,7 @@ class PuzzleScreenViewModel(
     fun start() {
         val current = state
         if (current is PuzzleScreenState.Idle) {
-            Log.v(logTag, "Transitioning to Solving")
+            log("Transitioning to Solving")
             state = PuzzleScreenState.Solving(current.puzzle.shuffle())
         }
     }
@@ -89,7 +85,7 @@ class PuzzleScreenViewModel(
     fun reset() {
         val current = state
         if (current is PuzzleScreenState.Solving) {
-            Log.v(logTag, "Resetting the puzzle")
+            log("Resetting the puzzle")
             idleTransitionJob?.cancel()
             state = PuzzleScreenState.Idle(solvedPuzzle)
         }
@@ -102,7 +98,7 @@ class PuzzleScreenViewModel(
     fun solve() {
         val current = state
         if (current is PuzzleScreenState.Solving) {
-            Log.v(logTag, "Transitioning to Solved")
+            log("Transitioning to Solved")
             state = PuzzleScreenState.Solved(solvedPuzzle).also { scheduleTransitionToIdle() }
         }
     }
@@ -115,16 +111,9 @@ class PuzzleScreenViewModel(
         idleTransitionJob = viewModelScope.launch {
             delay(solvedTimeoutMs.milliseconds)
             if (state is PuzzleScreenState.Solved) {
-                Log.v(logTag, "Auto-resetting after timeout")
+                log("Auto-resetting after timeout")
                 state = PuzzleScreenState.Idle(solvedPuzzle)
             }
         }
-    }
-
-    /**
-     * Called when the view model is no longer used and will be destroyed.
-     */
-    override fun onCleared() {
-        Log.v(logTag, "onCleared() on ${hashCode()}")
     }
 }
