@@ -1,24 +1,18 @@
-package isel.dei.pdm.demos.demo8puzzle
+package isel.dei.pdm.demos.demo8puzzle.main
 
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
-import isel.dei.pdm.demos.demo8puzzle.play.PuzzleScreen
-import isel.dei.pdm.demos.demo8puzzle.play.PuzzleScreenViewModel
+import isel.dei.pdm.demos.demo8puzzle.play.PlayActivity
+import isel.dei.pdm.demos.demo8puzzle.play.buildLLogTag
 import isel.dei.pdm.demos.demo8puzzle.ui.theme.Demo8PuzzleTheme
 
-const val APP_TAG = "Demo8PuzzleApp"
-fun buildLLogTag(className: String) = "$APP_TAG.$className"
-
 /**
- * The activity used to host the puzzle screen.
+ * Represents the activity that hosts the main screen of the app.
  */
 class MainActivity : ComponentActivity() {
-
-    private val viewModel by viewModels<PuzzleScreenViewModel>()
 
     private val logTag = buildLLogTag(this::class.java.simpleName)
 
@@ -28,7 +22,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Demo8PuzzleTheme {
-                PuzzleScreen(viewModel = viewModel)
+                MainScreen(onPlay = { PlayActivity.navigateFrom(this) })
             }
         }
     }

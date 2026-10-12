@@ -12,6 +12,7 @@ import androidx.compose.ui.test.performClick
 import isel.dei.pdm.demos.demo8puzzle.core.MAX_TILE_VALUE
 import isel.dei.pdm.demos.demo8puzzle.core.MIN_TILE_VALUE
 import isel.dei.pdm.demos.demo8puzzle.ui.theme.Demo8PuzzleTheme
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -196,5 +197,22 @@ class PuzzleScreenTests {
         composeTestRule.onNodeWithTag(START_BUTTON_TAG).performClick()
         composeTestRule.onNodeWithTag(RESET_BUTTON_TAG).assertIsDisplayed()
         composeTestRule.onNodeWithTag(SOLVE_BUTTON_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun clicking_about_button_triggers_on_about_callback() {
+        val viewModel = PuzzleScreenViewModel()
+        var aboutCalled = false
+        composeTestRule.setContent {
+            Demo8PuzzleTheme {
+                PuzzleScreen(
+                    viewModel = viewModel,
+                    onAbout = { aboutCalled = true }
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithTag(ABOUT_BUTTON_TAG).performClick()
+        assertTrue(aboutCalled)
     }
 }
