@@ -5,4 +5,8 @@
     <string name="app_lang_en">English</string>
     <string name="new_str">new string</string>
     <string name="app_increment">increment</string>
+    <string name="app_no_image">No Image to show</string>
+    <string name="app_loading">Loading</string>
+    <string name="app_refresh">refresh</string>
+    <string name="title_activity_details">DetailsActivity</string>
 </resources>

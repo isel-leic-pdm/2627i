@@ -8,24 +8,45 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import pt.isel.lei.pdm.nasaapod.domain.ApodImage
-import pt.isel.lei.pdm.nasaapod.mock.MockApodImages
-import pt.isel.lei.pdm.nasaapod.mock.MockNasaApodService
 import pt.isel.lei.pdm.nasaapod.services.NasaApodService
 
 class MainViewModel(
     val service: NasaApodService
 ) : ViewModel() {
-    val todayImage: ApodImage
-        get() = image
+    var image: ApodImage? by mutableStateOf(null)
+        private set;
 
-    private var image: ApodImage by mutableStateOf(???)
+    var loading: Boolean by mutableStateOf(false)
+        private set
+
+    var error: Exception? by mutableStateOf(null)
+        private set
+
+    init {
+        refresh()
+    }
 
 
-    fun refresh() {
+    fun refresh() = safeCall {
+        image = service.getTodaysImage()
+    }
+
+    private fun safeCall(
+        func: suspend () -> Unit
+    ) {
+        loading = true
+        error = null
         viewModelScope.launch {
-            image = service.getTodaysImage()
+            try {
+                func()
+            } catch (e: Exception) {
+                error = e
+            } finally {
+                loading = false
+            }
         }
     }
+
 }
 
 

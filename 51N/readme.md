@@ -115,3 +115,48 @@
 * [Manual dependency injection](https://developer.android.com/training/dependency-injection/manual)
 * [Testing Coroutines on Android](https://developer.android.com/kotlin/coroutines/test)
 * [Saved State module for ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel/viewmodel-savedstate)
+
+
+
+## Week 5 - 12/10/2026
+
+### Subject: Android concurrency model
+* Overview of concurrency in Android
+  * Main thread vs background threads
+  * Constraints on the work performed on the main thread
+  * ANR (Application Not Responding) errors
+* Kotlin's concurrency model (revision from Concurrent Programming course)
+  * Thread vs coroutine
+  * Suspending functions, coroutines, scopes e dispatchers
+* ViewModel (continued)
+  * ViewModelScope
+  * Launching coroutines from the ViewModel
+* UX: navigating between activities
+  * User task and back stack
+  * Intents: explicit and implicit
+* The Activity component: continued
+  * Basic lifecycle, revisited: behavior on navigation  
+  
+  
+  
+  
+  
+  
+  
+  
+????
+* Kotlin concurrency model
+  * Flows, revisited 
+* Local storage with DataStore
+  * General characterization
+  * Data model (i.e. key-value store)
+  * Supported data types
+  
+#### For reference:
+* [Kotlin Coroutines](https://kotlinlang.org/docs/coroutines-overview.html)
+* [ViewModel overview | Android Developers](https://developer.android.com/topic/libraries/architecture/viewmodel)
+  * [Use Kotlin coroutines with lifecycle-aware components | Android Developers](https://developer.android.com/topic/libraries/architecture/coroutines#viewmodelscope) 
+* [Tasks and Back Stack](https://developer.android.com/guide/components/activities/tasks-and-back-stack)
+* [Intents and intent filters](https://developer.android.com/guide/components/intents-filters)
+  * [Sending the user to another app](https://developer.android.com/training/basics/intents/sending)
+  * [Common Intents](https://developer.android.com/guide/components/intents-common)
