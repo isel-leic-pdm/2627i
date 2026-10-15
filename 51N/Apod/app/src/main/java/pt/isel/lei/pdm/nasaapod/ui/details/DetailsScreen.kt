@@ -1,13 +1,29 @@
 package pt.isel.lei.pdm.nasaapod.ui.details
 
+import android.widget.Button
 import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.HeartBroken
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import pt.isel.lei.pdm.nasaapod.domain.ApodImage
 import pt.isel.lei.pdm.nasaapod.ui.common.ApodImageView
 import pt.isel.lei.pdm.nasaapod.ui.common.NavigationActions
@@ -15,7 +31,7 @@ import pt.isel.lei.pdm.nasaapod.ui.common.ScreenBase
 
 @Composable
 fun DetailsScreen(
-    img: ApodImage,
+    vm: DetailsViewModel,
     backActionClicked: () -> Unit,
     infoActionClicked: () -> Unit,
 ) = ScreenBase(
@@ -24,14 +40,48 @@ fun DetailsScreen(
         infoAction = infoActionClicked
     )
 ) {
+
     val scrollState = rememberScrollState()
     Column(
-
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        ApodImageView(img)
-        Text(text = img.description)
+        Box() {
+            ApodImageView(vm.image)
+            FavoriteButton(
+                vm.isFavorite.collectAsStateWithLifecycle().value,
+                onClick = vm::toggleFavorite,
+                modifier = Modifier
+                    .padding(12.dp)
+                    .align(Alignment.TopStart)
+            )
+
+        }
+
+        Text(text = vm.image.description)
+
+    }
+}
+
+@Composable
+fun FavoriteButton(
+    isFavorite: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    IconButton(onClick = onClick, modifier = modifier) {
+        if (isFavorite)
+            Icon(
+                imageVector = Icons.Default.HeartBroken,
+                contentDescription = "",
+                tint = Color.White
+            )
+        else
+            Icon(
+                imageVector = Icons.Default.Favorite,
+                contentDescription = "",
+                tint = Color.White
+            )
     }
 }

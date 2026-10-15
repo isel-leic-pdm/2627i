@@ -8,9 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
@@ -25,9 +23,7 @@ class FlowPlaygroundViewModel(
 
 
     private val simpleFlow = flow<Int> {
-
         Log.d(TAG, "going to start the flow")
-
         repeat(3) { v: Int ->
             delay(1000)
             emit(v)
@@ -90,19 +86,20 @@ class FlowPlaygroundViewModel(
 
         viewModelScope.launch {
             //terminal operations
+            /*
+                        f.collect { value ->
+                            Log.d(TAG, "collect $value")
 
-            f.collect { value ->
-                Log.d(TAG, "collect $value")
+                        }
 
-            }
+                        val flowFirstValue = f.first()
+                        Log.d(TAG, "flow first value:  $flowFirstValue")
 
-            val flowFirstValue = f.first()
-            Log.d(TAG, "flow first value:  $flowFirstValue")
+                        val flowNrOfInts = f.count()
 
-            val flowNrOfInts = f.count()
-            Log.d(TAG, "flow count values:  $flowNrOfInts")
+                        Log.d(TAG, "flow count values:  $flowNrOfInts")
 
-
+             */
             f.filter { it % 2 == 0 }
                 .map { it * 2 }
                 .collect {
@@ -117,7 +114,8 @@ class FlowPlaygroundViewModel(
         val list = listOf(1, 2, 3, 4)
 
         viewModelScope.launch {
-            list.asFlow().collect {
+            val f = list.asFlow();
+            f.collect {
                 Log.d(TAG, "list value $it")
             }
         }
@@ -154,7 +152,6 @@ class FlowPlaygroundViewModel(
     fun hotFlow() {
 
         val mutableStateFlow = MutableStateFlow<Int>(-3)
-
         viewModelScope.launch {
             mutableStateFlow.emit(-2)
             mutableStateFlow.emit(-1)
@@ -191,7 +188,7 @@ class FlowPlaygroundViewModel(
 
     private val mutableStateFlow = MutableStateFlow(-1)
 
-    val state: StateFlow<Int>
+    val viewFlow: StateFlow<Int>
         get() = mutableStateFlow
 
 

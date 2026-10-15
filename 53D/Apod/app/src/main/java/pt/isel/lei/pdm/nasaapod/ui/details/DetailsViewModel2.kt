@@ -12,7 +12,6 @@ import pt.isel.lei.pdm.nasaapod.services.FavoriteRepository
 
 sealed interface DetailScreenViewState {
     val image: ApodImage
-
     class Favorite(override val image: ApodImage) : DetailScreenViewState
     class NotFavorite(override val image: ApodImage) : DetailScreenViewState
 }

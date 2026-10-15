@@ -42,9 +42,18 @@ class DetailsActivity : ComponentActivity() {
             finish()
             return
         }
+
+        val vm by viewModels<DetailsViewModel> {
+            viewModelInit {
+                DetailsViewModel(
+                    image,
+                    (application as DependencyContainer).favoriteRepository
+                )
+            }
+        }
         setContent {
             DetailsScreen(
-                img = image!!,
+                vm = vm,
                 backActionClicked = { finish() },
                 infoActionClicked = {
                     navigateToImageUrl(image!!)
