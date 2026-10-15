@@ -136,15 +136,6 @@
   * Intents: explicit and implicit
 * The Activity component: continued
   * Basic lifecycle, revisited: behavior on navigation  
-  
-  
-  
-  
-  
-  
-  
-  
-????
 * Kotlin concurrency model
   * Flows, revisited 
 * Local storage with DataStore
@@ -160,3 +151,5 @@
 * [Intents and intent filters](https://developer.android.com/guide/components/intents-filters)
   * [Sending the user to another app](https://developer.android.com/training/basics/intents/sending)
   * [Common Intents](https://developer.android.com/guide/components/intents-common)
+* [Asynchronous Flow | Kotlin Documentation](https://kotlinlang.org/docs/flow.html) 
+* [Kotlin flows on Android](https://developer.android.com/kotlin/flow#callback)

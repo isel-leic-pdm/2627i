@@ -57,4 +57,6 @@ dependencies {
     implementation ("com.google.code.gson:gson:2.9.1")
     implementation("io.coil-kt:coil-compose:2.0.0-rc01")
     implementation("androidx.compose.material:material-icons-extended")
+    // Preferences DataStore (SharedPreferences like APIs)
+    implementation("androidx.datastore:datastore-preferences:1.2.1")
 }
