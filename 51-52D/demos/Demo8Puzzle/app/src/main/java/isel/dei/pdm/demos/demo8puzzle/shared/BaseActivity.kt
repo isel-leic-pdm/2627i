@@ -27,5 +27,4 @@ abstract class BaseActivity: ComponentActivity() {
         super.onDestroy()
         log("onDestroy() on instance ${hashCode()}")
     }
-
 }

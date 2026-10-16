@@ -1,10 +1,10 @@
 package isel.dei.pdm.demos.demo8puzzle.main
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import isel.dei.pdm.demos.demo8puzzle.play.PlayActivity
+import isel.dei.pdm.demos.demo8puzzle.shared.BaseActivity
 import isel.dei.pdm.demos.demo8puzzle.ui.theme.Demo8PuzzleTheme
 
 /**
@@ -12,7 +12,7 @@ import isel.dei.pdm.demos.demo8puzzle.ui.theme.Demo8PuzzleTheme
  * This screen is a simple splash screen, used to show the app's logo and to direct the user to
  * the play screen.
  */
-class MainActivity : ComponentActivity() {
+class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
