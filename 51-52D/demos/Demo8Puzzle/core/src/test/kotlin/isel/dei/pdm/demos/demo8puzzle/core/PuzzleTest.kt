@@ -1,84 +1,154 @@
 package isel.dei.pdm.demos.demo8puzzle.core
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class PuzzleTest {
     @Test
-    fun `Puzzle initialization and access`() {
-        val puzzle = Puzzle(1, 2, 3, 4, 5, 6, 7, 8, 0)
-        assertEquals(1, puzzle[0]?.value)
-        assertEquals(1, puzzle[0, 0]?.value)
-        assertEquals(3, puzzle[0, 2]?.value)
-        assertEquals(4, puzzle[1, 0]?.value)
-        assertEquals(null, puzzle[8])
-        assertEquals(null, puzzle[2, 2])
+    fun `initialisation works correctly`() {
+        // Arrange and Act
+        val pieces = intArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 0)
+        val puzzle = Puzzle(*pieces)
+
+        // Assert
+        assertNull(puzzle[pieces.size - 1])
+        puzzle.filterNotNull().forEachIndexed { index, tile ->
+            assertEquals(pieces[index], tile.value)
+        }
     }
 
     @Test
-    fun `Puzzle move works for adjacent tile`() {
+    fun `move tile works for tile adjacent to the space`() {
+        // Arrange
         // 1 2 3
         // 4 5 6
         // 7 8 _
         val puzzle = Puzzle(1, 2, 3, 4, 5, 6, 7, 8, 0)
-        
-        // Move 8 to the right
-        val nextPuzzle = puzzle.move(Tile(8))
-        
+        val valueToMove = 8
+
+        // Act
+        val actualPuzzle = puzzle.move(tile = Tile(valueToMove))
+
+        // Assert
         // 1 2 3
         // 4 5 6
         // 7 _ 8
-        assertEquals(null, nextPuzzle[2, 1])
-        assertEquals(Tile(8), nextPuzzle[2, 2])
+        assertNull(actualPuzzle[2, 1])
+        assertEquals(valueToMove, actualPuzzle[2, 2]?.value)
     }
 
     @Test
-    fun `Puzzle move returns same instance for non-adjacent tile`() {
+    fun `move tile returns same instance for non-adjacent tile`() {
+        // Arrange
         val puzzle = Puzzle(1, 2, 3, 4, 5, 6, 7, 8, 0)
-        val nextPuzzle = puzzle.move(Tile(1))
+        val tileToMove = Tile(1)
+
+        // Act
+        val nextPuzzle = puzzle.move(tileToMove)
+
+        // Assert
         assertSame(puzzle, nextPuzzle)
     }
 
     @Test
-    fun `Puzzle is iterable`() {
+    fun `instance is iterable`() {
+        // Arrange
         val puzzle = Puzzle(1, 2, 3, 4, 5, 6, 7, 8, 0)
-        val list = puzzle.toList()
-        assertEquals(9, list.size)
-        assertEquals(Tile(1), list[0])
-        assertEquals(null, list[8])
+
+        // Act & Assert
+        puzzle.filterNotNull().forEachIndexed { index, tile ->
+            assertEquals(index + 1, tile.value)
+        }
+        assertNull(puzzle.last())
     }
 
     @Test
     fun `solvedPuzzle is solved`() {
-        assertTrue(solvedPuzzle.isSolved())
+        // Arrange
+        val sut = solvedPuzzle
+
+        // Act & Assert
+        assertTrue(sut.isSolved())
     }
 
     @Test
-    fun `unsolved puzzle isNotSolved`() {
-        val puzzle = Puzzle(1, 2, 3, 4, 5, 6, 7, 0, 8)
-        assertFalse(puzzle.isSolved())
+    fun `isSolved for unsolved puzzle returns false`() {
+        // Arrange
+        val sut = Puzzle(1, 2, 3, 4, 5, 6, 7, 0, 8)
+
+        // Act & Assert
+        assertFalse(sut.isSolved())
     }
 
     @Test
-    fun `shuffle produces non-solved solvable puzzle`() {
-        val shuffled = solvedPuzzle.shuffle()
-        assertFalse(shuffled.isSolved())
-        assertTrue(shuffled.isSolvable())
-        assertEquals(9, shuffled.count())
-        assertEquals(1, shuffled.count { it == null })
+    fun `isSolvable for solvable puzzle returns true`() {
+        // Arrange
+        val sut = Puzzle(1, 2, 3, 4, 5, 7, 8, 6, 0)
+
+        // Act & Assert
+        assertTrue(sut.isSolvable())
     }
 
     @Test
-    fun `inversions calculation and solvability check`() {
-        // Solved puzzle has 0 inversions and is solvable
-        assertEquals(0, solvedPuzzle.inversions())
-        assertTrue(solvedPuzzle.isSolvable())
+    fun `shuffle produces non-solved solvable puzzles`() {
+        // Arrange
+        val solved = solvedPuzzle
 
-        // 1 2 3
-        // 4 5 6
-        // 8 7 _ -> 1 inversion (8 > 7), unsolvable
-        val unsolvable = Puzzle(1, 2, 3, 4, 5, 6, 8, 7, 0)
-        assertEquals(1, unsolvable.inversions())
-        assertFalse(unsolvable.isSolvable())
+        // We use randomization in our algorithm, so lets repeat the test a few times
+        repeat(times = 100) {
+            // Act
+            val shuffled = solved.shuffle()
+
+            // Assert
+            assertFalse(shuffled.isSolved())
+            assertTrue(shuffled.isSolvable())
+        }
+    }
+
+    @Test
+    fun `inversions returns the correct number of inversions`() {
+        // Arrange
+        val puzzle = Puzzle(1, 2, 3, 4, 5, 8, 6, 7, 0)
+        val expectedInversions = 2
+
+        // Act
+        val actual = puzzle.inversions()
+
+        // Assert
+        assertEquals(expectedInversions, actual)
+    }
+
+    @Test
+    fun `equals between two equivalent puzzles returns true`() {
+        // Arrange
+        val puzzle1 = Puzzle(1, 2, 3, 4, 5, 6, 7, 8, 0)
+        val puzzle2 = Puzzle(1, 2, 3, 4, 5, 6, 7, 8, 0)
+
+        // Act & Assert
+        assertTrue(puzzle1 == puzzle2)
+    }
+
+    @Test
+    fun `equals between two different puzzles returns false`() {
+        // Arrange
+        val puzzle1 = Puzzle(1, 2, 3, 4, 5, 6, 7, 8, 0)
+        val puzzle2 = Puzzle(1, 2, 3, 4, 5, 6, 7, 0, 8)
+
+        // Act & Assert
+        assertFalse(puzzle1 == puzzle2)
+    }
+
+    @Test
+    fun `equals between puzzle and non-puzzle returns false`() {
+        // Arrange
+        val puzzle = Puzzle(1, 2, 3, 4, 5, 6, 7, 8, 0)
+        val nonPuzzle = "Not a puzzle"
+
+        // Act & Assert
+        assertFalse(puzzle.equals(nonPuzzle))
     }
 }

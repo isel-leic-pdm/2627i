@@ -2,13 +2,12 @@ package isel.dei.pdm.demos.demo8puzzle.play
 
 import isel.dei.pdm.demos.demo8puzzle.core.solvedPuzzle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PuzzleScreenViewModelTest {
@@ -43,12 +42,11 @@ class PuzzleScreenViewModelTest {
     @Test
     fun `moveTile in Solving state updates puzzle state`() {
         // Arrange
-        val sut = PuzzleScreenViewModel()
-        sut.start()
+        val sut = PuzzleScreenViewModel(initialState = PuzzleScreenState.Solving(solvedPuzzle))
         val initialState = sut.state as PuzzleScreenState.Solving
 
         // Act
-        val tileToMove = initialState.puzzle.getMoveableTiles().shuffled().first()
+        val tileToMove = initialState.puzzle.getMoveableTiles().first()
         sut.moveTile(tileToMove)
 
         // Assert
@@ -59,8 +57,7 @@ class PuzzleScreenViewModelTest {
     @Test
     fun `reset from Solving state transitions to Idle`() {
         // Arrange
-        val sut = PuzzleScreenViewModel()
-        sut.start()
+        val sut = PuzzleScreenViewModel(initialState = PuzzleScreenState.Solving(solvedPuzzle))
 
         // Act
         sut.reset()
@@ -74,16 +71,35 @@ class PuzzleScreenViewModelTest {
     @Test
     fun `state auto resets from Solved to Idle after timeout`() = runTest {
         // Arrange
-        val viewModel = PuzzleScreenViewModel(solvedTimeoutMs = 100L)
-        viewModel.start()
+        val nearSolvedPuzzle = solvedPuzzle.move(solvedPuzzle.getMoveableTiles().first())
+        val viewModel = PuzzleScreenViewModel(
+            initialState = PuzzleScreenState.Solving(nearSolvedPuzzle),
+            solvedTimeoutMs = 100L,
+            solveDelayMs = 0L,
+            computationDispatcher = mainDispatcherRule.testDispatcher
+        )
 
         // Act
         viewModel.solve()
-        advanceTimeBy(150L.milliseconds)
+        advanceUntilIdle()
 
         // Assert
         val state = viewModel.state
-        assertTrue(state is PuzzleScreenState.Idle)
+        assertTrue("Expected Idle, but got $state", state is PuzzleScreenState.Idle)
         assertEquals(solvedPuzzle, state.puzzle)
+    }
+
+    @Test
+    fun `viewModel can be initialized with custom initial state`() {
+        // Arrange
+        val customPuzzle = solvedPuzzle.move(solvedPuzzle.getMoveableTiles().first())
+        val customState = PuzzleScreenState.Solving(customPuzzle)
+
+        // Act
+        val sut = PuzzleScreenViewModel(initialState = customState)
+
+        // Assert
+        assertEquals(customState, sut.state)
+        assertEquals(customPuzzle, sut.state.puzzle)
     }
 }

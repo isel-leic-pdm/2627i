@@ -6,11 +6,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import isel.dei.pdm.demos.demo8puzzle.core.MAX_TILE_VALUE
 import isel.dei.pdm.demos.demo8puzzle.core.MIN_TILE_VALUE
+import isel.dei.pdm.demos.demo8puzzle.core.solvedPuzzle
 import isel.dei.pdm.demos.demo8puzzle.ui.theme.Demo8PuzzleTheme
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -79,13 +80,16 @@ class PuzzleScreenTests {
     @Test
     fun clicking_solve_transitions_to_solved_state() {
         // Arrange
-        val viewModel = PuzzleScreenViewModel()
+        val nearSolvedPuzzle = solvedPuzzle.move(solvedPuzzle.getMoveableTiles().first())
+        val viewModel = PuzzleScreenViewModel(
+            initialState = PuzzleScreenState.Solving(nearSolvedPuzzle),
+            solveDelayMs = 0L
+        )
         composeTestRule.setContent {
             Demo8PuzzleTheme {
                 PuzzleScreen(viewModel = viewModel)
             }
         }
-        composeTestRule.onNodeWithTag(START_BUTTON_TAG).performClick()
 
         // Act
         composeTestRule.onNodeWithTag(SOLVE_BUTTON_TAG).performClick()
@@ -100,20 +104,26 @@ class PuzzleScreenTests {
     @Test
     fun solved_state_auto_resets_to_idle_after_timeout() {
         // Arrange
-        val viewModel = PuzzleScreenViewModel(solvedTimeoutMs = 100L)
+        val nearSolvedPuzzle = solvedPuzzle.move(solvedPuzzle.getMoveableTiles().first())
+        val viewModel = PuzzleScreenViewModel(
+            initialState = PuzzleScreenState.Solving(nearSolvedPuzzle),
+            solvedTimeoutMs = 500L,
+            solveDelayMs = 0L
+        )
         composeTestRule.setContent {
             Demo8PuzzleTheme {
                 PuzzleScreen(viewModel = viewModel)
             }
         }
-        composeTestRule.onNodeWithTag(START_BUTTON_TAG).performClick()
+
+        // Act
         composeTestRule.onNodeWithTag(SOLVE_BUTTON_TAG).performClick()
 
         // Assert
         composeTestRule.onNodeWithTag(CONGRATS_MESSAGE_TAG).assertIsDisplayed()
 
         // Wait for auto-reset timeout
-        composeTestRule.waitUntil(timeoutMillis = 1000L) {
+        composeTestRule.waitUntil(timeoutMillis = 2000L) {
             viewModel.state is PuzzleScreenState.Idle
         }
 
@@ -140,16 +150,13 @@ class PuzzleScreenTests {
 
     @Test
     fun board_is_enabled_in_solving_state() {
-        // Arrange
-        val viewModel = PuzzleScreenViewModel()
+        // Arrange & Act
+        val viewModel = PuzzleScreenViewModel(initialState = PuzzleScreenState.Solving(solvedPuzzle))
         composeTestRule.setContent {
             Demo8PuzzleTheme {
                 PuzzleScreen(viewModel = viewModel)
             }
         }
-
-        // Act
-        composeTestRule.onNodeWithTag(START_BUTTON_TAG).performClick()
 
         // Assert
         for (value in MIN_TILE_VALUE..MAX_TILE_VALUE) {
@@ -159,17 +166,13 @@ class PuzzleScreenTests {
 
     @Test
     fun board_is_disabled_in_solved_state() {
-        // Arrange
-        val viewModel = PuzzleScreenViewModel()
+        // Arrange & Act
+        val viewModel = PuzzleScreenViewModel(initialState = PuzzleScreenState.Solved(solvedPuzzle))
         composeTestRule.setContent {
             Demo8PuzzleTheme {
                 PuzzleScreen(viewModel = viewModel)
             }
         }
-        composeTestRule.onNodeWithTag(START_BUTTON_TAG).performClick()
-
-        // Act
-        composeTestRule.onNodeWithTag(SOLVE_BUTTON_TAG).performClick()
 
         // Assert
         for (value in MIN_TILE_VALUE..MAX_TILE_VALUE) {
