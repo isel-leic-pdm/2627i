@@ -153,3 +153,24 @@
   * [Common Intents](https://developer.android.com/guide/components/intents-common)
 * [Asynchronous Flow | Kotlin Documentation](https://kotlinlang.org/docs/flow.html) 
 * [Kotlin flows on Android](https://developer.android.com/kotlin/flow#callback)
+
+
+
+
+
+## Week 6 - 19/10/2026
+
+### Subject: Persistent storage with Room
+* Discussion, should we use Databases on mobile applications?
+* Room characterization
+  * Base components and systems
+  * Integration workflow
+  * One to many relations
+  
+#### For reference:
+* [Lazy lists and lazy grids](https://developer.android.com/develop/ui/compose/lists)
+* [Room](https://developer.android.com/training/data-storage/room#)
+* [Database](https://developer.android.com/training/data-storage/room#database)
+* [Entities](https://developer.android.com/training/data-storage/room/defining-data)
+* [DAOs](https://developer.android.com/training/data-storage/room/accessing-data)
+* [Define relationships between objects](https://developer.android.com/training/data-storage/room/relationships)

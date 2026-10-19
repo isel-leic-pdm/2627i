@@ -13,6 +13,41 @@ import pt.isel.lei.pdm.nasaapod.domain.ApodImage
 import pt.isel.lei.pdm.nasaapod.service.FavoriteRepository
 import pt.isel.lei.pdm.nasaapod.ui.ViewModelBase
 
+//changed, original viewmodel commented below
+sealed interface DetailScreenViewState {
+    val image: ApodImage
+    class Favorite(override val image: ApodImage) : DetailScreenViewState
+    class NotFavorite(override val image: ApodImage) : DetailScreenViewState
+}
+
+class DetailsViewModel(
+    val image: ApodImage,
+    val favoriteRepository: FavoriteRepository
+) : ViewModelBase() {
+
+    val viewState: StateFlow<DetailScreenViewState> =
+        favoriteRepository.favorite.map {
+            if (it == image.date)
+                DetailScreenViewState.Favorite(image)
+            else
+                DetailScreenViewState.NotFavorite(image)
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            DetailScreenViewState.NotFavorite(image)
+        )
+
+    fun toggleFavorite() {
+        viewModelScope.launch {
+            if (viewState.value is DetailScreenViewState.Favorite)
+                favoriteRepository.clearFavorite()
+            else
+                favoriteRepository.setFavorite(image.date)
+        }
+    }
+
+}
+/*
 class DetailsViewModel(
     val image: ApodImage,
     val repo: FavoriteRepository
@@ -35,4 +70,4 @@ class DetailsViewModel(
                 repo.setFavorite(image.date)
         }
     }
-}
+}*/
