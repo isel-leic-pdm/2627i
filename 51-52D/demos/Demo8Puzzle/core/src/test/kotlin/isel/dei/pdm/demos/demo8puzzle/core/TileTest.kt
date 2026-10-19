@@ -1,7 +1,7 @@
 package isel.dei.pdm.demos.demo8puzzle.core
 
-import org.junit.Test
 import org.junit.Assert.assertEquals
+import org.junit.Test
 
 class TileTest {
     @Test
@@ -18,5 +18,15 @@ class TileTest {
     @Test(expected = IllegalArgumentException::class)
     fun `Tile value cannot be above max`() {
         Tile(MAX_TILE_VALUE + 1)
+    }
+
+    @Test
+    fun `Tile toString returns value`() {
+        val sut = Tile(MIN_TILE_VALUE)
+        val expected = MIN_TILE_VALUE.toString()
+
+        val actual = sut.toString()
+
+        assertEquals(expected, actual)
     }
 }
