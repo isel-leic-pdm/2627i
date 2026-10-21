@@ -102,13 +102,16 @@ object SearchBoxTestTags {
     const val CLEAR_BUTTON = "search_box_clear_button"
 }
 
-@Preview(showBackground = true)
-@Composable
-fun SearchBoxPreview() {
-    DemoGameVaultTheme {
-        SearchBox(
-            onQueryChange = {},
-            onQueryCleared = {}
-        )
+@Suppress("Unused")
+class SearchBoxPreviews {
+    @Preview(showBackground = true)
+    @Composable
+    fun Preview() {
+        DemoGameVaultTheme {
+            SearchBox(
+                onQueryChange = {},
+                onQueryCleared = {}
+            )
+        }
     }
 }

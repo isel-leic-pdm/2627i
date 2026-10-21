@@ -17,6 +17,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class SearchBoxTest {
 
@@ -48,14 +49,12 @@ class SearchBoxTest {
     fun entering_valid_search_query_triggers_onQueryChange_after_debounce() {
         // Arrange
         var capturedQuery: SearchString? = null
-        val delayMS = 100L
 
         composeTestRule.setContent {
             DemoGameVaultTheme {
                 SearchBox(
                     onQueryChange = { capturedQuery = it },
                     onQueryCleared = {},
-                    debounceDelay = delayMS.milliseconds,
                 )
             }
         }
@@ -66,7 +65,7 @@ class SearchBoxTest {
             .performTextInput("PlayStation")
 
         // Wait for debounce delay
-        composeTestRule.waitUntil(timeoutMillis = delayMS * 2) {
+        composeTestRule.waitUntil(timeoutMillis = 2.seconds.inWholeMilliseconds) {
             capturedQuery != null
         }
 

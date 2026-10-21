@@ -2,7 +2,6 @@ package isel.dei.pdm.demos.gamevault.search
 
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -94,7 +93,7 @@ class PlatformListItemTest {
     }
 
     @Test
-    fun item_without_onSelected_renders_without_click_action() {
+    fun platform_list_item_with_null_trailing_content_renders_correctly() {
         // Arrange & Act
         val platform = Platform(
             id = 1L,
@@ -107,7 +106,8 @@ class PlatformListItemTest {
             CompositionLocalProvider(LocalImageLoader provides successLoader) {
                 PlatformListItem(
                     platform = platform,
-                    onSelected = null,
+                    onSelected = {},
+                    trailingContent = null,
                 )
             }
         }
@@ -118,9 +118,5 @@ class PlatformListItemTest {
         composeTestRule
             .onNodeWithTag(PlatformListItemTestTags.ITEM)
             .assertIsDisplayed()
-
-        composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.ITEM)
-            .assertHasNoClickAction()
     }
 }

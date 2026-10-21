@@ -128,60 +128,64 @@ object AsyncImageTestTags {
 }
 
 
-@Preview(showBackground = true, name = "Loading State")
-@Composable
-fun AsyncImageLoadingPreview() {
+@Suppress("Unused")
+class AsyncImagePreviews {
 
-    val loadingLoader: ImageLoader = {
-        delay(10.seconds) // Long duration delay for preview
-        Result.failure(IllegalStateException())
-    }
+    @Preview(showBackground = true, name = "Loading State")
+    @Composable
+    fun LoadingState() {
 
-    DemoGameVaultTheme {
-        AsyncImage(
-            uri = "http://example.com/image.jpg".toUri(),
-            contentDescription = null,
-            modifier = Modifier.size(100.dp),
-            loader = loadingLoader
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Success State")
-@Composable
-fun AsyncImageSuccessPreview() {
-
-    val successLoader: ImageLoader = {
-        val bitmap = createBitmap(100, 100).apply {
-            eraseColor(android.graphics.Color.BLUE)
+        val loadingLoader: ImageLoader = {
+            delay(10.seconds) // Long duration delay for preview
+            Result.failure(IllegalStateException())
         }
-        Result.success(bitmap.asImageBitmap())
+
+        DemoGameVaultTheme {
+            AsyncImage(
+                uri = "http://example.com/image.jpg".toUri(),
+                contentDescription = null,
+                modifier = Modifier.size(100.dp),
+                loader = loadingLoader
+            )
+        }
     }
 
-    DemoGameVaultTheme {
-        AsyncImage(
-            uri = "http://example.com/image.jpg".toUri(),
-            contentDescription = null,
-            modifier = Modifier.size(100.dp),
-            loader = successLoader
-        )
+    @Preview(showBackground = true, name = "Success State")
+    @Composable
+    fun SuccessState() {
+
+        val successLoader: ImageLoader = {
+            val bitmap = createBitmap(100, 100).apply {
+                eraseColor(android.graphics.Color.BLUE)
+            }
+            Result.success(bitmap.asImageBitmap())
+        }
+
+        DemoGameVaultTheme {
+            AsyncImage(
+                uri = "http://example.com/image.jpg".toUri(),
+                contentDescription = null,
+                modifier = Modifier.size(100.dp),
+                loader = successLoader
+            )
+        }
     }
-}
 
-@Preview(showBackground = true, name = "Error State")
-@Composable
-fun AsyncImageErrorPreview() {
+    @Preview(showBackground = true, name = "Error State")
+    @Composable
+    fun ErrorState() {
 
-    val errorLoader: ImageLoader = {
-        Result.failure(RuntimeException("Simulated error"))
-    }
+        val errorLoader: ImageLoader = {
+            Result.failure(RuntimeException("Simulated error"))
+        }
 
-    DemoGameVaultTheme {
-        AsyncImage(
-            uri = "http://example.com/image.jpg".toUri(),
-            contentDescription = null,
-            modifier = Modifier.size(100.dp),
-            loader = errorLoader
-        )
+        DemoGameVaultTheme {
+            AsyncImage(
+                uri = "http://example.com/image.jpg".toUri(),
+                contentDescription = null,
+                modifier = Modifier.size(100.dp),
+                loader = errorLoader
+            )
+        }
     }
 }

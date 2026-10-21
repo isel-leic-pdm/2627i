@@ -32,16 +32,18 @@ import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 fun PlatformListItem(
     platform: Platform,
     modifier: Modifier = Modifier,
-    onSelected: ((platform: Platform) -> Unit)? = null,
+    onSelected: (platform: Platform) -> Unit,
+    trailingContent: @Composable (() -> Unit)? = {
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = null,
+        )
+    },
 ) {
-
     OutlinedCard(
         modifier = modifier
             .fillMaxWidth()
-            .then(
-                if (onSelected != null) Modifier.clickable { onSelected(platform) }
-                else Modifier
-            )
+            .clickable { onSelected(platform) }
             .testTag(PlatformListItemTestTags.ITEM),
         shape = MaterialTheme.shapes.medium,
     ) {
@@ -69,14 +71,7 @@ fun PlatformListItem(
                         .testTag(PlatformListItemTestTags.LOGO),
                 )
             },
-            trailingContent = {
-                if (onSelected != null) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null,
-                    )
-                }
-            },
+            trailingContent = trailingContent,
         )
     }
 }
@@ -90,38 +85,43 @@ object PlatformListItemTestTags {
     const val ABBREVIATION = "platform_abbreviation"
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PlatformListItemPreviewWithIcon() {
-    val platform = Platform(
-        id = 1L,
-        abbreviation = "PS5",
-        name = "PlayStation 5",
-        logoUri = "http://example.com/ps5.png",
-    )
-    DemoGameVaultTheme {
-        PlatformListItem(
-            platform = platform,
-            onSelected = {},
-            modifier = Modifier.padding(16.dp),
-        )
-    }
-}
+@Suppress("Unused")
+class PlatformListItemPreviews {
 
-@Preview(showBackground = true)
-@Composable
-fun PlatformListItemPreviewNoIcon() {
-    val platform = Platform(
-        id = 1L,
-        abbreviation = "PS5",
-        name = "PlayStation 5",
-        logoUri = "http://example.com/ps5.png",
-    )
-    DemoGameVaultTheme {
-        PlatformListItem(
-            platform = platform,
-            onSelected = null,
-            modifier = Modifier.padding(16.dp),
+    @Preview(showBackground = true)
+    @Composable
+    fun WithIcon() {
+        val platform = Platform(
+            id = 1L,
+            abbreviation = "PS5",
+            name = "PlayStation 5",
+            logoUri = "http://example.com/ps5.png",
         )
+        DemoGameVaultTheme {
+            PlatformListItem(
+                platform = platform,
+                onSelected = {},
+                modifier = Modifier.padding(16.dp),
+            )
+        }
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun NoIcon() {
+        val platform = Platform(
+            id = 1L,
+            abbreviation = "PS5",
+            name = "PlayStation 5",
+            logoUri = "http://example.com/ps5.png",
+        )
+        DemoGameVaultTheme {
+            PlatformListItem(
+                platform = platform,
+                onSelected = {},
+                trailingContent = null,
+                modifier = Modifier.padding(16.dp),
+            )
+        }
     }
 }

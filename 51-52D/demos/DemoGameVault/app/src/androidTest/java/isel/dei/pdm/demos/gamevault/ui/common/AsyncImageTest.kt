@@ -111,4 +111,17 @@ class AsyncImageTest {
             .onNodeWithTag(AsyncImageTestTags.ERROR)
             .assertIsDisplayed()
     }
+
+    @Test(expected = IllegalStateException::class)
+    fun throws_when_no_image_loader_is_provided_on_composition_local() {
+        composeTestRule.setContent {
+            DemoGameVaultTheme {
+                AsyncImage(
+                    uri = "http://example.com/image.jpg".toUri(),
+                    contentDescription = "Error image",
+                    modifier = Modifier.size(100.dp),
+                )
+            }
+        }
+    }
 }
