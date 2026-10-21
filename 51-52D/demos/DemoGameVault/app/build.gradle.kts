@@ -1,10 +1,19 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.util.Properties
+import kotlin.apply
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     jacoco
+}
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.inputStream().use { load(it) }
+    }
 }
 
 android {
@@ -21,6 +30,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "IGDB_CLIENT_ID", "\"${localProperties.getProperty("igdb.client.id") ?: ""}\"")
+        buildConfigField("String", "IGDB_CLIENT_SECRET", "\"${localProperties.getProperty("igdb.client.secret") ?: ""}\"")
+        buildConfigField("String", "IGDB_ACCESS_TOKEN", "\"${localProperties.getProperty("igdb.access.token") ?: ""}\"")
     }
 
     buildTypes {
@@ -49,6 +62,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     testOptions {
@@ -81,9 +95,9 @@ dependencies {
 }
 
 tasks.register<JacocoReport>("jacocoTestReport") {
-    description = "Generates Jacoco coverage reports for both unit and instrumentation tests."
+    description = "Generates Jacoco coverage reports for both unit and instrumentation tests (app & core)."
     group = "Reporting"
-    dependsOn("testDebugUnitTest", "connectedDebugAndroidTest")
+    dependsOn(":core:test", "testDebugUnitTest", "connectedDebugAndroidTest")
     reports {
         xml.required.set(true)
         html.required.set(true)
@@ -102,16 +116,28 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         },
         fileTree("${project.layout.buildDirectory.get()}/intermediates/built_in_kotlinc/debug/compileDebugKotlin/classes") {
             exclude(fileFilter)
+        },
+        fileTree("${project(":core").layout.buildDirectory.get()}/classes/java/main") {
+            exclude(fileFilter)
+        },
+        fileTree("${project(":core").layout.buildDirectory.get()}/classes/kotlin/main") {
+            exclude(fileFilter)
         }
     )
-    val mainSrc = "${project.projectDir}/src/main/java"
+    val appSrc = "${project.projectDir}/src/main/java"
+    val coreSrc = "${project(":core").projectDir}/src/main/java"
 
-    sourceDirectories.setFrom(files(mainSrc))
+    sourceDirectories.setFrom(files(appSrc, coreSrc))
     classDirectories.setFrom(files(debugTree))
-    executionData.setFrom(fileTree(project.layout.buildDirectory.get()) {
-        include(
-            "outputs/unit_test_code_coverage/debugUnitTest/*.exec",
-            "outputs/code_coverage/debugAndroidTest/**/*.ec"
-        )
-    })
+    executionData.setFrom(files(
+        fileTree(project.layout.buildDirectory.get()) {
+            include(
+                "outputs/unit_test_code_coverage/debugUnitTest/*.exec",
+                "outputs/code_coverage/debugAndroidTest/**/*.ec"
+            )
+        },
+        fileTree(project(":core").layout.buildDirectory.get()) {
+            include("jacoco/test.exec")
+        }
+    ))
 }

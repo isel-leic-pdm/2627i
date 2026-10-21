@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.core.domain.search
+package isel.dei.pdm.demos.gamevault.domain.search
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

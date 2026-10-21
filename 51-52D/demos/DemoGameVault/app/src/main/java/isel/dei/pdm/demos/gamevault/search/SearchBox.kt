@@ -22,8 +22,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import isel.dei.pdm.demos.gamevault.R
-import isel.dei.pdm.demos.gamevault.core.domain.search.SearchString
-import isel.dei.pdm.demos.gamevault.core.domain.search.toSearchStringOrNull
+import isel.dei.pdm.demos.gamevault.domain.search.SearchString
+import isel.dei.pdm.demos.gamevault.domain.search.toSearchStringOrNull
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 import kotlinx.coroutines.delay
 import kotlin.time.Duration

@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.kotlinJvm)
+    jacoco
 }
 
 java {
@@ -19,4 +20,5 @@ tasks.withType<KotlinCompile>().configureEach {
 
 dependencies {
     testImplementation(libs.junit)
+    testImplementation(kotlin("test"))
 }

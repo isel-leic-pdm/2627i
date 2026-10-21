@@ -1,18 +1,18 @@
-package isel.dei.pdm.demos.gamevault.core.domain.search
+package isel.dei.pdm.demos.gamevault.domain.search
 
-import isel.dei.pdm.demos.gamevault.core.domain.NonBlankString
+import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import java.net.URI
 import java.time.LocalDate
 
 /**
- * Represents a game in the game search service.
+ * Represents the game information as provided by the game search service.
  * @param id The unique identifier of the game, as assigned by the service.
  * @param name The name of the game.
  * @param releaseDate The release date of the game, if available.
  * @param coverUri The URI of the game's cover image, if available.
  * @param thumbnailUri The URI of the game's thumbnail image, if available.
  */
-data class Game(
+data class GameInfo(
     val id: Long,
     val name: NonBlankString,
     val releaseDate: LocalDate?,
@@ -60,7 +60,7 @@ data class Game(
  * @property genres The genres of the game.
  */
 data class GameDetails(
-    val game: Game,
+    val game: GameInfo,
     val description: String?,
     val developers: List<String>,
     val publishers: List<String>,

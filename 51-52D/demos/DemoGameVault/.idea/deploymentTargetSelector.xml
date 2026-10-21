@@ -6,10 +6,6 @@
         <option name="selectionMode" value="DROPDOWN" />
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="Loading State - AsyncImageLoadingPreview">
-        <option name="selectionMode" value="DROPDOWN" />
-        <DialogSelection />
-      </SelectionState>
       <SelectionState runConfigName="Tests in 'isel.dei.pdm.demos.gamevault'">
         <option name="selectionMode" value="DROPDOWN" />
         <DialogSelection />

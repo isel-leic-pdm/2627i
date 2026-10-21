@@ -9,7 +9,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.text.AnnotatedString
-import isel.dei.pdm.demos.gamevault.core.domain.search.SearchString
+import isel.dei.pdm.demos.gamevault.domain.search.SearchString
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

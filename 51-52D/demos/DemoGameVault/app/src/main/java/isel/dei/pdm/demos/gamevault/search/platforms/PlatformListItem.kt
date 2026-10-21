@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.search
+package isel.dei.pdm.demos.gamevault.search.platforms
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import isel.dei.pdm.demos.gamevault.core.domain.search.Platform
+import isel.dei.pdm.demos.gamevault.domain.search.PlatformInfo
 import isel.dei.pdm.demos.gamevault.ui.common.AsyncImage
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 
@@ -30,9 +30,9 @@ import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
  */
 @Composable
 fun PlatformListItem(
-    platform: Platform,
+    platform: PlatformInfo,
     modifier: Modifier = Modifier,
-    onSelected: (platform: Platform) -> Unit,
+    onSelected: (platform: PlatformInfo) -> Unit,
     trailingContent: @Composable (() -> Unit)? = {
         Icon(
             imageVector = Icons.Default.Add,
@@ -91,7 +91,7 @@ class PlatformListItemPreviews {
     @Preview(showBackground = true)
     @Composable
     fun WithIcon() {
-        val platform = Platform(
+        val platform = PlatformInfo(
             id = 1L,
             abbreviation = "PS5",
             name = "PlayStation 5",
@@ -109,7 +109,7 @@ class PlatformListItemPreviews {
     @Preview(showBackground = true)
     @Composable
     fun NoIcon() {
-        val platform = Platform(
+        val platform = PlatformInfo(
             id = 1L,
             abbreviation = "PS5",
             name = "PlayStation 5",

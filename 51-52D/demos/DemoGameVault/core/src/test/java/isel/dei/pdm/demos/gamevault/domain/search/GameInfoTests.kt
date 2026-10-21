@@ -1,6 +1,8 @@
-package isel.dei.pdm.demos.gamevault.core.domain.search
+package isel.dei.pdm.demos.gamevault.domain.search
 
-import isel.dei.pdm.demos.gamevault.core.domain.NonBlankString
+import isel.dei.pdm.demos.gamevault.domain.NonBlankString
+import isel.dei.pdm.demos.gamevault.domain.search.GameDetails
+import isel.dei.pdm.demos.gamevault.domain.search.GameInfo
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -9,7 +11,7 @@ import java.net.URI
 import java.time.LocalDate
 import kotlin.test.assertFailsWith
 
-class GameTests {
+class GameInfoTests {
 
     @Test
     fun `primary constructor creates Game instance with valid properties`() {
@@ -21,7 +23,7 @@ class GameTests {
         val expectedThumbnailUri = URI.create("https://example.com/thumb.jpg")
 
         // Act
-        val sut = Game(
+        val sut = GameInfo(
             id = expectedId,
             name = expectedName,
             releaseDate = expectedReleaseDate,
@@ -47,7 +49,7 @@ class GameTests {
         val expectedThumbnailUriString = "https://example.com/thumb.jpg"
 
         // Act
-        val sut = Game(
+        val sut = GameInfo(
             id = expectedId,
             name = expectedName,
             releaseDate = expectedReleaseDate,
@@ -70,7 +72,7 @@ class GameTests {
         val expectedName = "Hades"
 
         // Act
-        val sut = Game(
+        val sut = GameInfo(
             id = expectedId,
             name = expectedName
         )
@@ -86,7 +88,7 @@ class GameTests {
     @Test
     fun `secondary constructor throws IllegalArgumentException when name is blank`() {
         assertFailsWith<IllegalArgumentException> {
-            Game(
+            GameInfo(
                 id = 1L,
                 name = "   "
             )
@@ -96,7 +98,7 @@ class GameTests {
     @Test
     fun `secondary constructor throws IllegalArgumentException when coverUri is an invalid URI`() {
         assertFailsWith<IllegalArgumentException> {
-            Game(
+            GameInfo(
                 id = 1L,
                 name = "Elden Ring",
                 coverUri = "http://example.com/cover image.jpg"
@@ -107,7 +109,7 @@ class GameTests {
     @Test
     fun `secondary constructor throws IllegalArgumentException when thumbnailUri is an invalid URI`() {
         assertFailsWith<IllegalArgumentException> {
-            Game(
+            GameInfo(
                 id = 1L,
                 name = "Elden Ring",
                 thumbnailUri = "http://example.com/thumb image.jpg"
@@ -118,8 +120,8 @@ class GameTests {
     @Test
     fun `two Game instances with same properties are equal`() {
         // Arrange
-        val game1 = Game(id = 1L, name = "Elden Ring")
-        val game2 = Game(id = 1L, name = "Elden Ring")
+        val game1 = GameInfo(id = 1L, name = "Elden Ring")
+        val game2 = GameInfo(id = 1L, name = "Elden Ring")
 
         // Act & Assert
         assertEquals(game1, game2)
@@ -129,21 +131,21 @@ class GameTests {
     @Test
     fun `Game Category enum contains expected values`() {
         // Arrange
-        val categories = Game.Category.entries
+        val categories = GameInfo.Category.entries
 
         // Act & Assert
         assertEquals(5, categories.size)
-        assertTrue(categories.contains(Game.Category.MAIN_GAME))
-        assertTrue(categories.contains(Game.Category.DLC))
-        assertTrue(categories.contains(Game.Category.BUNDLE))
-        assertTrue(categories.contains(Game.Category.REMAKE))
-        assertTrue(categories.contains(Game.Category.REMASTER))
+        assertTrue(categories.contains(GameInfo.Category.MAIN_GAME))
+        assertTrue(categories.contains(GameInfo.Category.DLC))
+        assertTrue(categories.contains(GameInfo.Category.BUNDLE))
+        assertTrue(categories.contains(GameInfo.Category.REMAKE))
+        assertTrue(categories.contains(GameInfo.Category.REMASTER))
     }
 
     @Test
     fun `GameDetails holds game and detailed properties`() {
         // Arrange
-        val game = Game(id = 1L, name = "Elden Ring")
+        val game = GameInfo(id = 1L, name = "Elden Ring")
         val expectedDescription = "An action RPG game"
         val expectedDevelopers = listOf("FromSoftware")
         val expectedPublishers = listOf("Bandai Namco Entertainment")

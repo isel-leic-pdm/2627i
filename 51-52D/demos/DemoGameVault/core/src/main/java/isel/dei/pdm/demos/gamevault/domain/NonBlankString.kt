@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.core.domain
+package isel.dei.pdm.demos.gamevault.domain
 
 /**
  * Represents a string that is guaranteed not to be blank.

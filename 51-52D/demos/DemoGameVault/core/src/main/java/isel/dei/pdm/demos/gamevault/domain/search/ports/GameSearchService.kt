@@ -1,9 +1,9 @@
-package isel.dei.pdm.demos.gamevault.core.domain.search.ports
+package isel.dei.pdm.demos.gamevault.domain.search.ports
 
-import isel.dei.pdm.demos.gamevault.core.domain.search.Game
-import isel.dei.pdm.demos.gamevault.core.domain.search.GameDetails
-import isel.dei.pdm.demos.gamevault.core.domain.search.Platform
-import isel.dei.pdm.demos.gamevault.core.domain.search.SearchString
+import isel.dei.pdm.demos.gamevault.domain.search.GameInfo
+import isel.dei.pdm.demos.gamevault.domain.search.GameDetails
+import isel.dei.pdm.demos.gamevault.domain.search.PlatformInfo
+import isel.dei.pdm.demos.gamevault.domain.search.SearchString
 
 /**
  * Contract for services that can be used for searching games.
@@ -18,9 +18,9 @@ interface GameSearchService {
      */
     suspend fun searchGames(
         name: SearchString,
-        platform: Platform,
-        category: Game.Category?
-    ): Result<List<Game>>
+        platform: PlatformInfo,
+        category: GameInfo.Category?
+    ): Result<List<GameInfo>>
 
     /**
      * Fetches the details for the game with the given [gameId], as returned by the search method.

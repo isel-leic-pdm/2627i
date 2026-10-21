@@ -1,23 +1,24 @@
-package isel.dei.pdm.demos.gamevault.core.domain.search
+package isel.dei.pdm.demos.gamevault.domain.search
 
+import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 import java.net.URI
 import kotlin.test.assertFailsWith
 
-class PlatformTests {
+class PlatformInfoTests {
 
     @Test
     fun `primary constructor creates Platform instance with valid properties`() {
         // Arrange
         val expectedId = 1L
-        val expectedAbbreviation = SearchString("PS5")
-        val expectedName = SearchString("PlayStation 5")
+        val expectedAbbreviation = NonBlankString("PS5")
+        val expectedName = NonBlankString("PlayStation 5")
         val expectedLogoUri = URI.create("https://example.com/ps5.png")
 
         // Act
-        val sut = Platform(
+        val sut = PlatformInfo(
             id = expectedId,
             abbreviation = expectedAbbreviation,
             name = expectedName,
@@ -40,7 +41,7 @@ class PlatformTests {
         val expectedLogoUriString = "https://example.com/ps5.png"
 
         // Act
-        val sut = Platform(
+        val sut = PlatformInfo(
             id = expectedId,
             abbreviation = expectedAbbreviation,
             name = expectedName,
@@ -62,7 +63,7 @@ class PlatformTests {
         val expectedName = "Xbox Series X"
 
         // Act
-        val sut = Platform(
+        val sut = PlatformInfo(
             id = expectedId,
             abbreviation = expectedAbbreviation,
             name = expectedName
@@ -76,23 +77,23 @@ class PlatformTests {
     }
 
     @Test
-    fun `secondary constructor throws IllegalArgumentException when abbreviation has less than 2 non-blank characters`() {
+    fun `secondary constructor throws IllegalArgumentException when abbreviation is blank`() {
         assertFailsWith<IllegalArgumentException> {
-            Platform(
+            PlatformInfo(
                 id = 1L,
-                abbreviation = "P",
+                abbreviation = "   \t ",
                 name = "PlayStation 5"
             )
         }
     }
 
     @Test
-    fun `secondary constructor throws IllegalArgumentException when name has less than 2 non-blank characters`() {
+    fun `secondary constructor throws IllegalArgumentException when name is blank`() {
         assertFailsWith<IllegalArgumentException> {
-            Platform(
+            PlatformInfo(
                 id = 1L,
                 abbreviation = "PS5",
-                name = "P"
+                name = "  "
             )
         }
     }
@@ -100,7 +101,7 @@ class PlatformTests {
     @Test
     fun `secondary constructor throws IllegalArgumentException when logoUri is an invalid URI`() {
         assertFailsWith<IllegalArgumentException> {
-            Platform(
+            PlatformInfo(
                 id = 1L,
                 abbreviation = "PS5",
                 name = "PlayStation 5",
@@ -112,8 +113,8 @@ class PlatformTests {
     @Test
     fun `two Platform instances with same properties are equal`() {
         // Arrange
-        val platform1 = Platform(id = 1L, abbreviation = "PS5", name = "PlayStation 5")
-        val platform2 = Platform(id = 1L, abbreviation = "PS5", name = "PlayStation 5")
+        val platform1 = PlatformInfo(id = 1L, abbreviation = "PS5", name = "PlayStation 5")
+        val platform2 = PlatformInfo(id = 1L, abbreviation = "PS5", name = "PlayStation 5")
 
         // Act & Assert
         assertEquals(platform1, platform2)

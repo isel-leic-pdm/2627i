@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.core.domain.search
+package isel.dei.pdm.demos.gamevault.domain.search
 
 /**
  * Represents a string that is used in search parameters, guaranteed to contain

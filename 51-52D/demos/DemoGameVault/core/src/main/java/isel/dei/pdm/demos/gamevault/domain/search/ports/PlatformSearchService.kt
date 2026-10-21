@@ -1,7 +1,7 @@
-package isel.dei.pdm.demos.gamevault.core.domain.search.ports
+package isel.dei.pdm.demos.gamevault.domain.search.ports
 
-import isel.dei.pdm.demos.gamevault.core.domain.search.Platform
-import isel.dei.pdm.demos.gamevault.core.domain.search.SearchString
+import isel.dei.pdm.demos.gamevault.domain.search.PlatformInfo
+import isel.dei.pdm.demos.gamevault.domain.search.SearchString
 
 /**
  * Contract to be supported by services that can search for platforms.
@@ -13,5 +13,5 @@ interface PlatformSearchService {
      * @param abbreviation The partial abbreviation of the platform to search for.
      * @return A result containing the list of platforms that match the search query.
      */
-    suspend fun search(name: SearchString?, abbreviation: SearchString?): Result<List<Platform>>
+    suspend fun search(name: SearchString?, abbreviation: SearchString?): Result<List<PlatformInfo>>
 }

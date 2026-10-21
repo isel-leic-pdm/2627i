@@ -7,14 +7,16 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.core.graphics.createBitmap
-import isel.dei.pdm.demos.gamevault.core.domain.search.Platform
+import isel.dei.pdm.demos.gamevault.domain.search.PlatformInfo
+import isel.dei.pdm.demos.gamevault.search.platforms.PlatformListItem
+import isel.dei.pdm.demos.gamevault.search.platforms.PlatformListItemTestTags
 import isel.dei.pdm.demos.gamevault.ui.common.ImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
-class PlatformListItemTest {
+class PlatformInfoListItemTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -29,7 +31,7 @@ class PlatformListItemTest {
     @Test
     fun platform_list_item_displays_content() {
         // Arrange & Act
-        val platform = Platform(
+        val platform = PlatformInfo(
             id = 1L,
             abbreviation = "PS5",
             name = "PlayStation 5",
@@ -66,8 +68,8 @@ class PlatformListItemTest {
     @Test
     fun clicking_item_with_onSelected_triggers_callback() {
         // Arrange
-        var selectedPlatform: Platform? = null
-        val platform = Platform(
+        var selectedPlatform: PlatformInfo? = null
+        val platform = PlatformInfo(
             id = 1L,
             abbreviation = "PS5",
             name = "PlayStation 5",
@@ -95,7 +97,7 @@ class PlatformListItemTest {
     @Test
     fun platform_list_item_with_null_trailing_content_renders_correctly() {
         // Arrange & Act
-        val platform = Platform(
+        val platform = PlatformInfo(
             id = 1L,
             abbreviation = "PS5",
             name = "PlayStation 5",
