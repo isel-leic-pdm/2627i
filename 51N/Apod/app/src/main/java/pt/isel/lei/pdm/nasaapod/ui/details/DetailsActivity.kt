@@ -47,7 +47,8 @@ class DetailsActivity : ComponentActivity() {
             viewModelInit {
                 DetailsViewModel(
                     image,
-                    (application as DependencyContainer).favoriteRepository
+                    (application as DependencyContainer).favoriteRepository,
+                    (application as DependencyContainer).bookmarksRepository
                 )
             }
         }

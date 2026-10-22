@@ -1,15 +1,13 @@
 package pt.isel.lei.pdm.nasaapod.ui.main
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.ui.text.LinkAnnotation
-import androidx.core.net.toUri
 import pt.isel.lei.pdm.nasaapod.DependencyContainer
 import pt.isel.lei.pdm.nasaapod.domain.ApodImage
 import pt.isel.lei.pdm.nasaapod.ui.ActivityBase
+import pt.isel.lei.pdm.nasaapod.ui.bookmarks.BookmarksActivity
 import pt.isel.lei.pdm.nasaapod.ui.common.viewModelInit
 import pt.isel.lei.pdm.nasaapod.ui.details.DetailsActivity
 
@@ -53,13 +51,13 @@ class MainActivity : ActivityBase() {
             //)
             MainScreen2(
                 vm = vm2,
-                onNasaImageClicked = ::navigateToDetails
+                onNasaImageClicked = ::navigateToDetails,
+                        onBookmarksClicked = { BookmarksActivity.navigate(this) }
             )
 
             // */
         }
     }
-
 
 
     fun navigateToDetails(image: ApodImage) {

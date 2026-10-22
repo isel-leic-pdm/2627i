@@ -9,4 +9,5 @@
     <string name="refres">refresh</string>
     <string name="refresh">refresh</string>
     <string name="title_activity_details">DetailsActivity</string>
+    <string name="title_activity_bookmarks">BookmarksActivity</string>
 </resources>

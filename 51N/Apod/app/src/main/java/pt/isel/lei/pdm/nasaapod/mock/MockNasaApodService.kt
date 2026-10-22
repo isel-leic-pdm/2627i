@@ -7,10 +7,10 @@ import kotlin.random.Random
 
 class MockNasaApodService : NasaApodService {
     override suspend fun getTodaysImage(): ApodImage {
-        delay(2000)
+        //delay(2000)
 
-        if (Random.nextInt(10) <= 1)
-            throw Exception("Something went wrong")
+        //if (Random.nextInt(10) <= 1)
+          //  throw Exception("Something went wrong")
 
         return MockApodImages.Images.random()
     }
