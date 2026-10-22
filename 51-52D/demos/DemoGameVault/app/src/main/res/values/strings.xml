@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">DemoGameVault</string>
+
+    <string name="search_box_placeholder">Search …</string>
+
+    <string name="image_placeholder">Image</string>
+    <string name="image_not_available">Image not available</string>
+</resources>
