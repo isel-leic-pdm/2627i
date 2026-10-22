@@ -9,4 +9,5 @@
     <string name="app_loading">Loading</string>
     <string name="app_refresh">refresh</string>
     <string name="title_activity_details">DetailsActivity</string>
+    <string name="title_activity_bookmarks">BookmarksActivity</string>
 </resources>

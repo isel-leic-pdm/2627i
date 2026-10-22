@@ -1,5 +1,6 @@
 package pt.isel.lei.pdm.nasaapod.ui.details
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -19,29 +20,41 @@ import pt.isel.lei.pdm.nasaapod.domain.ApodImage
 import pt.isel.lei.pdm.nasaapod.ui.common.viewModelInit
 
 class DetailsActivity : ComponentActivity() {
+
+    companion object {
+        const val INTENT_IMAGE_EXTRA = "image"
+        fun navigate(ctx: Context, image: ApodImage) {
+            val intent = Intent(ctx, DetailsActivity::class.java)
+            intent.putExtra(INTENT_IMAGE_EXTRA, image)
+            ctx.startActivity(intent)
+
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val image = intent.getParcelableExtra<ApodImage?>("image")
+        val image = intent.getParcelableExtra<ApodImage?>(INTENT_IMAGE_EXTRA)
 
         if (image == null) {
             finish()
             return
         }
-/*
-        val vm by viewModels<DetailsViewModel> {
-            viewModelInit {
-                DetailsViewModel(
-                    image,
-                    (application as DependencyContainer).favoriteRepository
-                )
-            }
-        }
-*/
+        /*
+                val vm by viewModels<DetailsViewModel> {
+                    viewModelInit {
+                        DetailsViewModel(
+                            image,
+                            (application as DependencyContainer).favoriteRepository
+                        )
+                    }
+                }
+        */
         val vm2 by viewModels<DetailsViewModel2> {
             viewModelInit {
                 DetailsViewModel2(
                     image,
-                    (application as DependencyContainer).favoriteRepository
+                    (application as DependencyContainer).favoriteRepository,
+                    (application as DependencyContainer).bookmarksRepository,
                 )
             }
         }

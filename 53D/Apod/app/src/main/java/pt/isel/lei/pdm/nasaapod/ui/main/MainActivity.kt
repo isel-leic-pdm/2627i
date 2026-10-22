@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import pt.isel.lei.pdm.nasaapod.domain.ApodImage
 import pt.isel.lei.pdm.nasaapod.ui.BaseActivity
+import pt.isel.lei.pdm.nasaapod.ui.bookmarks.BookmarksActivity
 import pt.isel.lei.pdm.nasaapod.ui.common.viewModelInit
 import pt.isel.lei.pdm.nasaapod.ui.details.DetailsActivity
 
@@ -69,23 +70,16 @@ class MainActivity : BaseActivity() {
                 vm
             )*/
             MainScreen2(
-                vm2,
-                {
-                    navigateToDetailsActivity(it)
-                }
+                vm = vm2,
+                navigateToImage = { DetailsActivity.navigate(this, it) },
+                navigateToBookmarks = { BookmarksActivity.navigate(this) }
             )
             // */
         }
     }
 
-    fun navigateToDetailsActivity(image: ApodImage) {
-        val intent = Intent(this, DetailsActivity::class.java)
-        intent.putExtra("image", image)
-        startActivity(intent)
-    }
 
-
-    fun navigateToUrl(img : ApodImage){
+    fun navigateToUrl(img: ApodImage) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(img.url))
         startActivity(intent)
     }

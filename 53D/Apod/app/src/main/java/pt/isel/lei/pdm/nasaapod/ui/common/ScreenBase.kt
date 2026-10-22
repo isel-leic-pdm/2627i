@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bookmarks
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,6 +31,7 @@ fun ScreenBase(
     onRefresh: (() -> Unit)? = null,
     onBack: (() -> Unit)? = null,
     onInfo: (() -> Unit)? = null,
+    onBookmark: (() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
     NasaApodTheme {
@@ -54,6 +56,10 @@ fun ScreenBase(
                         if (onInfo != null)
                             IconButton(onClick = { onInfo() }) {
                                 Icon(imageVector = Icons.Default.Info, contentDescription = "")
+                            }
+                        if (onBookmark != null)
+                            IconButton(onClick = { onBookmark() }) {
+                                Icon(imageVector = Icons.Default.Bookmarks, contentDescription = "")
                             }
                     }
                 )
