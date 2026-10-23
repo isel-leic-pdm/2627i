@@ -36,6 +36,7 @@ class PuzzleScreenTests {
         composeTestRule.onNodeWithTag(START_BUTTON_TAG).assertIsDisplayed()
         composeTestRule.onNodeWithTag(RESET_BUTTON_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(SOLVE_BUTTON_TAG).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(STOP_BUTTON_TAG).assertDoesNotExist()
     }
 
     @Test
@@ -55,6 +56,7 @@ class PuzzleScreenTests {
         composeTestRule.onNodeWithTag(START_BUTTON_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(RESET_BUTTON_TAG).assertIsDisplayed()
         composeTestRule.onNodeWithTag(SOLVE_BUTTON_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(STOP_BUTTON_TAG).assertDoesNotExist()
     }
 
     @Test
@@ -75,6 +77,7 @@ class PuzzleScreenTests {
         composeTestRule.onNodeWithTag(START_BUTTON_TAG).assertIsDisplayed()
         composeTestRule.onNodeWithTag(RESET_BUTTON_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(SOLVE_BUTTON_TAG).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(STOP_BUTTON_TAG).assertDoesNotExist()
     }
 
     @Test
@@ -98,7 +101,45 @@ class PuzzleScreenTests {
         composeTestRule.onNodeWithTag(START_BUTTON_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(RESET_BUTTON_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(SOLVE_BUTTON_TAG).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(STOP_BUTTON_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(CONGRATS_MESSAGE_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun clicking_solve_transitions_to_autosolving_state_and_clicking_stop_returns_to_solving() {
+        // Arrange
+        val nearSolvedPuzzle = solvedPuzzle.move(solvedPuzzle.getMoveableTiles().first())
+        val viewModel = PuzzleScreenViewModel(
+            initialState = PuzzleScreenState.Solving(nearSolvedPuzzle),
+            solveDelayMs = 2000L
+        )
+        composeTestRule.setContent {
+            Demo8PuzzleTheme {
+                PuzzleScreen(viewModel = viewModel)
+            }
+        }
+
+        // Act: Click Solve
+        composeTestRule.onNodeWithTag(SOLVE_BUTTON_TAG).performClick()
+
+        // Assert: AutoSolving state
+        composeTestRule.onNodeWithTag(STOP_BUTTON_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(RESET_BUTTON_TAG).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(SOLVE_BUTTON_TAG).assertDoesNotExist()
+        for (value in MIN_TILE_VALUE..MAX_TILE_VALUE) {
+            composeTestRule.onNodeWithTag(puzzleTileTag(value)).assertIsNotEnabled()
+        }
+
+        // Act: Click Stop
+        composeTestRule.onNodeWithTag(STOP_BUTTON_TAG).performClick()
+
+        // Assert: Solving state
+        composeTestRule.onNodeWithTag(RESET_BUTTON_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(SOLVE_BUTTON_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(STOP_BUTTON_TAG).assertDoesNotExist()
+        for (value in MIN_TILE_VALUE..MAX_TILE_VALUE) {
+            composeTestRule.onNodeWithTag(puzzleTileTag(value)).assertIsEnabled()
+        }
     }
 
     @Test
@@ -162,6 +203,23 @@ class PuzzleScreenTests {
         for (value in MIN_TILE_VALUE..MAX_TILE_VALUE) {
             composeTestRule.onNodeWithTag(puzzleTileTag(value)).assertIsEnabled()
         }
+    }
+
+    @Test
+    fun board_is_disabled_in_autosolving_state() {
+        // Arrange & Act
+        val viewModel = PuzzleScreenViewModel(initialState = PuzzleScreenState.AutoSolving(solvedPuzzle))
+        composeTestRule.setContent {
+            Demo8PuzzleTheme {
+                PuzzleScreen(viewModel = viewModel)
+            }
+        }
+
+        // Assert
+        for (value in MIN_TILE_VALUE..MAX_TILE_VALUE) {
+            composeTestRule.onNodeWithTag(puzzleTileTag(value)).assertIsNotEnabled()
+        }
+        composeTestRule.onNodeWithTag(STOP_BUTTON_TAG).assertIsDisplayed()
     }
 
     @Test

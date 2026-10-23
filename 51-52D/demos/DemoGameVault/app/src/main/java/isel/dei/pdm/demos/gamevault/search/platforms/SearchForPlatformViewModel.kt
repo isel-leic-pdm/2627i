@@ -2,7 +2,7 @@ package isel.dei.pdm.demos.gamevault.search.platforms
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import isel.dei.pdm.demos.gamevault.domain.collection.CollectionRepository
+import isel.dei.pdm.demos.gamevault.domain.collection.ports.CollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.search.ports.PlatformSearchService
 
 /**

@@ -69,6 +69,40 @@ class PuzzleScreenViewModelTest {
     }
 
     @Test
+    fun `solve from Solving transitions to AutoSolving`() {
+        // Arrange
+        val nearSolvedPuzzle = solvedPuzzle.move(solvedPuzzle.getMoveableTiles().first())
+        val sut = PuzzleScreenViewModel(
+            initialState = PuzzleScreenState.Solving(nearSolvedPuzzle),
+            solveDelayMs = 1000L
+        )
+
+        // Act
+        sut.solve()
+
+        // Assert
+        val state = sut.state
+        assertTrue(state is PuzzleScreenState.AutoSolving)
+    }
+
+    @Test
+    fun `stop from AutoSolving transitions to Solving`() {
+        // Arrange
+        val nearSolvedPuzzle = solvedPuzzle.move(solvedPuzzle.getMoveableTiles().first())
+        val sut = PuzzleScreenViewModel(
+            initialState = PuzzleScreenState.AutoSolving(nearSolvedPuzzle)
+        )
+
+        // Act
+        sut.stop()
+
+        // Assert
+        val state = sut.state
+        assertTrue(state is PuzzleScreenState.Solving)
+        assertEquals(nearSolvedPuzzle, state.puzzle)
+    }
+
+    @Test
     fun `state auto resets from Solved to Idle after timeout`() = runTest {
         // Arrange
         val nearSolvedPuzzle = solvedPuzzle.move(solvedPuzzle.getMoveableTiles().first())

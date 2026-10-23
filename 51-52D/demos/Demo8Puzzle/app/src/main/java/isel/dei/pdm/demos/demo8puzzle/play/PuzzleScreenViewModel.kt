@@ -29,13 +29,14 @@ sealed class PuzzleScreenState {
     abstract val puzzle: Puzzle
     data class Idle(override val puzzle: Puzzle) : PuzzleScreenState()
     data class Solving(override val puzzle: Puzzle) : PuzzleScreenState()
+    data class AutoSolving(override val puzzle: Puzzle) : PuzzleScreenState()
     data class Solved(override val puzzle: Puzzle) : PuzzleScreenState()
 }
 
 /**
  * The view model for the puzzle screen. It holds the screen's state and provides methods
  * to produce the admissible state transitions. The state machine is depicted in the file
- * puzzle-screen-state-machine.png of the documentation folder.
+ * play-screen-state-machine-v2.png of the documentation folder.
  * The constructor arguments are used to simplify the testing of the screen.
  *
  * @param initialState the initial state of the screen
@@ -53,6 +54,7 @@ class PuzzleScreenViewModel(
 ) : BaseViewModel() {
 
     private var idleTransitionJob: Job? = null
+    private var solveJob: Job? = null
 
     /**
      * The current state of the screen's state machine.
@@ -111,31 +113,57 @@ class PuzzleScreenViewModel(
     }
 
     /**
-     * Solves the puzzle.
+     * Solves the puzzle automatically. If the current state is Solving, a transition to
+     * the AutoSolving state occurs.
      */
     fun solve() {
         val current = state
         if (current is PuzzleScreenState.Solving) {
             log("Solving automatically")
-            viewModelScope.launch {
+            state = PuzzleScreenState.AutoSolving(current.puzzle)
+            solveJob = viewModelScope.launch {
                 val result = withContext(computationDispatcher) {
                     findSolutionOrNull(board = current.puzzle, onStep = { log("Search step"); yield() })
                 }
-                result?.forEach { tile ->
-                    if (solveDelayMs > 0L) {
-                        delay(solveDelayMs.milliseconds)
+                if (result != null) {
+                    result.forEach { tile ->
+                        if (solveDelayMs > 0L) {
+                            delay(solveDelayMs.milliseconds)
+                        }
+                        val activeState = state
+                        if (activeState is PuzzleScreenState.AutoSolving) {
+                            val newPuzzle = activeState.puzzle.move(tile)
+                            state = if (newPuzzle.isSolved()) {
+                                log("Transitioning to Solved")
+                                PuzzleScreenState.Solved(newPuzzle).also { scheduleTransitionToIdle() }
+                            } else {
+                                PuzzleScreenState.AutoSolving(newPuzzle)
+                            }
+                        }
                     }
-                    val activeState = state
-                    if (activeState is PuzzleScreenState.Solving) {
-                        state = PuzzleScreenState.Solving(puzzle = activeState.puzzle.move(tile))
+                    val finalState = state
+                    if (finalState is PuzzleScreenState.AutoSolving && finalState.puzzle.isSolved()) {
+                        log("Transitioning to Solved")
+                        state = PuzzleScreenState.Solved(finalState.puzzle).also { scheduleTransitionToIdle() }
                     }
-                }
-                log("Transitioning to Solved")
-                val finalState = state
-                if (finalState is PuzzleScreenState.Solving) {
-                    state = PuzzleScreenState.Solved(solvedPuzzle).also { scheduleTransitionToIdle() }
+                } else {
+                    log("No solution found")
+                    state = PuzzleScreenState.Solving(current.puzzle)
                 }
             }
+        }
+    }
+
+    /**
+     * Stops the automatic resolution. If the current state is AutoSolving, a transition to
+     * the Solving state occurs with the current puzzle board.
+     */
+    fun stop() {
+        val current = state
+        if (current is PuzzleScreenState.AutoSolving) {
+            log("Stopping automatic resolution")
+            solveJob?.cancel()
+            state = PuzzleScreenState.Solving(current.puzzle)
         }
     }
 

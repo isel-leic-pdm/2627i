@@ -40,6 +40,7 @@ import isel.dei.pdm.demos.demo8puzzle.ui.theme.Demo8PuzzleTheme
 const val START_BUTTON_TAG = "StartButton"
 const val RESET_BUTTON_TAG = "ResetButton"
 const val SOLVE_BUTTON_TAG = "SolveButton"
+const val STOP_BUTTON_TAG = "StopButton"
 const val CONGRATS_MESSAGE_TAG = "CongratsMessage"
 const val ABOUT_BUTTON_TAG = "AboutButton"
 
@@ -82,7 +83,8 @@ fun PuzzleScreen(
                 onTileClicked = { viewModel.moveTile(it) },
                 onStart = { viewModel.start() },
                 onReset = { viewModel.reset() },
-                onSolve = { viewModel.solve() }
+                onSolve = { viewModel.solve() },
+                onStop = { viewModel.stop() }
             )
         }
     }
@@ -96,6 +98,7 @@ fun PuzzleScreen(
  * @param onStart Callback for when the start button is clicked.
  * @param onReset Callback for when the reset button is clicked.
  * @param onSolve Callback for when the solve button is clicked.
+ * @param onStop Callback for when the stop button is clicked.
  */
 @Composable
 private fun PuzzleScreenContent(
@@ -104,7 +107,7 @@ private fun PuzzleScreenContent(
     onStart: () -> Unit,
     onReset: () -> Unit,
     onSolve: () -> Unit,
-
+    onStop: () -> Unit
 ) {
     val configuration = LocalConfiguration.current
     if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -113,7 +116,8 @@ private fun PuzzleScreenContent(
             onTileClicked = onTileClicked,
             onStart = onStart,
             onReset = onReset,
-            onSolve = onSolve
+            onSolve = onSolve,
+            onStop = onStop
         )
     } else {
         PuzzleScreenPortraitContent(
@@ -121,7 +125,8 @@ private fun PuzzleScreenContent(
             onTileClicked = onTileClicked,
             onStart = onStart,
             onReset = onReset,
-            onSolve = onSolve
+            onSolve = onSolve,
+            onStop = onStop
         )
     }
 }
@@ -132,7 +137,8 @@ private fun PuzzleScreenPortraitContent(
     onTileClicked: (Tile) -> Unit,
     onStart: () -> Unit,
     onReset: () -> Unit,
-    onSolve: () -> Unit
+    onSolve: () -> Unit,
+    onStop: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -151,7 +157,8 @@ private fun PuzzleScreenPortraitContent(
             state = state,
             onStart = onStart,
             onReset = onReset,
-            onSolve = onSolve
+            onSolve = onSolve,
+            onStop = onStop
         )
     }
 }
@@ -162,7 +169,8 @@ private fun PuzzleScreenLandscapeContent(
     onTileClicked: (Tile) -> Unit,
     onStart: () -> Unit,
     onReset: () -> Unit,
-    onSolve: () -> Unit
+    onSolve: () -> Unit,
+    onStop: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -181,7 +189,8 @@ private fun PuzzleScreenLandscapeContent(
             state = state,
             onStart = onStart,
             onReset = onReset,
-            onSolve = onSolve
+            onSolve = onSolve,
+            onStop = onStop
         )
     }
 }
@@ -191,7 +200,8 @@ private fun PuzzleControls(
     state: PuzzleScreenState,
     onStart: () -> Unit,
     onReset: () -> Unit,
-    onSolve: () -> Unit
+    onSolve: () -> Unit,
+    onStop: () -> Unit
 ) {
     when (state) {
         is PuzzleScreenState.Idle -> {
@@ -216,6 +226,14 @@ private fun PuzzleControls(
                 ) {
                     Text(text = stringResource(id = R.string.solve_button), fontSize = 24.sp)
                 }
+            }
+        }
+        is PuzzleScreenState.AutoSolving -> {
+            Button(
+                onClick = onStop,
+                modifier = Modifier.testTag(STOP_BUTTON_TAG)
+            ) {
+                Text(text = stringResource(id = R.string.stop_button), fontSize = 24.sp)
             }
         }
         is PuzzleScreenState.Solved -> {
@@ -255,7 +273,8 @@ fun PuzzleScreenPreviewIdle() {
             onTileClicked = { },
             onStart = { },
             onReset = { },
-            onSolve = { }
+            onSolve = { },
+            onStop = { }
         )
     }
 }
@@ -269,7 +288,23 @@ fun PuzzleScreenPreviewSolving() {
             onTileClicked = { },
             onStart = { },
             onReset = { },
-            onSolve = { }
+            onSolve = { },
+            onStop = { }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PuzzleScreenPreviewAutoSolving() {
+    Demo8PuzzleTheme {
+        PuzzleScreenContent(
+            state = PuzzleScreenState.AutoSolving(solvedPuzzle),
+            onTileClicked = { },
+            onStart = { },
+            onReset = { },
+            onSolve = { },
+            onStop = { }
         )
     }
 }
@@ -283,7 +318,8 @@ fun PuzzleScreenPreviewSolved() {
             onTileClicked = { },
             onStart = { },
             onReset = { },
-            onSolve = { }
+            onSolve = { },
+            onStop = { }
         )
     }
 }
@@ -297,7 +333,8 @@ fun PuzzleScreenLandscapePreviewIdle() {
             onTileClicked = { },
             onStart = { },
             onReset = { },
-            onSolve = { }
+            onSolve = { },
+            onStop = { }
         )
     }
 }
@@ -311,7 +348,23 @@ fun PuzzleScreenLandscapePreviewSolving() {
             onTileClicked = { },
             onStart = { },
             onReset = { },
-            onSolve = { }
+            onSolve = { },
+            onStop = { }
+        )
+    }
+}
+
+@Preview(showBackground = true, widthDp = 640, heightDp = 360)
+@Composable
+fun PuzzleScreenLandscapePreviewAutoSolving() {
+    Demo8PuzzleTheme {
+        PuzzleScreenLandscapeContent(
+            state = PuzzleScreenState.AutoSolving(solvedPuzzle),
+            onTileClicked = { },
+            onStart = { },
+            onReset = { },
+            onSolve = { },
+            onStop = { }
         )
     }
 }
@@ -325,7 +378,8 @@ fun PuzzleScreenLandscapePreviewSolved() {
             onTileClicked = { },
             onStart = { },
             onReset = { },
-            onSolve = { }
+            onSolve = { },
+            onStop = { }
         )
     }
 }
