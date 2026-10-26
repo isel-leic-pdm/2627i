@@ -47,7 +47,8 @@ class InfiniteApodsViewModel(
         config = PagingConfig(
             pageSize = 10,
             initialLoadSize = 10,
-            prefetchDistance = 3
+            prefetchDistance = 3,
+            maxSize = 20
         ),
         pagingSourceFactory = {
             ApodImagesPagingSource(service)

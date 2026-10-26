@@ -14,12 +14,14 @@ import pt.isel.lei.pdm.nasaapod.ui.common.ScreenBase
 fun MainScreen2(
     vm: MainViewModel2,
     onNasaImageClicked: (ApodImage) -> Unit,
-    onBookmarksClicked: () -> Unit
+    onBookmarksClicked: () -> Unit,
+    onFeedClicked: () -> Unit
 ) {
     ScreenBase(
         actions = NavigationActions(
             refreshAction = vm::refresh,
-            bookmarksAction = onBookmarksClicked
+            bookmarksAction = onBookmarksClicked,
+            feedAction = onFeedClicked
         )
     )
     {

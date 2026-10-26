@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmarks
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -50,6 +51,7 @@ data class NavigationActions(
     val infoAction: (() -> Unit)? = null,
     val refreshAction: (() -> Unit)? = null,
     val bookmarksAction: (() -> Unit)? = null,
+    val feedAction: (() -> Unit)? = null,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,6 +78,10 @@ fun CustomAppTopBar(actions: NavigationActions) {
             if (actions.bookmarksAction != null)
                 IconButton(onClick = actions.bookmarksAction) {
                     Icon(imageVector = Icons.Default.Bookmarks, contentDescription = "")
+                }
+            if (actions.feedAction != null)
+                IconButton(onClick = actions.feedAction) {
+                    Icon(imageVector = Icons.Default.List, contentDescription = "")
                 }
         }
 

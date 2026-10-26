@@ -3,6 +3,7 @@ package pt.isel.lei.pdm.nasaapod.domain
 import android.os.Parcelable
 import androidx.room3.PrimaryKey
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 @Parcelize
 data class ApodImage(

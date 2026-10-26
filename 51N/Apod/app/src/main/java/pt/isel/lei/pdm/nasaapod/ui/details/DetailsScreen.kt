@@ -26,6 +26,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import pt.isel.lei.pdm.nasaapod.domain.ApodImage
@@ -74,7 +76,7 @@ fun DetailsScreen(
 
         }
 
-        Text(text = vm.image.description)
+        Text(text = AnnotatedString.fromHtml(vm.image.description))
 
     }
 }

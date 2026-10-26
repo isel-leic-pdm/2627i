@@ -10,6 +10,7 @@ import pt.isel.lei.pdm.nasaapod.ui.ActivityBase
 import pt.isel.lei.pdm.nasaapod.ui.bookmarks.BookmarksActivity
 import pt.isel.lei.pdm.nasaapod.ui.common.viewModelInit
 import pt.isel.lei.pdm.nasaapod.ui.details.DetailsActivity
+import pt.isel.lei.pdm.nasaapod.ui.feed.FeedActivity
 
 class MainActivity : ActivityBase() {
 
@@ -52,7 +53,8 @@ class MainActivity : ActivityBase() {
             MainScreen2(
                 vm = vm2,
                 onNasaImageClicked = ::navigateToDetails,
-                        onBookmarksClicked = { BookmarksActivity.navigate(this) }
+                onBookmarksClicked = { BookmarksActivity.navigate(this) },
+                onFeedClicked = { FeedActivity.navigate(this) }
             )
 
             // */

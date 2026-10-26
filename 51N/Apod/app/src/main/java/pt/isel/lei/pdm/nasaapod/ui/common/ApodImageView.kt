@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,7 +40,9 @@ fun ApodImageView(
             AsyncImage(
                 model = data.imageUrl,
                 contentDescription = "",
-                modifier = Modifier.fillMaxWidth().heightIn(min = 100.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 100.dp),
                 contentScale = ContentScale.FillWidth,
                 placeholder = painterResource(R.drawable.ic_launcher_foreground)
             )
@@ -69,7 +73,7 @@ fun ApodImageView(
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
-                text = data.author,
+                text = AnnotatedString.fromHtml(data.author),
                 textAlign = TextAlign.End,
             )
         }
