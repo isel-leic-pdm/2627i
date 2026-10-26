@@ -1,15 +1,13 @@
-package isel.dei.pdm.demos.gamevault.domain.search
+package isel.dei.pdm.demos.gamevault.domain.search.games
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
-import isel.dei.pdm.demos.gamevault.domain.search.GameDetails
-import isel.dei.pdm.demos.gamevault.domain.search.GameInfo
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
-import org.junit.Test
 import java.net.URI
 import java.time.LocalDate
+import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class GameInfoTests {
 
@@ -135,6 +133,7 @@ class GameInfoTests {
 
         // Act & Assert
         assertEquals(5, categories.size)
+        assertTrue(categories.contains(GameInfo.Category.MAIN_GAME))
         assertTrue(categories.contains(GameInfo.Category.MAIN_GAME))
         assertTrue(categories.contains(GameInfo.Category.DLC))
         assertTrue(categories.contains(GameInfo.Category.BUNDLE))

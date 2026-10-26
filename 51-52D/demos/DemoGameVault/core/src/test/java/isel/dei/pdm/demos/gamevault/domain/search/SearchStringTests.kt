@@ -1,12 +1,12 @@
 package isel.dei.pdm.demos.gamevault.domain.search
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class SearchStringTests {
 
@@ -187,7 +187,7 @@ class SearchStringTests {
 
         // Assert
         assertNotNull(actual)
-        assertEquals(input, actual?.value)
+        assertEquals(input, actual.value)
     }
 
     @Test

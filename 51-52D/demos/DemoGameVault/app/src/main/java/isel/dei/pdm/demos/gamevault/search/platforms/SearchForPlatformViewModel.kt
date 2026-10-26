@@ -2,8 +2,8 @@ package isel.dei.pdm.demos.gamevault.search.platforms
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import isel.dei.pdm.demos.gamevault.domain.collection.ports.CollectionRepository
-import isel.dei.pdm.demos.gamevault.domain.search.ports.PlatformSearchService
+import isel.dei.pdm.demos.gamevault.domain.collection.PlatformCollectionRepository
+import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformSearchService
 
 /**
  * The view model for the search platforms screen. The view model is responsible for managing the
@@ -16,8 +16,10 @@ import isel.dei.pdm.demos.gamevault.domain.search.ports.PlatformSearchService
  */
 class SearchForPlatformViewModel(
     private val searchService: PlatformSearchService,
-    private val collectionRepo: CollectionRepository,
+    private val collectionRepo: PlatformCollectionRepository,
 ) : ViewModel() {
+
+    // TODO: Implement
 
     companion object {
         /**
@@ -25,7 +27,7 @@ class SearchForPlatformViewModel(
          */
         fun factory(
             searchService: PlatformSearchService,
-            repository: CollectionRepository
+            repository: PlatformCollectionRepository
         ) = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -33,5 +35,4 @@ class SearchForPlatformViewModel(
             }
         }
     }
-
 }

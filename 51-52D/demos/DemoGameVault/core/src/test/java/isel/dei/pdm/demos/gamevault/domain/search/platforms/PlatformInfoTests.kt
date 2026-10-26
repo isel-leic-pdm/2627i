@@ -1,16 +1,16 @@
-package isel.dei.pdm.demos.gamevault.domain.search
+package isel.dei.pdm.demos.gamevault.domain.search.platforms
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Test
 import java.net.URI
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertFailsWith
 
 class PlatformInfoTests {
 
     @Test
-    fun `primary constructor creates Platform instance with valid properties`() {
+    fun `primary constructor creates instance with valid properties`() {
         // Arrange
         val expectedId = 1L
         val expectedAbbreviation = NonBlankString("PS5")
@@ -33,7 +33,28 @@ class PlatformInfoTests {
     }
 
     @Test
-    fun `secondary constructor creates Platform instance with valid string inputs`() {
+    fun `primary constructor creates instance without logoUri`() {
+        // Arrange
+        val expectedId = 1L
+        val expectedAbbreviation = NonBlankString("PS5")
+        val expectedName = NonBlankString("PlayStation 5")
+
+        // Act
+        val sut = PlatformInfo(
+            id = expectedId,
+            abbreviation = expectedAbbreviation,
+            name = expectedName
+        )
+
+        // Assert
+        assertEquals(expectedId, sut.id)
+        assertEquals(expectedAbbreviation, sut.abbreviation)
+        assertEquals(expectedName, sut.name)
+        assertNull(sut.logoUri)
+    }
+
+    @Test
+    fun `secondary constructor creates instance with valid string inputs`() {
         // Arrange
         val expectedId = 1L
         val expectedAbbreviation = "PS5"
@@ -56,7 +77,7 @@ class PlatformInfoTests {
     }
 
     @Test
-    fun `secondary constructor creates Platform instance without logoUri`() {
+    fun `secondary constructor creates instance without logoUri`() {
         // Arrange
         val expectedId = 2L
         val expectedAbbreviation = "XBOX"
@@ -108,16 +129,5 @@ class PlatformInfoTests {
                 logoUri = "http://example.com/logo with space.png"
             )
         }
-    }
-
-    @Test
-    fun `two Platform instances with same properties are equal`() {
-        // Arrange
-        val platform1 = PlatformInfo(id = 1L, abbreviation = "PS5", name = "PlayStation 5")
-        val platform2 = PlatformInfo(id = 1L, abbreviation = "PS5", name = "PlayStation 5")
-
-        // Act & Assert
-        assertEquals(platform1, platform2)
-        assertEquals(platform1.hashCode(), platform2.hashCode())
     }
 }

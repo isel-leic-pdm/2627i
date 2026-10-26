@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import isel.dei.pdm.demos.gamevault.domain.search.PlatformInfo
+import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
 import isel.dei.pdm.demos.gamevault.ui.common.AsyncImage
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 

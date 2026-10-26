@@ -7,7 +7,7 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.core.graphics.createBitmap
-import isel.dei.pdm.demos.gamevault.domain.search.PlatformInfo
+import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
 import isel.dei.pdm.demos.gamevault.search.platforms.PlatformListItem
 import isel.dei.pdm.demos.gamevault.search.platforms.PlatformListItemTestTags
 import isel.dei.pdm.demos.gamevault.ui.common.ImageLoader

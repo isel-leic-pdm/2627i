@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 
 /**
  * The composable function that defines the search platforms screen.
- *
  * @param viewModel The view model for the screen.
  */
 @Composable

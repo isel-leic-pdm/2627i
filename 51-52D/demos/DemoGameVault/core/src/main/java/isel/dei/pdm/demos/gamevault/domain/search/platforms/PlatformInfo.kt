@@ -1,11 +1,11 @@
-package isel.dei.pdm.demos.gamevault.domain.search
+package isel.dei.pdm.demos.gamevault.domain.search.platforms
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import java.net.URI
 
 /**
  * Represents the platform where a game can be played, as provided by the platform search service.
- * @property id The platform's unique identifier.
+ * @property id The platform's unique identifier, as assigned by the service.
  * @property abbreviation The platform's abbreviation (e.g. PS5, XBOX).
  * @property name The platform's full name (e.g. PlayStation 5).
  * @property logoUri The URI of the platform's logo, if available.

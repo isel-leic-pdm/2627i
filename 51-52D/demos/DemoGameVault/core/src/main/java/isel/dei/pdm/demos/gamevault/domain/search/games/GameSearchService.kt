@@ -1,9 +1,7 @@
-package isel.dei.pdm.demos.gamevault.domain.search.ports
+package isel.dei.pdm.demos.gamevault.domain.search.games
 
-import isel.dei.pdm.demos.gamevault.domain.search.GameInfo
-import isel.dei.pdm.demos.gamevault.domain.search.GameDetails
-import isel.dei.pdm.demos.gamevault.domain.search.PlatformInfo
 import isel.dei.pdm.demos.gamevault.domain.search.SearchString
+import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
 
 /**
  * Contract for services that can be used for searching games.
@@ -13,7 +11,7 @@ interface GameSearchService {
      * Searches for games that match the given search criteria.
      * @param name The partial (or full) name of the game to search for.
      * @param platform The platform to search for.
-     * @param category The category to search for, or null for all.
+     * @param category The category to search for, or null for any category.
      * @return A result containing the list of games that match the query.
      */
     suspend fun searchGames(
