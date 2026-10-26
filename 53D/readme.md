@@ -174,3 +174,27 @@
 * [Entities](https://developer.android.com/training/data-storage/room/defining-data)
 * [DAOs](https://developer.android.com/training/data-storage/room/accessing-data)
 * [Define relationships between objects](https://developer.android.com/training/data-storage/room/relationships)
+
+
+
+## Week 7 - 26/10/2026
+
+#### Topic breakdown:
+* The Android application as a HTTP client
+  * Motivation and consequences of distribution
+  * Required permissions
+* HTTP communication with Ktor client
+  * Programming model
+  * Making assinchrounous requests
+* JSON serialization with Kotlinx Serialization
+* Pagination
+
+### For reference:
+* [Connecting to the network](https://developer.android.com/training/basics/network-ops/connecting)
+* [Ktor Client](https://ktor.io/docs/client-create-multiplatform-application.html#ktor-dependencies)
+  * [Ktor engines](https://ktor.io/docs/client-engines.html)
+  * [Content negotiation](https://ktor.io/docs/client-serialization.html)
+  * [Kotlin Serialization](https://kotlinlang.org/docs/serialization.html)
+* [PagingSource](https://developer.android.com/reference/kotlin/androidx/paging/PagingSource)
+* [Paging library overview](https://developer.android.com/topic/libraries/architecture/paging/v3-overview)
+* [Load and display paged data](https://developer.android.com/topic/libraries/architecture/paging/v3-paged-data)
