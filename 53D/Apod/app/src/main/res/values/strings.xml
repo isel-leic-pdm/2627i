@@ -10,4 +10,6 @@
     <string name="app_refresh">refresh</string>
     <string name="title_activity_details">DetailsActivity</string>
     <string name="title_activity_bookmarks">BookmarksActivity</string>
+    <string name="title_activity_infinite_apods">InfiniteApodsActivity</string>
+    <string name="load_more">load more</string>
 </resources>

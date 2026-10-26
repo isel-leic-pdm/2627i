@@ -11,11 +11,12 @@ import pt.isel.lei.pdm.nasaapod.ui.common.ScreenBase
 fun MainScreen2(
     vm: MainViewModel2,
     navigateToImage: (ApodImage) -> Unit,
-    navigateToBookmarks: () -> Unit
+    navigateToBookmarks: () -> Unit,
+    navigateToInfiniteList: () -> Unit,
 ) {
     ScreenBase(onRefresh = {
         vm.refresh()
-    }, onBookmark = navigateToBookmarks) {
+    }, onBookmark = navigateToBookmarks, onInfiniteList = navigateToInfiniteList) {
         when (val state = vm.screenState) {
             is MainScreenViewState.Error -> {
                 ErrorContent(state.error, { vm.refresh() })

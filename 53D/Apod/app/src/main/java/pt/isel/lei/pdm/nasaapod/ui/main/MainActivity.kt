@@ -11,6 +11,7 @@ import pt.isel.lei.pdm.nasaapod.ui.BaseActivity
 import pt.isel.lei.pdm.nasaapod.ui.bookmarks.BookmarksActivity
 import pt.isel.lei.pdm.nasaapod.ui.common.viewModelInit
 import pt.isel.lei.pdm.nasaapod.ui.details.DetailsActivity
+import pt.isel.lei.pdm.nasaapod.ui.infiniteapods.InfiniteApodsActivity
 
 class MainActivity : BaseActivity() {
 
@@ -72,7 +73,8 @@ class MainActivity : BaseActivity() {
             MainScreen2(
                 vm = vm2,
                 navigateToImage = { DetailsActivity.navigate(this, it) },
-                navigateToBookmarks = { BookmarksActivity.navigate(this) }
+                navigateToBookmarks = { BookmarksActivity.navigate(this) },
+                navigateToInfiniteList = { InfiniteApodsActivity.navigate(this) }
             )
             // */
         }

@@ -18,6 +18,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import pt.isel.lei.pdm.nasaapod.ui.common.ApodImageView
@@ -68,7 +70,7 @@ fun DetailsScreen2(
             }
 
         }
-        Text(text = vm.image.description)
+        Text(text = AnnotatedString.fromHtml(vm.image.description))
     }
 }
 

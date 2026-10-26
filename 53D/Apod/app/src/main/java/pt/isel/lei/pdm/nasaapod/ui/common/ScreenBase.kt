@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmarks
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,6 +33,7 @@ fun ScreenBase(
     onBack: (() -> Unit)? = null,
     onInfo: (() -> Unit)? = null,
     onBookmark: (() -> Unit)? = null,
+    onInfiniteList: (() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit
 ) {
     NasaApodTheme {
@@ -45,7 +47,10 @@ fun ScreenBase(
                     navigationIcon = {
                         if (onBack != null)
                             IconButton(onClick = { onBack() }) {
-                                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "")
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = ""
+                                )
                             }
                     },
                     actions = {
@@ -61,6 +66,12 @@ fun ScreenBase(
                             IconButton(onClick = { onBookmark() }) {
                                 Icon(imageVector = Icons.Default.Bookmarks, contentDescription = "")
                             }
+                        if (onInfiniteList != null)
+                            IconButton(onClick = { onInfiniteList() }) {
+                                Icon(imageVector = Icons.Default.List, contentDescription = "")
+                            }
+
+
                     }
                 )
             }

@@ -38,6 +38,12 @@
             android:label="@string/title_activity_bookmarks"
             android:theme="@style/Theme.NasaApod"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ui.infiniteapods.InfiniteApodsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_infinite_apods"
+            android:theme="@style/Theme.NasaApod"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

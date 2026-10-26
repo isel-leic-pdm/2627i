@@ -10,8 +10,12 @@ class MockNasaApodService : NasaApodService {
         //Thread.sleep(10000)
         delay(2000)
 
-        if(Random.nextInt(100) < 10)
+        if (Random.nextInt(100) < 10)
             throw Exception("Something went wrong")
         return MockApodImages.Images.random()
+    }
+
+    override suspend fun getApods(page: Int, perPage: Int): List<ApodImage> {
+        return MockApodImages.Images
     }
 }
