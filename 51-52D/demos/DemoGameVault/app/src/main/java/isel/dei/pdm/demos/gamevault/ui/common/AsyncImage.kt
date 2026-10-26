@@ -5,11 +5,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -17,15 +15,15 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.graphics.createBitmap
 import androidx.core.net.toUri
 import isel.dei.pdm.demos.gamevault.R
@@ -59,10 +57,10 @@ fun AsyncImage(
         value = if (uri != null) {
             loader(uri).fold(
                 onSuccess = { AsyncImageState.Success(it) },
-                onFailure = { AsyncImageState.Error(it) }
+                onFailure = { AsyncImageState.Error }
             )
         } else {
-            AsyncImageState.Error(IllegalArgumentException("URI is null"))
+            AsyncImageState.Error
         }
     }
 
@@ -74,17 +72,8 @@ fun AsyncImage(
     ) {
         when (val observedState = state) {
             is AsyncImageState.Loading -> CircularProgressIndicator(
-                modifier = Modifier.size(24.dp).testTag(LOADING),
+                modifier = Modifier.fillMaxSize(0.3f).testTag(LOADING),
                 strokeWidth = 2.dp
-            )
-
-            is AsyncImageState.Error -> Text(
-                text = stringResource(R.string.image_not_available),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                lineHeight = 12.sp,
-                modifier = Modifier.padding(4.dp).testTag(ERROR)
             )
 
             is AsyncImageState.Success -> Image(
@@ -92,6 +81,13 @@ fun AsyncImage(
                 contentDescription = contentDescription,
                 modifier = Modifier.fillMaxSize().testTag(SUCCESS),
                 contentScale = contentScale
+            )
+
+            else -> Image(
+                painter = painterResource(R.drawable.ic_broken_image),
+                contentDescription = stringResource(R.string.image_not_available),
+                modifier = Modifier.fillMaxSize(0.8f).testTag(ERROR),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant)
             )
         }
     }
@@ -108,7 +104,7 @@ typealias ImageLoader = suspend (Uri) -> Result<ImageBitmap>
 sealed class AsyncImageState {
     object Loading : AsyncImageState()
     data class Success(val bitmap: ImageBitmap) : AsyncImageState()
-    data class Error(val error: Throwable) : AsyncImageState()
+    object Error : AsyncImageState()
 }
 
 /**

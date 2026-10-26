@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.domain.search
+package isel.dei.pdm.demos.gamevault.domain.search.games
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import java.net.URI

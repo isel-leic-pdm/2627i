@@ -1,6 +1,5 @@
-package isel.dei.pdm.demos.gamevault.domain.search.ports
+package isel.dei.pdm.demos.gamevault.domain.search.platforms
 
-import isel.dei.pdm.demos.gamevault.domain.search.PlatformInfo
 import isel.dei.pdm.demos.gamevault.domain.search.SearchString
 
 /**
