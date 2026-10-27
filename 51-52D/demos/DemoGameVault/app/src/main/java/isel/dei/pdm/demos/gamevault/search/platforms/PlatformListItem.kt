@@ -79,10 +79,10 @@ fun PlatformListItem(
 // Testing & preview utilities
 
 object PlatformListItemTestTags {
-    const val ITEM = "platform_list_item"
-    const val LOGO = "platform_logo"
-    const val NAME = "platform_name"
-    const val ABBREVIATION = "platform_abbreviation"
+    const val ITEM = "PlatformListItem"
+    const val LOGO = "PlatformLogo"
+    const val NAME = "PlatformName"
+    const val ABBREVIATION = "PlatformAbbreviation"
 }
 
 @Suppress("Unused")
