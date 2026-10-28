@@ -11,6 +11,11 @@
     <string name="settings_back_description">Back</string>
 
     <string name="search_box_placeholder">Search …</string>
+    <string name="search_platform_title">Add Platform</string>
+    <string name="search_results_label">Available Platforms</string>
+    <string name="search_no_platforms_found">No platforms found</string>
+    <string name="search_platform_add_description">Add platform</string>
+    <string name="search_platform_added_description">Platform in collection</string>
 
     <string name="image_placeholder">Image</string>
     <string name="image_not_available">Image not available</string>

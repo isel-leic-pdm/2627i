@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.search
+package isel.dei.pdm.demos.gamevault.ui.common
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding

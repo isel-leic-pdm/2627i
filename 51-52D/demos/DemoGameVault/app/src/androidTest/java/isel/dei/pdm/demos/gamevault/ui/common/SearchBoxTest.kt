@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.search
+package isel.dei.pdm.demos.gamevault.ui.common
 
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
