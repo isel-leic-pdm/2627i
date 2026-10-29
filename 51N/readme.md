@@ -198,3 +198,32 @@
 * [PagingSource](https://developer.android.com/reference/kotlin/androidx/paging/PagingSource)
 * [Paging library overview](https://developer.android.com/topic/libraries/architecture/paging/v3-overview)
 * [Load and display paged data](https://developer.android.com/topic/libraries/architecture/paging/v3-paged-data)
+
+
+## Week 8 - 29/10/2026
+
+### Subject - Background work and Notification Manager
+
+#### Topic breakdown:
+* Storing Transient state on ViewModels
+* Execution constraints of Android applications
+  * The application lifecycle
+  * Processes classification: foreground, background, service, broadcast receiver
+* Background work in Android, overview
+* WorkManager
+* Foreground Services
+* Alarm Manager
+* Notification Manager
+
+### For reference:
+* [SavedStateHandle API Reference](https://developer.android.com/reference/androidx/lifecycle/SavedStateHandle)
+* [Saved State module for ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel/viewmodel-savedstate)
+* [Processes and app lifecycle](https://developer.android.com/guide/components/activities/process-lifecycle)
+* [Background Tasks Overview](https://developer.android.com/develop/background-work/background-tasks)
+* [WorkManager Overview](https://developer.android.com/develop/background-work/background-tasks/persistent)
+* [Threading in Worker](https://developer.android.com/develop/background-work/background-tasks/persistent/threading/worker)
+* [Threading in CoroutineWorker](https://developer.android.com/develop/background-work/background-tasks/persistent/threading/coroutineworker)
+* [Foreground services overview](https://developer.android.com/develop/background-work/services/fgs)
+* [Schedule alarms](https://developer.android.com/develop/background-work/services/alarms)
+* [NotificationManager](https://developer.android.com/reference/android/app/NotificationManager)
+* [Broadcast Receiver](https://developer.android.com/develop/background-work/background-tasks/broadcasts)
