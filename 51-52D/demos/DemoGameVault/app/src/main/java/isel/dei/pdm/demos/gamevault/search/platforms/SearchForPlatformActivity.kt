@@ -3,8 +3,8 @@ package isel.dei.pdm.demos.gamevault.search.platforms
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
-import isel.dei.pdm.demos.gamevault.search.platforms.adapters.FakePlatformCollectionRepository
-import isel.dei.pdm.demos.gamevault.search.platforms.adapters.FakePlatformSearchService
+import isel.dei.pdm.demos.gamevault.adapters.fakes.FakePlatformCollectionRepository
+import isel.dei.pdm.demos.gamevault.adapters.fakes.FakePlatformSearchService
 
 /**
  * Activity responsible for displaying the search platforms screen.

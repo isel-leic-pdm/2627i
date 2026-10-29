@@ -1,8 +1,26 @@
 <resources>
     <string name="app_name">DemoGameVault</string>
 
+    <string name="settings_title">API Configuration</string>
+    <string name="settings_client_id_label">IGDB Client ID</string>
+    <string name="settings_client_secret_label">IGDB Client Secret</string>
+    <string name="settings_save_button_label">Save Settings</string>
+    <string name="settings_error_blank">Field cannot be blank.</string>
+    <string name="settings_loading">Loading settings…</string>
+    <string name="settings_saving">Saving settings…</string>
+    <string name="settings_back_description">Back</string>
+
     <string name="search_box_placeholder">Search …</string>
+    <string name="search_platform_title">Add Platform</string>
+    <string name="search_results_label">Available Platforms</string>
+    <string name="search_no_platforms_found">No platforms found</string>
+    <string name="search_platform_add_description">Add platform</string>
+    <string name="search_platform_added_description">Platform in collection</string>
 
     <string name="image_placeholder">Image</string>
     <string name="image_not_available">Image not available</string>
+
+    <string name="secret_text_show">Show secret</string>
+    <string name="secret_text_hide">Hide secret</string>
 </resources>
+

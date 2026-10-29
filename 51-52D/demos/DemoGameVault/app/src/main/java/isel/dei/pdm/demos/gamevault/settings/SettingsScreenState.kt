@@ -66,4 +66,10 @@ sealed class SettingsScreenState(
      */
     val isSaveEnabled: Boolean
         get() = this is Modified && isClientIdValid && isClientSecretValid
+
+    /**
+     * Whether back navigation should be enabled.
+     */
+    val isBackEnabled: Boolean
+        get() = this !is Loading && this !is Saving
 }

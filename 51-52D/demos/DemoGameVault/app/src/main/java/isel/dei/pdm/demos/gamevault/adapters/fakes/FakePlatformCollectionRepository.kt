@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.search.platforms.adapters
+package isel.dei.pdm.demos.gamevault.adapters.fakes
 
 import isel.dei.pdm.demos.gamevault.domain.collection.NewPlatform
 import isel.dei.pdm.demos.gamevault.domain.collection.Platform
