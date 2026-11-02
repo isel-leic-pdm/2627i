@@ -1,8 +1,10 @@
 package pt.isel.lei.pdm.nasaapod.ui.main
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -19,8 +21,13 @@ sealed interface MainScreenViewState {
 }
 
 class MainViewModel2(
-    val service: NasaApodService
+    val service: NasaApodService,
+    val session: SavedStateHandle
 ) : ViewModel() {
+
+    companion object {
+        const val SESSION_KEY = "session"
+    }
 
     var screenState: MainScreenViewState by mutableStateOf(MainScreenViewState.Idle)
         private set
@@ -44,7 +51,16 @@ class MainViewModel2(
     }
 
     fun refresh() = safeCall {
-        val img = service.getTodaysImage()
+
+        var img = session.get<ApodImage>(SESSION_KEY)
+
+        if (img == null)
+            img = service.getTodaysImage()
+        else
+            Log.d("MainViewModel", "Got from the session handle")
+
+        session[SESSION_KEY] = img
+
         return@safeCall MainScreenViewState.Image(img)
     }
 }

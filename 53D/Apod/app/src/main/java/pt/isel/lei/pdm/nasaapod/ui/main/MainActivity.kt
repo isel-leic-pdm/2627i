@@ -10,6 +10,7 @@ import pt.isel.lei.pdm.nasaapod.domain.ApodImage
 import pt.isel.lei.pdm.nasaapod.ui.BaseActivity
 import pt.isel.lei.pdm.nasaapod.ui.bookmarks.BookmarksActivity
 import pt.isel.lei.pdm.nasaapod.ui.common.viewModelInit
+import pt.isel.lei.pdm.nasaapod.ui.common.viewModelInitWithSavedState
 import pt.isel.lei.pdm.nasaapod.ui.details.DetailsActivity
 import pt.isel.lei.pdm.nasaapod.ui.infiniteapods.InfiniteApodsActivity
 
@@ -49,8 +50,8 @@ class MainActivity : BaseActivity() {
     }
      */
     val vm2 by viewModels<MainViewModel2> {
-        viewModelInit {
-            MainViewModel2(dependencyContainer.nasaApodService)
+        viewModelInitWithSavedState { session ->
+            MainViewModel2(dependencyContainer.nasaApodService, session)
         }
 
     }

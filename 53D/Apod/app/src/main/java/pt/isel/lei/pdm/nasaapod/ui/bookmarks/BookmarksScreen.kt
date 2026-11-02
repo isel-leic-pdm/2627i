@@ -1,15 +1,15 @@
 package pt.isel.lei.pdm.nasaapod.ui.bookmarks
 
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -59,6 +59,21 @@ private fun LazyContent(
     vm: BookmarksViewModel
 ) {
     LazyColumn() {
+        item {
+            Row() {
+                Button(onClick = {
+                    vm.downloadPendingBookmarks(downloadAll = true)
+                }) {
+                    Text(stringResource(R.string.download_all))
+                }
+                Button(onClick = {
+                    vm.downloadPendingBookmarks()
+                }) {
+                    Text(stringResource(R.string.download_pending_bookmarks))
+                }
+            }
+
+        }
         items(images) { image ->
             Box() {
                 ApodImageView(image)
@@ -73,6 +88,7 @@ private fun LazyContent(
                 }
             }
         }
+
     }
 }
 

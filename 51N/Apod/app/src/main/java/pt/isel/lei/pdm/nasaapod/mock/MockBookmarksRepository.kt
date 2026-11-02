@@ -12,6 +12,7 @@ class MockBookmarksRepository : BookmarksRepository {
 
     override val bookmarks: Flow<List<ApodImage>>
         field = MutableStateFlow(emptyList())
+    override val pendingDownloads: Flow<List<ApodImage>> = bookmarks
 
     override fun isBookmarked(image: ApodImage): Flow<Boolean> =
         bookmarks.map { it.contains(image) }
@@ -24,5 +25,8 @@ class MockBookmarksRepository : BookmarksRepository {
     override suspend fun remove(image: ApodImage) {
         bookmarkList.remove(image)
         bookmarks.emit(bookmarkList.toList())
+    }
+
+    override suspend fun markAsDownloaded(image: ApodImage) {
     }
 }

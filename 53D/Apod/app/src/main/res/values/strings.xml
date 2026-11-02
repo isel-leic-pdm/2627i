@@ -12,4 +12,20 @@
     <string name="title_activity_bookmarks">BookmarksActivity</string>
     <string name="title_activity_infinite_apods">InfiniteApodsActivity</string>
     <string name="load_more">load more</string>
+    <string name="fs_prep">Preparing downloads</string>
+    <string name="fs_all_downloaded">All bookmarked images are downloaded</string>
+    <string name="fs_download_failed">"Download failed: %1$s</string>
+    <string name="app_unknown_error">"Unknown Error</string>
+    <string name="fs_processed_format">Processed %1$d of %2$d</string>
+    <string name="fs_failed_format">(%d failed)</string>
+    <string name="fs_downloaded_format">Downloaded %d images</string>
+    <string name="fs_some_failed_format">Downloaded %1$d; %2$d failed</string>
+    <string name="not_apod_downloads">APOD downloads</string>
+    <string name="not_apod_downloads_desc">Progress of bookmarked image downloads</string>
+    <string name="not_apod_daily">New Astronomy Picture of the Day!\"</string>
+    <string name="not_apod_dailyo">Notifications when a new Astronomy Picture of the Day is available</string>
+    <string name="not_apod_daily_desc">Notifications when a new Astronomy Picture of the Day is available</string>
+    <string name="not_apod_format">%s is now available to view.</string>
+    <string name="download_pending_bookmarks">Downlaod Pending Bookmarks</string>
+    <string name="download_all">download all</string>
 </resources>

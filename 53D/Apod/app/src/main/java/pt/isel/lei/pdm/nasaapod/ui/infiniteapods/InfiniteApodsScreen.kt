@@ -1,5 +1,6 @@
 package pt.isel.lei.pdm.nasaapod.ui.infiniteapods
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,13 +20,15 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.delay
 import pt.isel.lei.pdm.nasaapod.R
+import pt.isel.lei.pdm.nasaapod.domain.ApodImage
 import pt.isel.lei.pdm.nasaapod.ui.common.ApodImageView
 import pt.isel.lei.pdm.nasaapod.ui.common.ScreenBase
 
 @Composable
 fun InfiniteApodsScreen(
     vm: InfiniteApodsViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onDetails: (ApodImage) -> Unit
 ) = ScreenBase(onBack = onBack) {
 
     val screenState = vm.screenState
@@ -75,7 +78,12 @@ fun InfiniteApodsScreen(
                     modifier = Modifier.weight(1f)
                 ) {
                     items(images) { image ->
-                        ApodImageView(image)
+                        ApodImageView(
+                            image,
+                            modifier = Modifier.clickable(enabled = true, onClick = {
+                                onDetails(image)
+                            })
+                        )
                     }
 
                     if (state.isLoading) {
@@ -92,7 +100,7 @@ fun InfiniteApodsScreen(
 
         }
 
-        is InfiniteApodsScreenState.AutoContent ->{
+        is InfiniteApodsScreenState.AutoContent -> {
             val images = state.images.collectAsLazyPagingItems()
             LazyColumn() {
                 items(images.itemCount) { index ->

@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import pt.isel.lei.pdm.nasaapod.DependencyContainer
 import pt.isel.lei.pdm.nasaapod.ui.bookmarks.BookmarksActivity
 import pt.isel.lei.pdm.nasaapod.ui.common.viewModelInit
+import pt.isel.lei.pdm.nasaapod.ui.details.DetailsActivity
 
 class InfiniteApodsActivity : ComponentActivity() {
 
@@ -38,7 +39,8 @@ class InfiniteApodsActivity : ComponentActivity() {
         setContent {
             InfiniteApodsScreen(
                 vm = vm,
-                onBack = { finish() }
+                onBack = { finish() },
+                onDetails = { DetailsActivity.navigate(this, it) },
             )
         }
     }

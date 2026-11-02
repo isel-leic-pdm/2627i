@@ -1,12 +1,19 @@
 package pt.isel.lei.pdm.nasaapod
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room3.Room
 import androidx.sqlite.driver.AndroidSQLiteDriver
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
@@ -21,6 +28,11 @@ import pt.isel.lei.pdm.nasaapod.service.FavoriteRepository
 import pt.isel.lei.pdm.nasaapod.service.NasaApodService
 import pt.isel.lei.pdm.nasaapod.service.RemoteNasaApodService
 import pt.isel.lei.pdm.nasaapod.service.RoomBookmarksRepository
+import pt.isel.lei.pdm.nasaapod.service.platform.AppDailyNotifierWorker
+import pt.isel.lei.pdm.nasaapod.service.platform.AppNotificationManager
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.concurrent.TimeUnit
 
 interface DependencyContainer {
     val nasaService: NasaApodService
@@ -37,7 +49,6 @@ class NasaApodApplication : Application(), DependencyContainer {
             .fallbackToDestructiveMigration(true)
             .build()
     }
-
 
 
     val httpClient by lazy {
@@ -63,12 +74,6 @@ class NasaApodApplication : Application(), DependencyContainer {
             }
         }
     }
-
-    override fun onCreate() {
-        super.onCreate()
-        Log.d("NasaApodApplication", "onCreate()")
-    }
-
     override val nasaService: NasaApodService by lazy {
         RemoteNasaApodService(httpClient)
     }
@@ -77,5 +82,65 @@ class NasaApodApplication : Application(), DependencyContainer {
     }
     override val bookmarksRepository: BookmarksRepository by lazy {
         RoomBookmarksRepository(db.bookmarkDao())
+    }
+
+    override fun onCreate() {
+        Log.d("NasaApodApplication", "onCreate")
+        super.onCreate()
+
+        scheduleDailyDownload(this)
+    }
+
+    fun scheduleDailyDownload(context: Context) {
+        val now = ZonedDateTime.now()
+
+        var nextRun = now
+            .withZoneSameInstant(ZoneId.of("America/New_York"))
+            .toLocalDate()
+            .atTime(5, 30)
+            .atZone(ZoneId.of("America/New_York"))
+
+        if (!nextRun.isAfter(now)) {
+            nextRun = nextRun.plusDays(1)
+        }
+
+        val initialDelay =
+            nextRun.toInstant().toEpochMilli() - now.toInstant().toEpochMilli()
+
+        val request = PeriodicWorkRequestBuilder<AppDailyNotifierWorker>(
+            24, TimeUnit.HOURS
+        )
+            .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
+            .setConstraints(
+                Constraints.Builder().setRequiredNetworkType(
+                    networkType = NetworkType.CONNECTED,
+                )
+                    .build()
+            )
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            "daily_apod_download",
+            ExistingPeriodicWorkPolicy.UPDATE,
+            request
+        )
+
+        TestWorker()
+    }
+
+    val appNotificationManager by lazy {
+        AppNotificationManager(this, httpClient)
+    }
+
+
+    private fun TestWorker() {
+        if (BuildConfig.DEBUG) {
+            val request = OneTimeWorkRequestBuilder<AppDailyNotifierWorker>()
+                .build()
+
+            WorkManager.getInstance(this)
+                .enqueue(request)            // Debug-only code
+        }
+
     }
 }

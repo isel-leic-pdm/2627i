@@ -19,6 +19,9 @@ interface ApodImageBookmarkDao {
     @Query("SELECT EXISTS(SELECT 1 FROM apod_images WHERE date = :date)")
     fun isBookmarked(date: String): Flow<Boolean>
 
+    @Query("SELECT * FROM apod_images where downloaded = 0")
+    fun getPendingDownloads(): Flow<List<ApodImageEntity>>
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(image: ApodImageEntity)
 
@@ -27,4 +30,6 @@ interface ApodImageBookmarkDao {
 
     @Delete
     suspend fun delete(image: ApodImageEntity)
+
+
 }

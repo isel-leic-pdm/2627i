@@ -35,6 +35,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
@@ -79,4 +80,7 @@ dependencies {
 
     implementation("androidx.paging:paging-common:3.4.2")
     implementation("androidx.paging:paging-compose:3.4.2")
+
+    implementation("androidx.work:work-runtime-ktx:2.11.0")
+
 }

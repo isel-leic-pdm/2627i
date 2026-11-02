@@ -24,10 +24,14 @@ class DetailsActivity : ComponentActivity() {
     companion object {
         const val INTENT_IMAGE_EXTRA = "image"
         fun navigate(ctx: Context, image: ApodImage) {
+            ctx.startActivity(getIntent(ctx, image))
+
+        }
+
+        fun getIntent(ctx: Context, image: ApodImage): Intent {
             val intent = Intent(ctx, DetailsActivity::class.java)
             intent.putExtra(INTENT_IMAGE_EXTRA, image)
-            ctx.startActivity(intent)
-
+            return intent
         }
     }
 

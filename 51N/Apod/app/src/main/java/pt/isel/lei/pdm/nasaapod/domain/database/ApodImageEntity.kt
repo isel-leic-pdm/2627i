@@ -13,4 +13,5 @@ data class ApodImageEntity(
     val date: String,
     val imageUrl: String,
     val url: String,
+    val downloaded : Boolean
 )

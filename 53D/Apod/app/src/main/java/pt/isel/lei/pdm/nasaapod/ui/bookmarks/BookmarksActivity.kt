@@ -7,7 +7,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import coil.imageLoader
 import pt.isel.lei.pdm.nasaapod.DependencyContainer
+import pt.isel.lei.pdm.nasaapod.NasaApodApplication
 import pt.isel.lei.pdm.nasaapod.ui.common.viewModelInit
 
 class BookmarksActivity : ComponentActivity() {
@@ -21,7 +23,10 @@ class BookmarksActivity : ComponentActivity() {
 
     val vm by viewModels<BookmarksViewModel> {
         viewModelInit {
-            BookmarksViewModel((application as DependencyContainer).bookmarksRepository)
+            BookmarksViewModel(
+                (application as DependencyContainer).bookmarksRepository,
+                (application as DependencyContainer).imageDownloadService
+            )
         }
     }
 

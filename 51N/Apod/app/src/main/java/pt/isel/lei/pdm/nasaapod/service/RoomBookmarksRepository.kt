@@ -5,11 +5,15 @@ import kotlinx.coroutines.flow.map
 import pt.isel.lei.pdm.nasaapod.domain.ApodImage
 import pt.isel.lei.pdm.nasaapod.domain.database.ApodImageBookmarkDao
 import pt.isel.lei.pdm.nasaapod.domain.database.ApodImageEntity
+import pt.isel.lei.pdm.nasaapod.service.toApodImage
 
 class RoomBookmarksRepository(
     val bookmarkDao: ApodImageBookmarkDao
 ) : BookmarksRepository {
     override val bookmarks: Flow<List<ApodImage>> = bookmarkDao.getAll().map {
+        it.map { it.toApodImage() }
+    }
+    override val pendingDownloads: Flow<List<ApodImage>> = bookmarkDao.getPendingDownloads().map {
         it.map { it.toApodImage() }
     }
 
@@ -24,6 +28,10 @@ class RoomBookmarksRepository(
     override suspend fun remove(image: ApodImage) {
         bookmarkDao.delete(image.toEntity())
     }
+
+    override suspend fun markAsDownloaded(image: ApodImage) {
+        bookmarkDao.update(image.toEntity().copy(downloaded = true))
+    }
 }
 
 fun ApodImage.toEntity(): ApodImageEntity {
@@ -33,7 +41,8 @@ fun ApodImage.toEntity(): ApodImageEntity {
         description = description,
         date = date,
         imageUrl = imageUrl,
-        url = url
+        url = url,
+        downloaded = false
     )
 }
 

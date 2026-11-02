@@ -12,6 +12,9 @@ class RoomBookmarkRepository(
     override val bookmarks: Flow<List<ApodImage>> = dao.getAll().map {
         it.map { it.toApodImage() }
     }
+    override val pendingDownloads: Flow<List<ApodImage>> = dao.getPendingDownloads().map {
+        it.map { it.toApodImage() }
+    }
 
     override fun isBookmarked(image: ApodImage): Flow<Boolean> {
         return dao.isBookmarked(image.date)
@@ -24,6 +27,10 @@ class RoomBookmarkRepository(
     override suspend fun remove(image: ApodImage) {
         dao.delete(image.toEntity())
     }
+
+    override suspend fun markAsDownloaded(image: ApodImage) {
+        dao.update(image.toEntity().copy(downloaded = true))
+    }
 }
 
 fun ApodImage.toEntity() = ApodImageEntity(
@@ -32,7 +39,8 @@ fun ApodImage.toEntity() = ApodImageEntity(
     description = description,
     date = date,
     imageUrl = imageUrl,
-    url = url
+    url = url,
+    downloaded = false
 )
 
 fun ApodImageEntity.toApodImage() = ApodImage(
