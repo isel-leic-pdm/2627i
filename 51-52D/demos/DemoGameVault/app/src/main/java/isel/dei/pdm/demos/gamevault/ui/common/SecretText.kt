@@ -17,7 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import isel.dei.pdm.demos.gamevault.R
+import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 
 /**
  * A specialized [OutlinedTextField] that encapsulates the logic for hiding or showing
@@ -61,4 +63,15 @@ fun SecretText(
             }
         }
     )
+}
+
+@Preview
+@Composable
+fun SecretTextPreview() {
+    DemoGameVaultTheme {
+        SecretText(
+            value = "my-secret-text",
+            onValueChange = { },
+        )
+    }
 }
