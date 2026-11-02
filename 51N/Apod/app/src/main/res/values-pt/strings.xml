@@ -26,4 +26,5 @@
     <string name="not_apod_dailyo">Notifications when a new Astronomy Picture of the Day is available</string>
     <string name="not_apod_daily_desc">Notifications when a new Astronomy Picture of the Day is available</string>
     <string name="not_apod_format">%s is now available to view.</string>
+    <string name="download_pending_bookmarks">download pending bookmarks</string>
 </resources>

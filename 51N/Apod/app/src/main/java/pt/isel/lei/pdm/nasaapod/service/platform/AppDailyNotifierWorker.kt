@@ -18,9 +18,7 @@ class AppDailyNotifierWorker(
 
         var apod = service.getTodaysImage()
 
-        if (BuildConfig.DEBUG || apod.date != LocalDate.now().toString()) {
-            notificationManager.showApodNotification(apod)
-        }
+        notificationManager.showApodNotification(apod)
         return Result.success()
     }
 }

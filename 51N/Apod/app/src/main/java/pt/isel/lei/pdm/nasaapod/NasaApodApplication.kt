@@ -25,10 +25,12 @@ import pt.isel.lei.pdm.nasaapod.domain.database.AppDatabase
 import pt.isel.lei.pdm.nasaapod.service.BookmarksRepository
 import pt.isel.lei.pdm.nasaapod.service.DataStoreFavoriteRepository
 import pt.isel.lei.pdm.nasaapod.service.FavoriteRepository
+import pt.isel.lei.pdm.nasaapod.service.ImageDownloadService
 import pt.isel.lei.pdm.nasaapod.service.NasaApodService
 import pt.isel.lei.pdm.nasaapod.service.RemoteNasaApodService
 import pt.isel.lei.pdm.nasaapod.service.RoomBookmarksRepository
 import pt.isel.lei.pdm.nasaapod.service.platform.AppDailyNotifierWorker
+import pt.isel.lei.pdm.nasaapod.service.platform.AppImageDownloadService
 import pt.isel.lei.pdm.nasaapod.service.platform.AppNotificationManager
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -38,6 +40,7 @@ interface DependencyContainer {
     val nasaService: NasaApodService
     val favoriteRepository: FavoriteRepository
     val bookmarksRepository: BookmarksRepository
+    val imageDownloadService: ImageDownloadService
 }
 
 class NasaApodApplication : Application(), DependencyContainer {
@@ -82,6 +85,9 @@ class NasaApodApplication : Application(), DependencyContainer {
     }
     override val bookmarksRepository: BookmarksRepository by lazy {
         RoomBookmarksRepository(db.bookmarkDao())
+    }
+    override val imageDownloadService: ImageDownloadService by lazy {
+        AppImageDownloadService(this)
     }
 
     override fun onCreate() {

@@ -22,7 +22,10 @@ class BookmarksActivity : ComponentActivity() {
 
     val vm by viewModels<BookmarksViewModel> {
         viewModelInit {
-            BookmarksViewModel((application as DependencyContainer).bookmarksRepository)
+            BookmarksViewModel(
+                (application as DependencyContainer).bookmarksRepository,
+                (application as DependencyContainer).imageDownloadService
+            )
         }
     }
 

@@ -2,6 +2,7 @@ package pt.isel.lei.pdm.nasaapod.ui.feed
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,12 +26,13 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import kotlinx.coroutines.delay
 import pt.isel.lei.pdm.nasaapod.R
+import pt.isel.lei.pdm.nasaapod.domain.ApodImage
 import pt.isel.lei.pdm.nasaapod.ui.common.ApodImageView
 import pt.isel.lei.pdm.nasaapod.ui.common.NavigationActions
 import pt.isel.lei.pdm.nasaapod.ui.common.ScreenBase
 
 @Composable
-fun FeedScreen(vm: FeedViewModel, onBack: () -> Unit) = ScreenBase(
+fun FeedScreen(vm: FeedViewModel, onBack: () -> Unit, onDetails: (ApodImage) -> Unit) = ScreenBase(
     actions = NavigationActions(
         backAction = onBack
     )
@@ -101,12 +103,17 @@ fun FeedScreen(vm: FeedViewModel, onBack: () -> Unit) = ScreenBase(
 
         }
 
-        is FeedScreenState.AutoContent ->{
+        is FeedScreenState.AutoContent -> {
             val images = viewState.images.collectAsLazyPagingItems()
             LazyColumn() {
                 items(images.itemCount) { index ->
                     val image = images[index]!!
-                    ApodImageView(image)
+                    ApodImageView(
+                        image,
+                        modifier = Modifier.clickable(
+                            enabled = true,
+                            onClick = { onDetails(image) })
+                    )
                 }
 
                 if (images.loadState.refresh is LoadState.Loading ||

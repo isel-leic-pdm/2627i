@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import pt.isel.lei.pdm.nasaapod.DependencyContainer
 import pt.isel.lei.pdm.nasaapod.ui.bookmarks.BookmarksActivity
 import pt.isel.lei.pdm.nasaapod.ui.common.viewModelInit
+import pt.isel.lei.pdm.nasaapod.ui.details.DetailsActivity
 
 class FeedActivity : ComponentActivity() {
 
@@ -30,7 +31,7 @@ class FeedActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            FeedScreen(vm, onBack = { finish() })
+            FeedScreen(vm, onBack = { finish() }, { DetailsActivity.navigate(this, it) })
         }
     }
 }

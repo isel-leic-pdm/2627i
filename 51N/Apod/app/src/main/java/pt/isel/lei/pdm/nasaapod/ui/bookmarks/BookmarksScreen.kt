@@ -2,7 +2,7 @@ package pt.isel.lei.pdm.nasaapod.ui.bookmarks
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -42,6 +42,20 @@ fun BookmarksScreen(
         is BookmarksScreenState.Content -> {
             val images = state.images.collectAsStateWithLifecycle().value
             LazyColumn() {
+                item {
+                    Row(){
+                        Button(onClick = {
+                            vm.downloadBookmarks(all=true)
+                        }) {
+                            Text(stringResource(R.string.download_all))
+                        }
+                        Button(onClick = {
+                            vm.downloadBookmarks()
+                        }) {
+                            Text(stringResource(R.string.download_pending_bookmarks))
+                        }
+                    }
+                }
                 items(images) {
                     Box()
                     {
