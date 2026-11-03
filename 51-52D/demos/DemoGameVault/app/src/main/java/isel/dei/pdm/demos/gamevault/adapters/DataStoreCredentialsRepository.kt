@@ -1,6 +1,7 @@
 package isel.dei.pdm.demos.gamevault.adapters
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -46,7 +47,7 @@ class DataStoreCredentialsRepository(
                 preferences[CLIENT_SECRET_KEY] = secrets.clientSecret
             }
             Result.success(Unit)
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             Result.failure(UnrecoverablePersistenceException("Failed to save secrets", e))
         }
 
@@ -56,7 +57,7 @@ class DataStoreCredentialsRepository(
                 preferences[ACCESS_TOKEN_KEY] = accessToken
             }
             Result.success(Unit)
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             Result.failure(UnrecoverablePersistenceException("Failed to save access token", e))
         }
 }

@@ -21,6 +21,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,6 +47,7 @@ fun SettingsScreenView(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+
     BackHandler(enabled = !state.isBackEnabled) {}
 
     Scaffold(

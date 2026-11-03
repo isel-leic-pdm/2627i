@@ -1,5 +1,7 @@
 package isel.dei.pdm.demos.gamevault.adapters.fakes
 
+import isel.dei.pdm.demos.gamevault.domain.RecoverablePersistenceException
+import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
 import isel.dei.pdm.demos.gamevault.domain.search.CredentialsRepository
 import isel.dei.pdm.demos.gamevault.domain.search.Secrets
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +24,10 @@ class FakeCredentialsRepository(
     override val accessToken: Flow<String?> = _accessToken.asStateFlow()
 
     override suspend fun saveSecrets(secrets: Secrets): Result<Unit> {
+        if (secrets.clientSecret == "u" || secrets.clientId == "u")
+            return Result.failure(UnrecoverablePersistenceException("Cannot recover"))
+        if (secrets.clientSecret == "r" || secrets.clientId == "r")
+            return Result.failure(RecoverablePersistenceException("Cannot recover"))
         _secrets.value = secrets
         return Result.success(Unit)
     }
