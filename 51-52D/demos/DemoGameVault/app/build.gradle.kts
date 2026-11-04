@@ -30,16 +30,18 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField("String", "IGDB_CLIENT_ID", "\"${localProperties.getProperty("igdb.client.id") ?: ""}\"")
-        buildConfigField("String", "IGDB_CLIENT_SECRET", "\"${localProperties.getProperty("igdb.client.secret") ?: ""}\"")
-        buildConfigField("String", "IGDB_ACCESS_TOKEN", "\"${localProperties.getProperty("igdb.access.token") ?: ""}\"")
     }
 
     buildTypes {
         debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
+
+            // Dev-time only secrets, loaded from local.properties (not in the repo). They are declared
+            // only for debug builds so that they are never embedded in release APKs.
+            buildConfigField("String", "IGDB_CLIENT_ID", "\"${localProperties.getProperty("igdb.client.id") ?: ""}\"")
+            buildConfigField("String", "IGDB_CLIENT_SECRET", "\"${localProperties.getProperty("igdb.client.secret") ?: ""}\"")
+            buildConfigField("String", "IGDB_ACCESS_TOKEN", "\"${localProperties.getProperty("igdb.access.token") ?: ""}\"")
         }
         release {
             optimization {

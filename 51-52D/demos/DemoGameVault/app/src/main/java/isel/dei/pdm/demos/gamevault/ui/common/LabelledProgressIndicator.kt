@@ -44,15 +44,19 @@ object LabelledProgressIndicatorTestTags {
     const val TEXT = "LoadingText"
 }
 
-@Preview(showBackground = true)
-@Composable
-fun LabelledProgressIndicatorPreview() {
-    DemoGameVaultTheme {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            LabelledProgressIndicator(text = "Loading settings…")
+@Suppress("Unused")
+class LabelledProgressIndicatorPreviews {
+
+    @Preview(showBackground = true)
+    @Composable
+    fun LabelledProgressIndicatorPreview() {
+        DemoGameVaultTheme {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                LabelledProgressIndicator(text = "Loading settings…")
+            }
         }
     }
 }

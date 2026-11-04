@@ -65,13 +65,19 @@ fun SecretText(
     )
 }
 
-@Preview
-@Composable
-fun SecretTextPreview() {
-    DemoGameVaultTheme {
-        SecretText(
-            value = "my-secret-text",
-            onValueChange = { },
-        )
+// Testing and preview utilities
+
+@Suppress("unused")
+class SecretTextPreviews {
+
+    @Preview
+    @Composable
+    fun SecretTextPreview() {
+        DemoGameVaultTheme {
+            SecretText(
+                value = "my-secret-text",
+                onValueChange = { },
+            )
+        }
     }
 }

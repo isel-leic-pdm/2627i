@@ -3,13 +3,18 @@ package isel.dei.pdm.demos.gamevault.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import isel.dei.pdm.demos.gamevault.domain.PersistenceException
 import isel.dei.pdm.demos.gamevault.domain.search.CredentialsRepository
 import isel.dei.pdm.demos.gamevault.domain.search.Secrets
-import isel.dei.pdm.demos.gamevault.settings.SettingsScreenState.Error
+import isel.dei.pdm.demos.gamevault.settings.SettingsScreenState.LoadError
+import isel.dei.pdm.demos.gamevault.settings.SettingsScreenState.Loading
 import isel.dei.pdm.demos.gamevault.settings.SettingsScreenState.Modified
 import isel.dei.pdm.demos.gamevault.settings.SettingsScreenState.Original
+import isel.dei.pdm.demos.gamevault.settings.SettingsScreenState.SaveError
 import isel.dei.pdm.demos.gamevault.settings.SettingsScreenState.Saving
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +22,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * The view model for the settings screen. The view model is responsible for managing the state
@@ -26,16 +31,19 @@ import kotlin.time.Duration.Companion.seconds
  * The screen supports setting the secrets required to access the game search web API.
  *
  * @param credentialsRepository The repository used to store the secrets.
- * @param errorTimeout How long the screen remains in the [Error] state before returning to [Original].
+ * @param minSavingDuration The minimum time the screen remains in the [Saving] state, so that
+ * the user can perceive that the values are being saved, even when saving is almost instantaneous.
+ * @param loadingIndicatorDelay How long loading must take before the loading indicator is
+ * displayed, so that it does not flash on screen when loading is almost instantaneous.
  */
 class SettingsViewModel(
     private val credentialsRepository: CredentialsRepository,
-    private val errorTimeout: Duration = DEFAULT_ERROR_TIMEOUT
+    private val minSavingDuration: Duration = DEFAULT_MIN_SAVING_DURATION,
+    private val loadingIndicatorDelay: Duration = DEFAULT_LOADING_INDICATOR_DELAY
 ) : ViewModel() {
 
-    private val _currentState = MutableStateFlow<SettingsScreenState>(SettingsScreenState.Loading)
-    val state: StateFlow<SettingsScreenState>
-        get() = _currentState.asStateFlow()
+    private val _currentState = MutableStateFlow<SettingsScreenState>(Loading())
+    val state: StateFlow<SettingsScreenState> = _currentState.asStateFlow()
 
     /**
      * The secrets currently stored in the repository, i.e. the initial values of the fields.
@@ -44,15 +52,27 @@ class SettingsViewModel(
 
     init {
         viewModelScope.launch {
-            val original = credentialsRepository.secrets.first()
-            persistedSecrets = Secrets(
-                clientId = original?.clientId ?: "",
-                clientSecret = original?.clientSecret ?: ""
-            )
-            _currentState.value = Original(
-                clientId = persistedSecrets.clientId,
-                clientSecret = persistedSecrets.clientSecret
-            )
+            // The loading indicator is only displayed if loading takes longer than the delay
+            val indicatorTimer = launch {
+                delay(loadingIndicatorDelay)
+                _currentState.value = Loading(isIndicatorVisible = true)
+            }
+            val loadedState = try {
+                val original = credentialsRepository.secrets.first()
+                persistedSecrets = Secrets(
+                    clientId = original?.clientId ?: "",
+                    clientSecret = original?.clientSecret ?: ""
+                )
+                Original(
+                    clientId = persistedSecrets.clientId,
+                    clientSecret = persistedSecrets.clientSecret
+                )
+            } catch (e: PersistenceException) {
+                LoadError(error = e)
+            }
+            // The timer is cancelled before publishing the outcome, so it cannot overwrite it
+            indicatorTimer.cancel()
+            _currentState.value = loadedState
         }
     }
 
@@ -96,69 +116,91 @@ class SettingsViewModel(
             else modified
     }
 
+    /**
+     * Implementation of the state transitions that result from the user pressing the save button.
+     * The screen moves to [Saving] and then, depending on the outcome, to [Original] (with a save
+     * confirmation) or to [SaveError]. The [Saving] state lasts at least [minSavingDuration].
+     * If the current state is not [Modified] or saving is not enabled, no action is taken.
+     */
     fun onSave() {
         val state = _currentState.value
-        if (state.isSaveEnabled) {
+        if (state is Modified && state.isSaveEnabled) {
 
+            val secrets = Secrets(clientId = state.clientId, clientSecret = state.clientSecret)
             _currentState.value = Saving(
-                clientId = state.clientId,
-                clientSecret = state.clientSecret
+                clientId = secrets.clientId,
+                clientSecret = secrets.clientSecret
             )
 
             viewModelScope.launch {
-
-                val result = credentialsRepository.saveSecrets(
-                    Secrets(
-                        clientId = state.clientId,
-                        clientSecret = state.clientSecret
+                // The save must last at least minSavingDuration to prevent flickering
+                val minDuration = async { delay(minSavingDuration) }
+                val savedState = try {
+                    credentialsRepository.saveSecrets(secrets)
+                    persistedSecrets = secrets
+                    Original(
+                        clientId = secrets.clientId,
+                        clientSecret = secrets.clientSecret,
+                        showSaveConfirmation = true
                     )
-                )
-                result.fold(
-                    onSuccess = {
-                        persistedSecrets = Secrets(
-                            clientId = state.clientId,
-                            clientSecret = state.clientSecret
-                        )
-                        _currentState.value = Original(
-                            clientId = state.clientId,
-                            clientSecret = state.clientSecret
-                        )
-                    },
-                    onFailure = { error ->
-                        _currentState.value = Error(
-                            error = UnrecoverablePersistenceException(cause = error),
-                            clientId = state.clientId,
-                            clientSecret = state.clientSecret
-                        )
-                        delay(errorTimeout)
-                        _currentState.value = Original(
-                            clientId = persistedSecrets.clientId,
-                            clientSecret = persistedSecrets.clientSecret
-                        )
-                    }
-                )
+                } catch (e: PersistenceException) {
+                    SaveError(
+                        error = e,
+                        clientId = secrets.clientId,
+                        clientSecret = secrets.clientSecret
+                    )
+                }
+                minDuration.await()
+                _currentState.value = savedState
             }
-
-            // some instruction
         }
+    }
+
+    /**
+     * Implementation of the state transition that results from the user dismissing a save error.
+     * The screen moves to [Original] with the values currently stored in the repository.
+     * If the current state is not [SaveError], no action is taken.
+     */
+    fun onSaveErrorDismissed() {
+        if (_currentState.value !is SaveError)
+            return
+
+        _currentState.value = Original(
+            clientId = persistedSecrets.clientId,
+            clientSecret = persistedSecrets.clientSecret
+        )
+    }
+
+    /**
+     * Implementation of the state transition that results from the save confirmation having been
+     * shown to the user. The screen remains in [Original], without the confirmation.
+     * If the current state is not [Original] with a pending confirmation, no action is taken.
+     */
+    fun onSaveConfirmationShown() {
+        val state = _currentState.value
+        if (state !is Original || !state.showSaveConfirmation)
+            return
+
+        _currentState.value = Original(clientId = state.clientId, clientSecret = state.clientSecret)
     }
 
     companion object {
         /**
-         * The default time the screen remains in the [Error] state.
+         * The default minimum time the screen remains in the [Saving] state.
          */
-        val DEFAULT_ERROR_TIMEOUT: Duration = 3.seconds
+        val DEFAULT_MIN_SAVING_DURATION: Duration = 500.milliseconds
+
+        /**
+         * The default time loading must take before the loading indicator is displayed.
+         */
+        val DEFAULT_LOADING_INDICATOR_DELAY: Duration = 300.milliseconds
 
         /**
          * Factory for creating instances of [SettingsViewModel] with the given dependencies.
          */
-        fun factory(
-            credentialsRepository: CredentialsRepository
-        ) = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return SettingsViewModel(credentialsRepository) as T
+        fun factory(credentialsRepository: CredentialsRepository): ViewModelProvider.Factory =
+            viewModelFactory {
+                initializer { SettingsViewModel(credentialsRepository) }
             }
-        }
     }
 }

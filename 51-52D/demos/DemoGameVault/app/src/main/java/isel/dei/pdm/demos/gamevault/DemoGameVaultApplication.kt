@@ -17,14 +17,19 @@ class DemoGameVaultApplication : DependenciesContainer, Application() {
     /**
      * The data store where the credentials are persisted. DataStore requires a single instance
      * per file, which holds because there is a single application instance per process.
+     *
+     * IMPORTANT: The resulting file (datastore/credentials.preferences_pb) is excluded from
+     * backups and device transfers in res/xml/backup_rules.xml and res/xml/data_extraction_rules.xml.
+     * If the name changes, those files MUST be updated accordingly, otherwise the secrets will be
+     * silently included in backups.
      */
     private val credentialsDataStore: DataStore<Preferences> by preferencesDataStore(
-        name = "credentials"
+        name = "credentials",
+        corruptionHandler = DataStoreCredentialsRepository.corruptionHandler
     )
 
     override val credentialsRepository: CredentialsRepository by lazy {
         DataStoreCredentialsRepository(dataStore = credentialsDataStore)
-        //FakeCredentialsRepository()
     }
 
     override val platformSearchService: PlatformSearchService

@@ -8,7 +8,14 @@
     <string name="settings_error_blank">Field cannot be blank.</string>
     <string name="settings_loading">Loading settings…</string>
     <string name="settings_saving">Saving settings…</string>
+    <string name="settings_save_confirmation">Settings saved</string>
     <string name="settings_back_description">Back</string>
+    <string name="settings_load_error_message">Could not load the settings.</string>
+    <string name="settings_load_error_tip">Try again later. If the problem persists, restarting the device may help.</string>
+    <string name="settings_load_error_button_label">Close</string>
+    <string name="settings_save_error_message">Could not save the settings.</string>
+    <string name="settings_save_error_tip">Make sure the device has enough free storage space and try again.</string>
+    <string name="settings_save_error_button_label">OK</string>
 
     <string name="search_box_placeholder">Search …</string>
     <string name="search_platform_title">Add Platform</string>

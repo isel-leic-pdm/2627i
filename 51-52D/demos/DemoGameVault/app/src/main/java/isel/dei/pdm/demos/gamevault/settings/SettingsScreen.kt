@@ -19,6 +19,8 @@ fun SettingsScreen(
         onClientIdChange = viewModel::onClientIdChange,
         onClientSecretChange = viewModel::onClientSecretChange,
         onSave = viewModel::onSave,
+        onSaveErrorDismissed = viewModel::onSaveErrorDismissed,
+        onSaveConfirmationShown = viewModel::onSaveConfirmationShown,
         onBack = onBack
     )
 }
