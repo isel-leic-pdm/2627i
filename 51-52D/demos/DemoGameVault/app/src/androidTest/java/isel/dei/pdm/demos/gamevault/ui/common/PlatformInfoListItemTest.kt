@@ -105,7 +105,7 @@ class PlatformInfoListItemTest {
         }
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.ADDED_ICON)
+            .onNodeWithTag(PlatformListItemTestTags.ADDED_ICON, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 
@@ -121,7 +121,7 @@ class PlatformInfoListItemTest {
         }
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.CHEVRON_ICON)
+            .onNodeWithTag(PlatformListItemTestTags.CHEVRON_ICON, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 

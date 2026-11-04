@@ -15,6 +15,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType.Companion.Password
+import androidx.compose.ui.text.input.KeyboardType.Companion.PasswordVisible
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,6 +26,18 @@ import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 /**
  * A specialized [OutlinedTextField] that encapsulates the logic for hiding or showing
  * sensitive text content (such as passwords or client secrets) with a visibility toggle trailing icon.
+ * The text is initially hidden and the field is single line.
+ *
+ * @param value The initial value of the text field.
+ * @param onValueChange Called when the value of the text field changes.
+ * @param modifier The modifier to apply to the text field.
+ * @param label The label to display for the text field.
+ * @param enabled Whether the text field is enabled.
+ * @param isError Whether the text field is in an error state.
+ * @param supportingText The supporting text to display for the text field.
+ * @param keyboardOptions The keyboard options to use. Its keyboard type and autocorrect settings
+ * are always overridden, so that the keyboard treats the content as a password.
+ * @param keyboardActions The actions to perform when the user interacts with the keyboard.
  */
 @Composable
 fun SecretText(
@@ -37,7 +51,9 @@ fun SecretText(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
+    // Deliberately not preserved on configuration changes
     var secretVisible by remember { mutableStateOf(false) }
+    val hideTransformation = remember { PasswordVisualTransformation() }
 
     OutlinedTextField(
         value = value,
@@ -46,19 +62,26 @@ fun SecretText(
         label = label,
         enabled = enabled,
         isError = isError,
+        singleLine = true,
         supportingText = supportingText,
-        visualTransformation = if (secretVisible) VisualTransformation.None else PasswordVisualTransformation(),
-        keyboardOptions = keyboardOptions,
+        visualTransformation = if (secretVisible) VisualTransformation.None else hideTransformation,
+        keyboardOptions = keyboardOptions.merge(
+            other = KeyboardOptions(
+                autoCorrectEnabled = false,
+                keyboardType = if (secretVisible) PasswordVisible else Password
+            )
+        ),
         keyboardActions = keyboardActions,
         trailingIcon = {
-            val image = if (secretVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+            // The icon depicts the action performed when clicked, like its content description
+            val image = if (secretVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
             val description = if (secretVisible) {
                 stringResource(R.string.secret_text_hide)
             } else {
                 stringResource(R.string.secret_text_show)
             }
 
-            IconButton(onClick = { secretVisible = !secretVisible }) {
+            IconButton(onClick = { secretVisible = !secretVisible }, enabled = enabled) {
                 Icon(imageVector = image, contentDescription = description)
             }
         }
