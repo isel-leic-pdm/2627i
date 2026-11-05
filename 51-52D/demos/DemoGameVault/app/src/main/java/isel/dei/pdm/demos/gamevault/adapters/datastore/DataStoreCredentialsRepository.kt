@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.adapters
+package isel.dei.pdm.demos.gamevault.adapters.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler

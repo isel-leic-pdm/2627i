@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.adapters
+package isel.dei.pdm.demos.gamevault.adapters.datastore
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.DataStore
@@ -49,7 +49,12 @@ class DataStoreCredentialsRepositoryTest {
     @Test
     fun retrieve_secrets_when_empty_returns_null() = runTest {
         // Arrange
-        val sut = DataStoreCredentialsRepository(newDataStore(backgroundScope, "secrets_initial.preferences_pb"))
+        val sut = DataStoreCredentialsRepository(
+            newDataStore(
+                backgroundScope,
+                "secrets_initial.preferences_pb"
+            )
+        )
 
         // Act
         val secrets = sut.secrets.first()
@@ -61,7 +66,12 @@ class DataStoreCredentialsRepositoryTest {
     @Test
     fun retrieve_access_token_when_empty_returns_null() = runTest {
         // Arrange
-        val sut = DataStoreCredentialsRepository(newDataStore(backgroundScope, "token_initial.preferences_pb"))
+        val sut = DataStoreCredentialsRepository(
+            newDataStore(
+                backgroundScope,
+                "token_initial.preferences_pb"
+            )
+        )
 
         // Act
         val accessToken = sut.accessToken.first()
@@ -73,7 +83,8 @@ class DataStoreCredentialsRepositoryTest {
     @Test
     fun save_secrets_persists_them() = runTest {
         // Arrange
-        val sut = DataStoreCredentialsRepository(newDataStore(backgroundScope, "secrets.preferences_pb"))
+        val sut =
+            DataStoreCredentialsRepository(newDataStore(backgroundScope, "secrets.preferences_pb"))
         val secrets = Secrets("client-123", "secret-456")
 
         // Act
@@ -86,7 +97,8 @@ class DataStoreCredentialsRepositoryTest {
     @Test
     fun save_access_token_persists_it() = runTest {
         // Arrange
-        val sut = DataStoreCredentialsRepository(newDataStore(backgroundScope, "token.preferences_pb"))
+        val sut =
+            DataStoreCredentialsRepository(newDataStore(backgroundScope, "token.preferences_pb"))
         val token = "token-xyz"
 
         // Act
@@ -99,7 +111,12 @@ class DataStoreCredentialsRepositoryTest {
     @Test
     fun is_logged_in_returns_false_when_there_is_no_access_token() = runTest {
         // Arrange
-        val sut = DataStoreCredentialsRepository(newDataStore(backgroundScope, "logged_out.preferences_pb"))
+        val sut = DataStoreCredentialsRepository(
+            newDataStore(
+                backgroundScope,
+                "logged_out.preferences_pb"
+            )
+        )
 
         // Act
         val isLoggedIn = sut.isLoggedIn()
@@ -111,7 +128,12 @@ class DataStoreCredentialsRepositoryTest {
     @Test
     fun is_logged_in_returns_true_when_there_is_an_access_token() = runTest {
         // Arrange
-        val sut = DataStoreCredentialsRepository(newDataStore(backgroundScope, "logged_in.preferences_pb"))
+        val sut = DataStoreCredentialsRepository(
+            newDataStore(
+                backgroundScope,
+                "logged_in.preferences_pb"
+            )
+        )
         sut.saveAccessToken("token-xyz")
 
         // Act

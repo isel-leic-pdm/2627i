@@ -28,21 +28,16 @@ data class PlatformSearchItemUiState(
      * The key that uniquely identifies the item in the search results. The platform's id is not
      * enough, because all versions of the same platform share it.
      */
-    val key: String
-        get() = "${platform.id}/${platform.version?.value.orEmpty()}"
+    val key: String = "${platform.id}/${platform.version?.value.orEmpty()}"
 
-    val isAdded: Boolean
-        get() = addStatus == PlatformAddStatus.ADDED
-
-    val isAdding: Boolean
-        get() = addStatus == PlatformAddStatus.ADDING
-
-    fun toListItemModel(): PlatformListItemModel {
-        val mode = when (addStatus) {
+    /**
+     * Converts the platform search item to a list item model.
+     */
+    fun toListItemModel(): PlatformListItemModel = platform.toListItemModel(
+        mode = when (addStatus) {
             PlatformAddStatus.NOT_ADDED -> PlatformListItemMode.ADDABLE
             PlatformAddStatus.ADDING -> PlatformListItemMode.ADDING
             PlatformAddStatus.ADDED -> PlatformListItemMode.ADDED
         }
-        return platform.toListItemModel(mode)
-    }
+    )
 }

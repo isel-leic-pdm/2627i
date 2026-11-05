@@ -4,10 +4,12 @@ import android.app.Application
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import isel.dei.pdm.demos.gamevault.adapters.DataStoreCredentialsRepository
+import androidx.room.Room
+import isel.dei.pdm.demos.gamevault.adapters.datastore.DataStoreCredentialsRepository
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeCredentialsRepository
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakePlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakePlatformSearchService
+import isel.dei.pdm.demos.gamevault.adapters.room.GameVaultDatabase
 import isel.dei.pdm.demos.gamevault.domain.collection.PlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.search.CredentialsRepository
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformSearchService
@@ -31,6 +33,14 @@ class DemoGameVaultApplication : DependenciesContainer, Application() {
         corruptionHandler = DataStoreCredentialsRepository.corruptionHandler
     )
 
+    /**
+     * The database where the user's collection is stored. Room requires a single instance per
+     * database file, which holds because there is a single application instance per process.
+     */
+    private val database: GameVaultDatabase by lazy {
+        Room.databaseBuilder(this, GameVaultDatabase::class.java, GameVaultDatabase.NAME).build()
+    }
+
     override val credentialsRepository: CredentialsRepository by lazy {
         // DataStoreCredentialsRepository(dataStore = credentialsDataStore)
         FakeCredentialsRepository()
@@ -41,6 +51,7 @@ class DemoGameVaultApplication : DependenciesContainer, Application() {
     }
 
     override val platformCollectionRepository: PlatformCollectionRepository by lazy {
+        // RoomPlatformCollectionRepository(dao = database.platformDao())
         FakePlatformCollectionRepository()
     }
 }
