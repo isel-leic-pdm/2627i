@@ -112,8 +112,8 @@ class AsyncImageTest {
             .assertIsDisplayed()
     }
 
-    @Test(expected = IllegalStateException::class)
-    fun throws_when_no_image_loader_is_provided_on_composition_local() {
+    @Test
+    fun error_state_is_displayed_when_no_image_loader_is_provided_on_composition_local() {
         composeTestRule.setContent {
             DemoGameVaultTheme {
                 AsyncImage(
@@ -123,5 +123,9 @@ class AsyncImageTest {
                 )
             }
         }
+
+        composeTestRule
+            .onNodeWithTag(AsyncImageTestTags.ERROR)
+            .assertIsDisplayed()
     }
 }

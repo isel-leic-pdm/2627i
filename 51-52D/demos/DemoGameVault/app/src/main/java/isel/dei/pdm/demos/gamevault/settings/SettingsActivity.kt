@@ -13,7 +13,7 @@ import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 class SettingsActivity : ComponentActivity() {
 
     /**
-     * The dependency for the credentials repository to be used by the app.
+     * The dependencies to be used.
      */
     private val dependencies: DependenciesContainer by lazy {
         application as DependenciesContainer

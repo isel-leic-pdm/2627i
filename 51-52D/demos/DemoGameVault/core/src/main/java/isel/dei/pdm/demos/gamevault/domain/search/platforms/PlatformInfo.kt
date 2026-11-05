@@ -5,29 +5,41 @@ import java.net.URI
 
 /**
  * Represents the platform where a game can be played, as provided by the platform search service.
- * @property id The platform's unique identifier, as assigned by the service.
+ * Each version of a platform (e.g. PlayStation 5 and PlayStation 5 Pro) is represented by a
+ * distinct instance.
+ * @property id The platform's identifier, as assigned by the service. Different versions of the
+ * same platform share the same identifier.
  * @property abbreviation The platform's abbreviation (e.g. PS5, XBOX).
  * @property name The platform's full name (e.g. PlayStation 5).
  * @property logoUri The URI of the platform's logo, if available.
+ * @property version The platform's version (e.g. Pro, Digital Edition), if available.
  */
 data class PlatformInfo(
     val id: Long,
     val abbreviation: NonBlankString,
     val name: NonBlankString,
-    val logoUri: URI? = null
+    val logoUri: URI? = null,
+    val version: NonBlankString? = null
 ) {
     /**
-     * Convenience constructor that accepts strings for abbreviation and name.
+     * Convenience constructor that accepts strings for abbreviation, name, logo URI and version.
      * @throws IllegalArgumentException if any of the strings does not meet the requirements for
      * being a [NonBlankString] or a [URI].
      * @see NonBlankString
      * @see URI
      */
     @Throws(IllegalArgumentException::class)
-    constructor(id: Long, abbreviation: String, name: String, logoUri: String? = null) : this(
+    constructor(
+        id: Long,
+        abbreviation: String,
+        name: String,
+        logoUri: String? = null,
+        version: String? = null
+    ) : this(
         id = id,
         abbreviation = NonBlankString(abbreviation),
         name = NonBlankString(name),
-        logoUri = logoUri?.let { URI.create(it) }
+        logoUri = logoUri?.let { URI.create(it) },
+        version = version?.let { NonBlankString(it) }
     )
 }

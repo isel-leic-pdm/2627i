@@ -26,6 +26,7 @@
         </activity>
 
         <activity android:name=".settings.SettingsActivity" android:exported="true" />
+        <activity android:name=".search.platforms.SearchForPlatformActivity" android:exported="true" />
     </application>
 
 </manifest>

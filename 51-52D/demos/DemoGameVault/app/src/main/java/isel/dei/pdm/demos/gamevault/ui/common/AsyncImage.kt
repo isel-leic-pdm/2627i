@@ -108,10 +108,11 @@ sealed class AsyncImageState {
 }
 
 /**
- * The CompositionLocal used to provide an [ImageLoader] to the UI tree.
+ * The CompositionLocal used to provide an [ImageLoader] to the UI tree. If none is provided,
+ * every image is displayed as not available.
  */
 val LocalImageLoader = staticCompositionLocalOf<ImageLoader> {
-    { throw IllegalStateException("No ImageLoader provided") }
+    { Result.failure(UnsupportedOperationException("No ImageLoader provided")) }
 }
 
 // Testing & preview utilities

@@ -3,6 +3,7 @@ package isel.dei.pdm.demos.gamevault.search.platforms
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
 import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItemMode
 import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItemModel
+import isel.dei.pdm.demos.gamevault.ui.common.toListItemModel
 
 /**
  * Represents the addition status of a platform in the search list.
@@ -23,6 +24,13 @@ data class PlatformSearchItemUiState(
     val platform: PlatformInfo,
     val addStatus: PlatformAddStatus = PlatformAddStatus.NOT_ADDED
 ) {
+    /**
+     * The key that uniquely identifies the item in the search results. The platform's id is not
+     * enough, because all versions of the same platform share it.
+     */
+    val key: String
+        get() = "${platform.id}/${platform.version?.value.orEmpty()}"
+
     val isAdded: Boolean
         get() = addStatus == PlatformAddStatus.ADDED
 
@@ -35,12 +43,6 @@ data class PlatformSearchItemUiState(
             PlatformAddStatus.ADDING -> PlatformListItemMode.ADDING
             PlatformAddStatus.ADDED -> PlatformListItemMode.ADDED
         }
-        return PlatformListItemModel(
-            id = platform.id,
-            abbreviation = platform.abbreviation,
-            name = platform.name,
-            logoUri = platform.logoUri,
-            mode = mode
-        )
+        return platform.toListItemModel(mode)
     }
 }

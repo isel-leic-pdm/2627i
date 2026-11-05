@@ -6,7 +6,7 @@ import isel.dei.pdm.demos.gamevault.domain.collection.PlatformCollectionReposito
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.first
 
 /**
  * A fake implementation of the [PlatformCollectionRepository] interface.
@@ -16,7 +16,7 @@ class FakePlatformCollectionRepository : PlatformCollectionRepository {
 
     private val _platforms = MutableStateFlow<List<Platform>>(emptyList())
 
-    override suspend fun add(platform: NewPlatform): Result<Long> {
+    override suspend fun add(platform: NewPlatform): Long {
         val current = _platforms.value
         val newId = (current.maxOfOrNull { it.id } ?: 0L) + 1L
         val created = Platform(
@@ -24,17 +24,18 @@ class FakePlatformCollectionRepository : PlatformCollectionRepository {
             abbreviation = platform.abbreviation,
             name = platform.name,
             logoUri = platform.logoUri,
-            ownedSince = platform.ownedSince
+            ownedSince = platform.ownedSince,
+            version = platform.version
         )
         _platforms.emit(_platforms.value + created)
-        return Result.success(newId)
+        return newId
     }
 
-    override suspend fun getById(id: Long): Result<Platform?> =
-        Result.success(platforms.last().find { it.id == id })
+    override suspend fun getById(id: Long): Platform? =
+        platforms.first().find { it.id == id }
 
-    override suspend fun getAll(): Result<List<Platform>> =
-        Result.success(platforms.last())
+    override suspend fun getAll(): List<Platform> =
+        platforms.first()
 
     override val platforms: Flow<List<Platform>> = _platforms.asStateFlow()
 }

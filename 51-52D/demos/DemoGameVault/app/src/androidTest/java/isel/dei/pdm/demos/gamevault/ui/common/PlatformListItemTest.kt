@@ -7,14 +7,16 @@ import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.core.graphics.createBitmap
+import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
-import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
-class PlatformInfoListItemTest {
+class PlatformListItemTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -33,16 +35,22 @@ class PlatformInfoListItemTest {
         logoUri = "http://example.com/ps5.png",
     )
 
-    @Test
-    fun platform_list_item_displays_content() {
+    /**
+     * Displays a list item for the given model.
+     */
+    private fun setItemContent(item: PlatformListItemModel, onSelected: () -> Unit = {}) {
         composeTestRule.setContent {
             CompositionLocalProvider(LocalImageLoader provides successLoader) {
-                PlatformListItem(
-                    item = samplePlatform.toListItemModel(PlatformListItemMode.ADDABLE),
-                    onSelected = {},
-                )
+                PlatformListItem(item = item, onSelected = onSelected)
             }
         }
+    }
+
+    // Content
+
+    @Test
+    fun platform_list_item_displays_content() {
+        setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.ADDABLE))
 
         composeTestRule
             .onNodeWithTag(PlatformListItemTestTags.ITEM)
@@ -62,15 +70,33 @@ class PlatformInfoListItemTest {
     }
 
     @Test
+    fun platform_list_item_displays_version_when_present() {
+        val versionedPlatform = samplePlatform.copy(version = NonBlankString("Pro"))
+        setItemContent(versionedPlatform.toListItemModel(PlatformListItemMode.ADDABLE))
+
+        composeTestRule
+            .onNodeWithTag(PlatformListItemTestTags.VERSION, useUnmergedTree = true)
+            .assertIsDisplayed()
+
+        composeTestRule
+            .onNodeWithText("Pro", substring = true, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun platform_list_item_does_not_display_version_when_absent() {
+        setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.ADDABLE))
+
+        composeTestRule
+            .onNodeWithTag(PlatformListItemTestTags.VERSION, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
+
+    // Trailing indicators
+
+    @Test
     fun platform_list_item_displays_add_button_when_addable() {
-        composeTestRule.setContent {
-            CompositionLocalProvider(LocalImageLoader provides successLoader) {
-                PlatformListItem(
-                    item = samplePlatform.toListItemModel(PlatformListItemMode.ADDABLE),
-                    onSelected = {},
-                )
-            }
-        }
+        setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.ADDABLE))
 
         composeTestRule
             .onNodeWithTag(PlatformListItemTestTags.ADD_BUTTON)
@@ -79,14 +105,7 @@ class PlatformInfoListItemTest {
 
     @Test
     fun platform_list_item_displays_progress_indicator_when_adding() {
-        composeTestRule.setContent {
-            CompositionLocalProvider(LocalImageLoader provides successLoader) {
-                PlatformListItem(
-                    item = samplePlatform.toListItemModel(PlatformListItemMode.ADDING),
-                    onSelected = {},
-                )
-            }
-        }
+        setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.ADDING))
 
         composeTestRule
             .onNodeWithTag(PlatformListItemTestTags.ADDING_INDICATOR)
@@ -95,14 +114,7 @@ class PlatformInfoListItemTest {
 
     @Test
     fun platform_list_item_displays_check_icon_when_added() {
-        composeTestRule.setContent {
-            CompositionLocalProvider(LocalImageLoader provides successLoader) {
-                PlatformListItem(
-                    item = samplePlatform.toListItemModel(PlatformListItemMode.ADDED),
-                    onSelected = {},
-                )
-            }
-        }
+        setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.ADDED))
 
         composeTestRule
             .onNodeWithTag(PlatformListItemTestTags.ADDED_ICON, useUnmergedTree = true)
@@ -111,50 +123,63 @@ class PlatformInfoListItemTest {
 
     @Test
     fun platform_list_item_displays_chevron_icon_when_navigable() {
-        composeTestRule.setContent {
-            CompositionLocalProvider(LocalImageLoader provides successLoader) {
-                PlatformListItem(
-                    item = samplePlatform.toListItemModel(PlatformListItemMode.NAVIGABLE),
-                    onSelected = {},
-                )
-            }
-        }
+        setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.NAVIGABLE))
 
         composeTestRule
             .onNodeWithTag(PlatformListItemTestTags.CHEVRON_ICON, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 
-    @Test
-    fun clicking_item_with_onSelected_triggers_callback_when_addable() {
-        var selected = false
+    // Interaction
 
-        composeTestRule.setContent {
-            CompositionLocalProvider(LocalImageLoader provides successLoader) {
-                PlatformListItem(
-                    item = samplePlatform.toListItemModel(PlatformListItemMode.ADDABLE),
-                    onSelected = { selected = true },
-                )
-            }
-        }
+    @Test
+    fun clicking_item_triggers_onSelected_when_addable() {
+        var selected = false
+        setItemContent(
+            item = samplePlatform.toListItemModel(PlatformListItemMode.ADDABLE),
+            onSelected = { selected = true }
+        )
 
         composeTestRule
             .onNodeWithTag(PlatformListItemTestTags.ITEM)
             .performClick()
 
-        assertEquals(true, selected)
+        assertTrue(selected)
+    }
+
+    @Test
+    fun clicking_add_button_triggers_onSelected() {
+        var selected = false
+        setItemContent(
+            item = samplePlatform.toListItemModel(PlatformListItemMode.ADDABLE),
+            onSelected = { selected = true }
+        )
+
+        composeTestRule
+            .onNodeWithTag(PlatformListItemTestTags.ADD_BUTTON)
+            .performClick()
+
+        assertTrue(selected)
+    }
+
+    @Test
+    fun clicking_item_triggers_onSelected_when_navigable() {
+        var selected = false
+        setItemContent(
+            item = samplePlatform.toListItemModel(PlatformListItemMode.NAVIGABLE),
+            onSelected = { selected = true }
+        )
+
+        composeTestRule
+            .onNodeWithTag(PlatformListItemTestTags.ITEM)
+            .performClick()
+
+        assertTrue(selected)
     }
 
     @Test
     fun item_has_no_click_action_when_adding() {
-        composeTestRule.setContent {
-            CompositionLocalProvider(LocalImageLoader provides successLoader) {
-                PlatformListItem(
-                    item = samplePlatform.toListItemModel(PlatformListItemMode.ADDING),
-                    onSelected = {},
-                )
-            }
-        }
+        setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.ADDING))
 
         composeTestRule
             .onNodeWithTag(PlatformListItemTestTags.ITEM)
@@ -163,14 +188,7 @@ class PlatformInfoListItemTest {
 
     @Test
     fun item_has_no_click_action_when_added() {
-        composeTestRule.setContent {
-            CompositionLocalProvider(LocalImageLoader provides successLoader) {
-                PlatformListItem(
-                    item = samplePlatform.toListItemModel(PlatformListItemMode.ADDED),
-                    onSelected = {},
-                )
-            }
-        }
+        setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.ADDED))
 
         composeTestRule
             .onNodeWithTag(PlatformListItemTestTags.ITEM)

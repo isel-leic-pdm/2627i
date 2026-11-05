@@ -1,6 +1,7 @@
 package isel.dei.pdm.demos.gamevault.ui.common
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -61,11 +62,20 @@ fun PlatformListItem(
                 )
             },
             supportingContent = {
-                Text(
-                    text = item.abbreviation.value,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.testTag(PlatformListItemTestTags.ABBREVIATION),
-                )
+                Row {
+                    Text(
+                        text = item.abbreviation.value,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.testTag(PlatformListItemTestTags.ABBREVIATION),
+                    )
+                    if (item.version != null) {
+                        Text(
+                            text = " · ${item.version.value}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.testTag(PlatformListItemTestTags.VERSION),
+                        )
+                    }
+                }
             },
             leadingContent = {
                 AsyncImage(
@@ -134,6 +144,7 @@ enum class PlatformListItemMode {
  * @property abbreviation The platform's abbreviation.
  * @property name The platform's name.
  * @property logoUri The platform's logo URI.
+ * @property version The platform's version, if available.
  * @property mode The presentation mode.
  */
 data class PlatformListItemModel(
@@ -141,6 +152,7 @@ data class PlatformListItemModel(
     val abbreviation: NonBlankString,
     val name: NonBlankString,
     val logoUri: URI?,
+    val version: NonBlankString? = null,
     val mode: PlatformListItemMode = PlatformListItemMode.ADDABLE
 )
 
@@ -153,6 +165,7 @@ fun PlatformInfo.toListItemModel(mode: PlatformListItemMode = PlatformListItemMo
         abbreviation = abbreviation,
         name = name,
         logoUri = logoUri,
+        version = version,
         mode = mode
     )
 
@@ -165,6 +178,7 @@ fun Platform.toListItemModel(mode: PlatformListItemMode = PlatformListItemMode.N
         abbreviation = abbreviation,
         name = name,
         logoUri = logoUri,
+        version = version,
         mode = mode
     )
 
@@ -176,6 +190,7 @@ object PlatformListItemTestTags {
     const val LOGO = "PlatformLogo"
     const val NAME = "PlatformName"
     const val ABBREVIATION = "PlatformAbbreviation"
+    const val VERSION = "PlatformVersion"
     const val ADD_BUTTON = "PlatformAddButton"
     const val ADDING_INDICATOR = "PlatformAddingIndicator"
     const val ADDED_ICON = "PlatformAddedIcon"
@@ -190,6 +205,7 @@ class PlatformListItemPreviews {
         abbreviation = NonBlankString("PS5"),
         name = NonBlankString("PlayStation 5"),
         logoUri = URI.create("http://example.com/ps5.png"),
+        version = NonBlankString("Pro"),
         mode = PlatformListItemMode.ADDABLE
     )
 

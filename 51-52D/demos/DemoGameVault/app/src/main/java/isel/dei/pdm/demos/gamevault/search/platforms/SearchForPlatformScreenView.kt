@@ -12,196 +12,213 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import isel.dei.pdm.demos.gamevault.R
 import isel.dei.pdm.demos.gamevault.domain.search.SearchString
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
-import isel.dei.pdm.demos.gamevault.ui.common.SearchBox
-import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenViewTestTags.BACK_BUTTON_TAG
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenViewTestTags.PLATFORM_LIST_TAG
-import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenViewTestTags.SCREEN_TAG
+import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenViewTestTags.SEARCH_INDICATOR_TAG
+import isel.dei.pdm.demos.gamevault.ui.common.LabelledProgressIndicator
 import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItem
+import isel.dei.pdm.demos.gamevault.ui.common.SearchBox
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 
 /**
- * The view for the "Find Platform" screen. Displays a top bar title, a search box,
- * and a lazy list of matching platforms.
+ * The view used to search for platforms.
  *
- * @param platforms The list of matching platforms to display.
+ * @param state The current state of the screen.
  * @param onSearchQueryChange Callback invoked when the user enters or updates the search query.
  * @param onSearchQueryCleared Callback invoked when the user clears the search query.
- * @param onPlatformSelected Callback invoked when a platform item is selected.
- * @param onBack Optional callback invoked when the back navigation button is clicked.
- * @param modifier Modifier to be applied to the screen layout.
+ * @param onAddPlatform Callback invoked when the user requests a platform to be added to the
+ * collection. Only platforms that are not added (nor being added) can be selected.
+ * @param modifier Modifier to be applied to the view's layout.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchForPlatformScreenView(
-    platforms: List<PlatformSearchItemUiState>,
+    state: SearchForPlatformScreenState,
     onSearchQueryChange: (SearchString) -> Unit,
     onSearchQueryCleared: () -> Unit,
-    onPlatformSelected: (PlatformInfo) -> Unit,
-    onBack: () -> Unit,
+    onAddPlatform: (PlatformInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Scaffold(
-        modifier = modifier
-            .fillMaxSize()
-            .testTag(SCREEN_TAG),
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.search_platform_title)) },
-                navigationIcon = {
-                    IconButton(
-                        onClick = onBack,
-                        modifier = Modifier.testTag(BACK_BUTTON_TAG)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.settings_back_description)
+    Column(modifier = modifier.fillMaxSize()) {
+        SearchBox(
+            onQueryChange = onSearchQueryChange,
+            onQueryCleared = onSearchQueryCleared,
+            initialQuery = state.queryOrNull
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) {
+            when (state) {
+                is SearchForPlatformScreenState.Start -> CenteredMessage(
+                    text = stringResource(R.string.search_platform_start_hint)
+                )
+                is SearchForPlatformScreenState.Search ->
+                    if (state.isIndicatorVisible) {
+                        LabelledProgressIndicator(
+                            text = stringResource(R.string.search_platform_searching),
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .testTag(SEARCH_INDICATOR_TAG)
                         )
                     }
-                }
+                is SearchForPlatformScreenState.Results -> SearchResults(
+                    items = state.items,
+                    onAddPlatform = onAddPlatform
+                )
+                // Displayed by the screen, in place of this view
+                is SearchForPlatformScreenState.Error -> Unit
+            }
+        }
+    }
+}
+
+/**
+ * The query of the state, if it has one.
+ */
+private val SearchForPlatformScreenState.queryOrNull: SearchString?
+    get() = when (this) {
+        is SearchForPlatformScreenState.Start -> null
+        is SearchForPlatformScreenState.Search -> query
+        is SearchForPlatformScreenState.Results -> query
+        is SearchForPlatformScreenState.Error -> query
+    }
+
+/**
+ * The search results, preceded by a header. If there are no results, a message is displayed.
+ */
+@Composable
+private fun SearchResults(
+    items: List<PlatformSearchItemUiState>,
+    onAddPlatform: (PlatformInfo) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.search_results_label),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            HorizontalDivider(
+                modifier = Modifier.weight(1f),
+                color = MaterialTheme.colorScheme.outlineVariant
             )
         }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-            SearchBox(
-                onQueryChange = onSearchQueryChange,
-                onQueryCleared = onSearchQueryCleared
-            )
 
-            Row(
+        if (items.isEmpty()) {
+            CenteredMessage(text = stringResource(R.string.search_no_platforms_found))
+        } else {
+            LazyColumn(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxSize()
+                    .testTag(PLATFORM_LIST_TAG),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text = stringResource(R.string.search_results_label),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                HorizontalDivider(
-                    modifier = Modifier.weight(1f),
-                    color = MaterialTheme.colorScheme.outlineVariant
-                )
-            }
-
-            if (platforms.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.search_no_platforms_found),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                items(items = items, key = { it.key }) { itemState ->
+                    PlatformListItem(
+                        item = itemState.toListItemModel(),
+                        onSelected = { onAddPlatform(itemState.platform) }
                     )
                 }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .testTag(PLATFORM_LIST_TAG),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(
-                        items = platforms,
-                        key = { it.platform.id }
-                    ) { itemState ->
-                        PlatformListItem(
-                            item = itemState.toListItemModel(),
-                            onSelected = { onPlatformSelected(itemState.platform) }
-                        )
-                    }
-                }
             }
         }
+    }
+}
+
+/**
+ * A message displayed in the center of the available area.
+ */
+@Composable
+private fun CenteredMessage(text: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
 // Testing & preview utilities
 
 object SearchForPlatformScreenViewTestTags {
-    const val SCREEN_TAG = "SearchForPlatformScreen"
     const val PLATFORM_LIST_TAG = "SearchForPlatformList"
-    const val BACK_BUTTON_TAG = "SearchForPlatformBackButton"
+    const val SEARCH_INDICATOR_TAG = "SearchForPlatformSearchIndicator"
 }
 
 @Suppress("Unused")
 class SearchForPlatformScreenViewPreviews {
 
-    private val samplePlatforms = listOf(
+    private val query = SearchString("PlayStation")
+
+    private val sampleItems = listOf(
         PlatformSearchItemUiState(
-            PlatformInfo(1L, "PS5", "PlayStation 5", "https://fake.url/ps5.png"),
+            PlatformInfo(5L, "PS5", "PlayStation 5", "https://fake.url/ps5.png", "Standard"),
             addStatus = PlatformAddStatus.NOT_ADDED
         ),
         PlatformSearchItemUiState(
-            PlatformInfo(2L, "XSX", "Xbox Series X/S", "https://fake.url/xbox.png"),
-            addStatus = PlatformAddStatus.ADDING
-        ),
-        PlatformSearchItemUiState(
-            PlatformInfo(3L, "NSW", "Nintendo Switch", "https://fake.url/switch.png"),
+            PlatformInfo(5L, "PS5", "PlayStation 5", "https://fake.url/ps5.png", "Pro"),
             addStatus = PlatformAddStatus.ADDED
         ),
         PlatformSearchItemUiState(
-            PlatformInfo(4L, "PC", "PC (Microsoft Windows)", "https://fake.url/pc.png"),
-            addStatus = PlatformAddStatus.NOT_ADDED
+            PlatformInfo(4L, "PS4", "PlayStation 4", "https://fake.url/ps4.png"),
+            addStatus = PlatformAddStatus.ADDING
         )
     )
 
-    @Preview(showBackground = true, name = "With Platforms")
     @Composable
-    fun SearchForPlatformScreenViewPreview() {
+    private fun PreviewOf(state: SearchForPlatformScreenState) {
         DemoGameVaultTheme {
             SearchForPlatformScreenView(
-                platforms = samplePlatforms,
+                state = state,
                 onSearchQueryChange = {},
                 onSearchQueryCleared = {},
-                onPlatformSelected = {},
-                onBack = {}
+                onAddPlatform = {}
             )
         }
     }
 
-    @Preview(showBackground = true, name = "Empty List")
+    @Preview(showBackground = true, name = "Start")
     @Composable
-    fun SearchForPlatformScreenViewEmptyPreview() {
-        DemoGameVaultTheme {
-            SearchForPlatformScreenView(
-                platforms = emptyList(),
-                onSearchQueryChange = {},
-                onSearchQueryCleared = {},
-                onPlatformSelected = {},
-                onBack = {}
-            )
-        }
-    }
+    fun StartPreview() = PreviewOf(SearchForPlatformScreenState.Start)
+
+    @Preview(showBackground = true, name = "Search - With indicator")
+    @Composable
+    fun SearchPreview() =
+        PreviewOf(SearchForPlatformScreenState.Search(query, isIndicatorVisible = true))
+
+    @Preview(showBackground = true, name = "Results")
+    @Composable
+    fun ResultsPreview() = PreviewOf(SearchForPlatformScreenState.Results(query, sampleItems))
+
+    @Preview(showBackground = true, name = "Results - Empty")
+    @Composable
+    fun EmptyResultsPreview() = PreviewOf(SearchForPlatformScreenState.Results(query, emptyList()))
 }

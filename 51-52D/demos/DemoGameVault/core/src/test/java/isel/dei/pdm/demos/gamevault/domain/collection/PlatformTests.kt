@@ -8,229 +8,149 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
-
 class PlatformTests {
 
-    @Test
-    fun `Platform primary constructor creates instance with valid properties`() {
-        // Arrange
-        val id = 1L
-        val abbreviation = NonBlankString("PS5")
-        val name = NonBlankString("PlayStation 5")
-        val logoUri = URI.create("https://example.com/ps5.png")
-        val ownedSince = Year.of(2020)
-
-
-        // Act
-        val platform = Platform(id, abbreviation, name, logoUri, ownedSince)
-
-        // Assert
-        assertEquals(id, platform.id)
-        assertEquals(abbreviation, platform.abbreviation)
-        assertEquals(name, platform.name)
-        assertEquals(logoUri, platform.logoUri)
-        assertEquals(ownedSince, platform.ownedSince)
-    }
+    // Platform
 
     @Test
-    fun `Platform primary constructor creates instance without optional args`() {
-        // Arrange
-        val id = 1L
-        val abbreviation = NonBlankString("PS5")
-        val name = NonBlankString("PlayStation 5")
-        val logoUri: URI? = null
-        val ownedSince: Year? = null
-
+    fun `Platform primary constructor leaves optional properties absent by default`() {
         // Act
-        val platform = Platform(id, abbreviation, name, logoUri, ownedSince)
+        val platform = Platform(1L, NonBlankString("PS5"), NonBlankString("PlayStation 5"))
 
         // Assert
-        assertEquals(id, platform.id)
-        assertEquals(abbreviation, platform.abbreviation)
-        assertEquals(name, platform.name)
         assertNull(platform.logoUri)
         assertNull(platform.ownedSince)
+        assertNull(platform.version)
     }
 
     @Test
-    fun `Platform secondary constructor creates instance with valid inputs`() {
-        // Arrange
-        val id = 1L
-        val abbreviation = "PS5"
-        val name = "PlayStation 5"
-        val logoUri = "https://example.com/ps5.png"
-        val ownedSince = 2020
-
+    fun `Platform secondary constructor converts intrinsic types into the corresponding types`() {
         // Act
-        val platform = Platform(id, abbreviation, name, logoUri, ownedSince)
+        val platform = Platform(
+            id = 1L,
+            abbreviation = "PS5",
+            name = "PlayStation 5",
+            logoUri = "https://example.com/ps5.png",
+            ownedSince = 2020,
+            version = "Digital Edition"
+        )
 
         // Assert
-        assertEquals(id, platform.id)
-        assertEquals(abbreviation, platform.abbreviation.value)
-        assertEquals(name, platform.name.value)
-        assertEquals(URI.create(logoUri), platform.logoUri)
+        assertEquals(1L, platform.id)
+        assertEquals(NonBlankString("PS5"), platform.abbreviation)
+        assertEquals(NonBlankString("PlayStation 5"), platform.name)
+        assertEquals(URI.create("https://example.com/ps5.png"), platform.logoUri)
+        assertEquals(Year.of(2020), platform.ownedSince)
+        assertEquals(NonBlankString("Digital Edition"), platform.version)
     }
 
     @Test
-    fun `Platform secondary constructor creates instance with valid string inputs and no optional args`() {
-        // Arrange
-        val id = 1L
-        val abbreviation = "PS5"
-        val name = "PlayStation 5"
-        val logoUri: String? = null
-        val ownedSince: Int? = null
-
+    fun `Platform secondary constructor leaves optional properties absent by default`() {
         // Act
-        val platform = Platform(id, abbreviation, name, logoUri, ownedSince)
+        val platform = Platform(id = 1L, abbreviation = "PS5", name = "PlayStation 5")
 
         // Assert
-        assertEquals(id, platform.id)
-        assertEquals(abbreviation, platform.abbreviation.value)
-        assertEquals(name, platform.name.value)
         assertNull(platform.logoUri)
         assertNull(platform.ownedSince)
+        assertNull(platform.version)
     }
 
     @Test
     fun `Platform secondary constructor throws IllegalArgumentException when abbreviation is blank`() {
-        // Arrange
-        val id = 1L
-        val abbreviation = "   "
-        val name = "PlayStation 5"
-        val logoUri = "https://example.com/ps5.png"
-        val ownedSince = 2020
-
-        // Act & Assert
         assertFailsWith<IllegalArgumentException> {
-            Platform(id, abbreviation, name, logoUri, ownedSince)
+            Platform(id = 1L, abbreviation = "   ", name = "PlayStation 5")
         }
     }
 
     @Test
     fun `Platform secondary constructor throws IllegalArgumentException when name is blank`() {
-        // Arrange
-        val id = 1L
-        val abbreviation = "PS5"
-        val name = "   "
-        val logoUri = "https://example.com/ps5.png"
-        val ownedSince = 2020
-
-        // Act & Assert
         assertFailsWith<IllegalArgumentException> {
-            Platform(id, abbreviation, name, logoUri, ownedSince)
+            Platform(id = 1L, abbreviation = "PS5", name = "   ")
+        }
+    }
+
+    @Test
+    fun `Platform secondary constructor throws IllegalArgumentException when version is blank`() {
+        assertFailsWith<IllegalArgumentException> {
+            Platform(id = 1L, abbreviation = "PS5", name = "PlayStation 5", version = "   ")
         }
     }
 
     @Test
     fun `Platform secondary constructor throws IllegalArgumentException when logoUri is invalid`() {
-        // Arrange
-        val id = 1L
-        val abbreviation = "PS5"
-        val name = "PlayStation 5"
-        val logoUri = " invalid_uri "
-        val ownedSince = 2020
-
-        // Act & Assert
         assertFailsWith<IllegalArgumentException> {
-            Platform(id, abbreviation, name, logoUri, ownedSince)
+            Platform(id = 1L, abbreviation = "PS5", name = "PlayStation 5", logoUri = " invalid_uri ")
         }
     }
 
-    @Test
-    fun `NewPlatform primary constructor creates instance with valid properties`() {
-        // Arrange
-        val abbreviation = NonBlankString("PS5")
-        val name = NonBlankString("PlayStation 5")
-        val logoUri = URI.create("https://example.com/ps5.png")
-
-        // Act
-        val newPlatform = NewPlatform(abbreviation, name, logoUri)
-
-        // Assert
-        assertEquals(abbreviation, newPlatform.abbreviation)
-        assertEquals(name, newPlatform.name)
-        assertEquals(logoUri, newPlatform.logoUri)
-    }
+    // NewPlatform
 
     @Test
-    fun `NewPlatform primary constructor creates instance with no optional args`() {
-        // Arrange
-        val abbreviation = NonBlankString("PS5")
-        val name = NonBlankString("PlayStation 5")
-        val logoUri: URI? = null
-        val ownedSince: Year? = null
-
+    fun `NewPlatform primary constructor leaves optional properties absent by default`() {
         // Act
-        val newPlatform = NewPlatform(abbreviation, name, logoUri, ownedSince)
+        val newPlatform = NewPlatform(NonBlankString("NSW"), NonBlankString("Nintendo Switch"))
 
         // Assert
-        assertEquals(abbreviation, newPlatform.abbreviation)
-        assertEquals(name, newPlatform.name)
         assertNull(newPlatform.logoUri)
         assertNull(newPlatform.ownedSince)
+        assertNull(newPlatform.version)
     }
 
     @Test
-    fun `NewPlatform secondary constructor creates instance with valid inputs`() {
-        // Arrange
-        val abbreviation = "PS5"
-        val name = "PlayStation 5"
-        val logoUri = "https://example.com/ps5.png"
-        val ownedSince = 2020
-
+    fun `NewPlatform secondary constructor converts intrinsic types into the corresponding types`() {
         // Act
-        val newPlatform = NewPlatform(abbreviation, name, logoUri, ownedSince)
+        val newPlatform = NewPlatform(
+            abbreviation = "NSW",
+            name = "Nintendo Switch",
+            logoUri = "https://example.com/switch.png",
+            ownedSince = 2021,
+            version = "OLED"
+        )
 
         // Assert
-        assertEquals(abbreviation, newPlatform.abbreviation.value)
-        assertEquals(name, newPlatform.name.value)
-        assertEquals(URI.create(logoUri), newPlatform.logoUri)
-        assertEquals(Year.of(ownedSince), newPlatform.ownedSince)
+        assertEquals(NonBlankString("NSW"), newPlatform.abbreviation)
+        assertEquals(NonBlankString("Nintendo Switch"), newPlatform.name)
+        assertEquals(URI.create("https://example.com/switch.png"), newPlatform.logoUri)
+        assertEquals(Year.of(2021), newPlatform.ownedSince)
+        assertEquals(NonBlankString("OLED"), newPlatform.version)
     }
 
     @Test
-    fun `NewPlatform secondary constructor creates instance with valid string inputs and no optional args`() {
-        // Arrange
-        val abbreviation = "PS5"
-        val name = "PlayStation 5"
-        val logoUri: String? = null
-        val ownedSince: Int? = null
-
+    fun `NewPlatform secondary constructor leaves optional properties absent by default`() {
         // Act
-        val newPlatform = NewPlatform(abbreviation, name, logoUri, ownedSince)
+        val newPlatform = NewPlatform(abbreviation = "NSW", name = "Nintendo Switch")
 
         // Assert
-        assertEquals(abbreviation, newPlatform.abbreviation.value)
-        assertEquals(name, newPlatform.name.value)
         assertNull(newPlatform.logoUri)
         assertNull(newPlatform.ownedSince)
+        assertNull(newPlatform.version)
     }
 
     @Test
     fun `NewPlatform secondary constructor throws IllegalArgumentException when abbreviation is blank`() {
-        // Arrange
-        val abbreviation = "   "
-        val name = "PlayStation 5"
-        val logoUri = "https://example.com/ps5.png"
-        val ownedSince = 2020
-
-        // Act & Assert
         assertFailsWith<IllegalArgumentException> {
-            NewPlatform(abbreviation, name, logoUri, ownedSince)
+            NewPlatform(abbreviation = "   ", name = "Nintendo Switch")
         }
     }
 
     @Test
     fun `NewPlatform secondary constructor throws IllegalArgumentException when name is blank`() {
-        // Arrange
-        val abbreviation = "PS5"
-        val name = "   "
-        val logoUri = "https://example.com/ps5.png"
-        val ownedSince = 2020
-
-        // Act & Assert
         assertFailsWith<IllegalArgumentException> {
-            NewPlatform(abbreviation, name, logoUri, ownedSince)
+            NewPlatform(abbreviation = "NSW", name = "   ")
+        }
+    }
+
+    @Test
+    fun `NewPlatform secondary constructor throws IllegalArgumentException when version is blank`() {
+        assertFailsWith<IllegalArgumentException> {
+            NewPlatform(abbreviation = "NSW", name = "Nintendo Switch", version = " ")
+        }
+    }
+
+    @Test
+    fun `NewPlatform secondary constructor throws IllegalArgumentException when logoUri is invalid`() {
+        assertFailsWith<IllegalArgumentException> {
+            NewPlatform(abbreviation = "NSW", name = "Nintendo Switch", logoUri = " invalid_uri ")
         }
     }
 }

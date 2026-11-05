@@ -70,7 +70,7 @@ class SettingsViewModel(
             } catch (e: PersistenceException) {
                 LoadError(error = e)
             }
-            // The timer is cancelled before publishing the outcome, so it cannot overwrite it
+            // The timer is canceled before publishing the outcome, so it cannot overwrite it
             indicatorTimer.cancel()
             _currentState.value = loadedState
         }

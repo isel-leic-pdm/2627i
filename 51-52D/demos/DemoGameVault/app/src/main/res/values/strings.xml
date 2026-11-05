@@ -23,6 +23,19 @@
     <string name="search_no_platforms_found">No platforms found</string>
     <string name="search_platform_add_description">Add platform</string>
     <string name="search_platform_added_description">Platform in collection</string>
+    <string name="search_platform_back_description">Back</string>
+    <string name="search_platform_start_hint">Type the name or abbreviation of a platform</string>
+    <string name="search_platform_searching">Searching platforms…</string>
+    <string name="search_platform_error_message">Could not search for platforms.</string>
+    <string name="search_platform_retry_button_label">Retry</string>
+    <string name="search_platform_added_message">%1$s added to your collection</string>
+    <string name="search_platform_add_failed_message">Could not add %1$s to your collection</string>
+
+    <string name="search_error_tip_no_connectivity">Check your internet connection and try again.</string>
+    <string name="search_error_tip_unauthenticated">Check the IGDB credentials in the settings and try again.</string>
+    <string name="search_error_tip_service_unavailable">The search service is temporarily unavailable. Try again later.</string>
+    <string name="search_error_tip_rate_limit_exceeded">Too many searches in a short time. Wait a moment and try again.</string>
+    <string name="search_error_tip_unexpected">Something unexpected happened. Try again later.</string>
 
     <string name="image_placeholder">Image</string>
     <string name="image_not_available">Image not available</string>

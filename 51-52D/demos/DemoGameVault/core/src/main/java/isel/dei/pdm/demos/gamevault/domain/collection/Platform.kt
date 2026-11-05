@@ -12,13 +12,15 @@ import java.time.Year
  * @property name The platform's full name (e.g. PlayStation 5).
  * @property logoUri The URI of the platform's logo, if available.
  * @property ownedSince The year the platform was acquired, if available.
+ * @property version The platform's version (e.g. Pro, Digital Edition), if available.
  */
 data class Platform(
     val id: Long,
     val abbreviation: NonBlankString,
     val name: NonBlankString,
     val logoUri: URI? = null,
-    val ownedSince: Year? = null
+    val ownedSince: Year? = null,
+    val version: NonBlankString? = null
 ) {
     /**
      * Convenience constructor that accepts instrinsic types (String and int).
@@ -30,13 +32,15 @@ data class Platform(
         abbreviation: String,
         name: String,
         logoUri: String? = null,
-        ownedSince: Int? = null
+        ownedSince: Int? = null,
+        version: String? = null
     ) : this(
         id = id,
         abbreviation = NonBlankString(abbreviation),
         name = NonBlankString(name),
         logoUri = logoUri?.let { URI.create(it) },
-        ownedSince = ownedSince?.let { Year.of(it) }
+        ownedSince = ownedSince?.let { Year.of(it) },
+        version = version?.let { NonBlankString(it) }
     )
 }
 
@@ -46,12 +50,14 @@ data class Platform(
  * @property name The platform's full name (e.g. PlayStation 5).
  * @property logoUri The URI of the platform's logo, if available.
  * @property ownedSince The year the platform was acquired, if available.
+ * @property version The platform's version (e.g. Pro, Digital Edition), if available.
  */
 data class NewPlatform(
     val abbreviation: NonBlankString,
     val name: NonBlankString,
     val logoUri: URI? = null,
-    val ownedSince: Year? = null
+    val ownedSince: Year? = null,
+    val version: NonBlankString? = null
 ) {
     /**
      * Convenience constructor that accepts instrinsic types (String and int).
@@ -62,11 +68,13 @@ data class NewPlatform(
         abbreviation: String,
         name: String,
         logoUri: String? = null,
-        ownedSince: Int? = null
+        ownedSince: Int? = null,
+        version: String? = null
     ) : this(
         abbreviation = NonBlankString(abbreviation),
         name = NonBlankString(name),
         logoUri = logoUri?.let { URI.create(it) },
-        ownedSince = ownedSince?.let { Year.of(it) }
+        ownedSince = ownedSince?.let { Year.of(it) },
+        version = version?.let { NonBlankString(it) }
     )
 }

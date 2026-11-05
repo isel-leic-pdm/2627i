@@ -5,6 +5,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import isel.dei.pdm.demos.gamevault.adapters.DataStoreCredentialsRepository
+import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeCredentialsRepository
+import isel.dei.pdm.demos.gamevault.adapters.fakes.FakePlatformCollectionRepository
+import isel.dei.pdm.demos.gamevault.adapters.fakes.FakePlatformSearchService
 import isel.dei.pdm.demos.gamevault.domain.collection.PlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.search.CredentialsRepository
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformSearchService
@@ -29,12 +32,15 @@ class DemoGameVaultApplication : DependenciesContainer, Application() {
     )
 
     override val credentialsRepository: CredentialsRepository by lazy {
-        DataStoreCredentialsRepository(dataStore = credentialsDataStore)
+        // DataStoreCredentialsRepository(dataStore = credentialsDataStore)
+        FakeCredentialsRepository()
     }
 
-    override val platformSearchService: PlatformSearchService
-        get() = TODO("Not yet implemented")
+    override val platformSearchService: PlatformSearchService by lazy {
+        FakePlatformSearchService()
+    }
 
-    override val platformCollectionRepository: PlatformCollectionRepository
-        get() = TODO("Not yet implemented")
+    override val platformCollectionRepository: PlatformCollectionRepository by lazy {
+        FakePlatformCollectionRepository()
+    }
 }
