@@ -1,5 +1,6 @@
 package isel.dei.pdm.demos.gamevault.adapters.fakes
 
+import isel.dei.pdm.demos.gamevault.BuildConfig
 import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
 import isel.dei.pdm.demos.gamevault.domain.search.CredentialsRepository
 import isel.dei.pdm.demos.gamevault.domain.search.Secrets
@@ -57,5 +58,19 @@ class FakeCredentialsRepository(
     override suspend fun saveAccessToken(accessToken: String) {
         delay(200.milliseconds) // simulate a delay
         _accessToken.value = accessToken
+    }
+
+    companion object {
+        /**
+         * Creates a repository initialized with the dev-time credentials defined in local.properties
+         * (igdb.client.id, igdb.client.secret and, optionally, igdb.access.token). They are only
+         * available in debug builds: in release builds, the repository is created empty.
+         * If the access token is absent, the IGDB client obtains one using the secrets.
+         */
+        fun withDevCredentials(): FakeCredentialsRepository = FakeCredentialsRepository(
+            initialSecrets = Secrets(BuildConfig.IGDB_CLIENT_ID, BuildConfig.IGDB_CLIENT_SECRET)
+                .takeIf { it.clientId.isNotBlank() && it.clientSecret.isNotBlank() },
+            initialAccessToken = BuildConfig.IGDB_ACCESS_TOKEN.ifBlank { null }
+        )
     }
 }

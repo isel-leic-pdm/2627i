@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.room)
+    alias(libs.plugins.kotlin.serialization)
     jacoco
 }
 
@@ -32,6 +33,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Empty by default, so that the fields exist in every build type. Only debug builds
+        // override them with the dev-time secrets (see below).
+        buildConfigField("String", "IGDB_CLIENT_ID", "\"\"")
+        buildConfigField("String", "IGDB_CLIENT_SECRET", "\"\"")
+        buildConfigField("String", "IGDB_ACCESS_TOKEN", "\"\"")
     }
 
     buildTypes {
@@ -39,7 +46,7 @@ android {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
 
-            // Dev-time only secrets, loaded from local.properties (not in the repo). They are declared
+            // Dev-time only secrets, loaded from local.properties (not in the repo). They are set
             // only for debug builds so that they are never embedded in release APKs.
             buildConfigField("String", "IGDB_CLIENT_ID", "\"${localProperties.getProperty("igdb.client.id") ?: ""}\"")
             buildConfigField("String", "IGDB_CLIENT_SECRET", "\"${localProperties.getProperty("igdb.client.secret") ?: ""}\"")
@@ -96,10 +103,15 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.auth)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
     testImplementation(kotlin("test"))
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.ktor.client.mock)
 
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

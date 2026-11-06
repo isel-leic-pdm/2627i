@@ -5,11 +5,15 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
 import isel.dei.pdm.demos.gamevault.adapters.datastore.DataStoreCredentialsRepository
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeCredentialsRepository
-import isel.dei.pdm.demos.gamevault.adapters.fakes.FakePlatformCollectionRepository
-import isel.dei.pdm.demos.gamevault.adapters.fakes.FakePlatformSearchService
+import isel.dei.pdm.demos.gamevault.adapters.igdb.IgdbApi
+import isel.dei.pdm.demos.gamevault.adapters.igdb.IgdbPlatformSearchService
+import isel.dei.pdm.demos.gamevault.adapters.igdb.createIgdbHttpClient
 import isel.dei.pdm.demos.gamevault.adapters.room.GameVaultDatabase
+import isel.dei.pdm.demos.gamevault.adapters.room.RoomPlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.collection.PlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.search.CredentialsRepository
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformSearchService
@@ -41,17 +45,29 @@ class DemoGameVaultApplication : DependenciesContainer, Application() {
         Room.databaseBuilder(this, GameVaultDatabase::class.java, GameVaultDatabase.NAME).build()
     }
 
+    /**
+     * The HTTP client used to access IGDB. It is shared by all IGDB services, so that they also
+     * share the access token and the connection pool.
+     */
+    private val igdbHttpClient: HttpClient by lazy {
+        createIgdbHttpClient(engine = OkHttp.create(), credentials = credentialsRepository)
+    }
+
+    private val igdbApi: IgdbApi by lazy {
+        IgdbApi(client = igdbHttpClient, credentials = credentialsRepository)
+    }
+
     override val credentialsRepository: CredentialsRepository by lazy {
         // DataStoreCredentialsRepository(dataStore = credentialsDataStore)
-        FakeCredentialsRepository()
+        // While the settings are not wired, the dev-time credentials from local.properties are used
+        FakeCredentialsRepository.withDevCredentials()
     }
 
     override val platformSearchService: PlatformSearchService by lazy {
-        FakePlatformSearchService()
+        IgdbPlatformSearchService(api = igdbApi)
     }
 
     override val platformCollectionRepository: PlatformCollectionRepository by lazy {
-        // RoomPlatformCollectionRepository(dao = database.platformDao())
-        FakePlatformCollectionRepository()
+        RoomPlatformCollectionRepository(dao = database.platformDao())
     }
 }
