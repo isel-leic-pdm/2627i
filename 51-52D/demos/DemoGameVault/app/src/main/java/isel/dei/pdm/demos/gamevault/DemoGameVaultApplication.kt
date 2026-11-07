@@ -59,7 +59,8 @@ class DemoGameVaultApplication : DependenciesContainer, Application() {
 
     override val credentialsRepository: CredentialsRepository by lazy {
         // DataStoreCredentialsRepository(dataStore = credentialsDataStore)
-        // While the settings are not wired, the dev-time credentials from local.properties are used
+        // For convenience, and while the settings are not wired, we use the dev-time credentials
+        // from local.properties
         FakeCredentialsRepository.withDevCredentials()
     }
 

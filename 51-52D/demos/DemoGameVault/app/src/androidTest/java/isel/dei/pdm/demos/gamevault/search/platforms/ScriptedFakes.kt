@@ -9,8 +9,11 @@ import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformSearchService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import java.util.Collections
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * A [PlatformSearchService] whose searches complete immediately, following a script: the n-th
@@ -39,16 +42,33 @@ class ScriptedPlatformSearchService(
 }
 
 /**
- * A [PlatformCollectionRepository] whose additions complete immediately.
+ * A [PlatformCollectionRepository] whose operations complete immediately.
  * @param addError If not null, the error thrown by every addition. Otherwise, additions succeed.
+ * @param readErrors The errors thrown when collecting [platforms]: the n-th collection throws the
+ * n-th error. Once the list is exhausted, collections succeed.
+ * @param initialPlatforms The platforms initially in the collection.
  */
 class ScriptedPlatformCollectionRepository(
-    private val addError: PersistenceException? = null
+    private val addError: PersistenceException? = null,
+    private val readErrors: List<PersistenceException> = emptyList(),
+    initialPlatforms: List<Platform> = emptyList()
 ) : PlatformCollectionRepository {
 
-    private val _platforms = MutableStateFlow<List<Platform>>(emptyList())
+    private val _platforms = MutableStateFlow(initialPlatforms)
 
-    override val platforms: Flow<List<Platform>> = _platforms
+    /**
+     * The number of times [platforms] was collected. Collections run on the main thread, while
+     * tests read this value from the instrumentation thread.
+     */
+    private val _readCount = AtomicInteger(0)
+
+    val readCount: Int
+        get() = _readCount.get()
+
+    override val platforms: Flow<List<Platform>> = flow {
+        readErrors.getOrNull(_readCount.getAndIncrement())?.let { throw it }
+        emitAll(_platforms)
+    }
 
     override suspend fun add(platform: NewPlatform): Long {
         addError?.let { throw it }

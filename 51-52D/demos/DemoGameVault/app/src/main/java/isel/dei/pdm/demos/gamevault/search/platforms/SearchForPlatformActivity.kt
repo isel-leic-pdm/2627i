@@ -1,5 +1,6 @@
 package isel.dei.pdm.demos.gamevault.search.platforms
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -35,6 +36,12 @@ class SearchForPlatformActivity : ComponentActivity() {
                     onBack = { finish() }
                 )
             }
+        }
+    }
+
+    companion object {
+        fun navigate(from: ComponentActivity) {
+            from.startActivity(Intent(from, SearchForPlatformActivity::class.java))
         }
     }
 }

@@ -17,9 +17,19 @@
     <string name="settings_save_error_tip">Make sure the device has enough free storage space and try again.</string>
     <string name="settings_save_error_button_label">OK</string>
 
+    <string name="platform_collection_title">My Platforms</string>
+    <string name="platform_collection_back_description">Back</string>
+    <string name="platform_collection_add_description">Add platform</string>
+    <string name="platform_collection_loading">Loading platforms…</string>
+    <string name="platform_collection_empty">Your collection has no platforms yet.\nTap + to add one.</string>
+    <string name="platform_collection_error_message">Could not load your platforms.</string>
+    <string name="platform_collection_error_tip_recoverable">The storage is temporarily unavailable.\nWait a moment and try again.</string>
+    <string name="platform_collection_error_tip_unrecoverable">Try again later. If the problem persists, restarting the device may help.</string>
+    <string name="platform_collection_retry_button_label">Retry</string>
+
     <string name="search_box_placeholder">Search …</string>
     <string name="search_platform_title">Add Platform</string>
-    <string name="search_results_label">Available Platforms</string>
+    <string name="search_results_label">Available Platforms in IGDB</string>
     <string name="search_no_platforms_found">No platforms found</string>
     <string name="search_platform_add_description">Add platform</string>
     <string name="search_platform_added_description">Platform in collection</string>
@@ -33,9 +43,9 @@
 
     <string name="search_error_tip_no_connectivity">Check your internet connection and try again.</string>
     <string name="search_error_tip_unauthenticated">Check the IGDB credentials in the settings and try again.</string>
-    <string name="search_error_tip_service_unavailable">The search service is temporarily unavailable. Try again later.</string>
-    <string name="search_error_tip_rate_limit_exceeded">Too many searches in a short time. Wait a moment and try again.</string>
-    <string name="search_error_tip_unexpected">Something unexpected happened. Try again later.</string>
+    <string name="search_error_tip_service_unavailable">The search service is temporarily unavailable.\nTry again later.</string>
+    <string name="search_error_tip_rate_limit_exceeded">Too many searches in a short time.\nWait a moment and try again.</string>
+    <string name="search_error_tip_unexpected">Something unexpected happened.\nTry again later.</string>
 
     <string name="image_placeholder">Image</string>
     <string name="image_not_available">Image not available</string>
