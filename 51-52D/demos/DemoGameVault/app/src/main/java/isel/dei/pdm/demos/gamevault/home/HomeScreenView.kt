@@ -2,10 +2,12 @@ package isel.dei.pdm.demos.gamevault.home
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -19,9 +21,12 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,29 +38,36 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import isel.dei.pdm.demos.gamevault.R
+import isel.dei.pdm.demos.gamevault.domain.RecoverablePersistenceException
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionEntry
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionItem
+import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionSummary
 import isel.dei.pdm.demos.gamevault.domain.collection.games.Game
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayTime
 import isel.dei.pdm.demos.gamevault.domain.collection.games.toItem
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
+import isel.dei.pdm.demos.gamevault.ui.common.DEFAULT_CAROUSEL_HEIGHT
 import isel.dei.pdm.demos.gamevault.ui.common.GameCarousel
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 import java.time.LocalDate
+import java.time.Year
 
 /**
  * The view used to display the home screen contents: the games being played, the collection
- * shortcuts, and the summary of the user's accomplishments.
+ * shortcuts, and the summary of the user's accomplishments. The games being played and the summary
+ * are displayed according to their own states, so that each one can be loading or have failed
+ * independently of the other.
  *
- * DRAFT: Meant to visualize the screen's layout. Its inputs will be replaced by the screen's state.
- *
- * @param playing The items of the collection entries currently being played.
- * @param stats The summary of the user's accomplishments.
+ * @param nowPlaying The state of the games being played.
+ * @param summary The state of the summary of the user's accomplishments.
+ * @param onRetryNowPlaying Callback invoked when the user retries loading the games being played.
+ * @param onRetrySummary Callback invoked when the user retries computing the summary.
  * @param onGameSelected Callback invoked when the user selects a game being played.
  * @param onFilterSelected Callback invoked when the user selects a filter, to browse the
  * collection filtered by it.
@@ -65,8 +77,10 @@ import java.time.LocalDate
  */
 @Composable
 fun HomeScreenView(
-    playing: List<CollectionItem>,
-    stats: HomeStats,
+    nowPlaying: NowPlayingState,
+    summary: SummaryState,
+    onRetryNowPlaying: () -> Unit,
+    onRetrySummary: () -> Unit,
     onGameSelected: (CollectionItem) -> Unit,
     onFilterSelected: (CollectionFilter) -> Unit,
     onBrowseAll: () -> Unit,
@@ -80,21 +94,50 @@ fun HomeScreenView(
             .padding(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        Section(title = stringResource(R.string.home_continue_playing_title)) {
-            ContinuePlaying(
-                playing = playing,
-                onGameSelected = onGameSelected
-            )
+        Section(
+            title = stringResource(R.string.home_continue_playing_title),
+            modifier = Modifier.testTag(HomeScreenViewTestTags.NOW_PLAYING_SECTION)
+        ) {
+            // The region takes the carousel's height in all states, so that the sections below
+            // it do not shift when its state changes (e.g. when loading completes)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(DEFAULT_CAROUSEL_HEIGHT),
+                contentAlignment = Alignment.Center
+            ) {
+                when (nowPlaying) {
+                    NowPlayingState.Loading -> RegionLoading()
+                    is NowPlayingState.Loaded -> ContinuePlaying(
+                        playing = nowPlaying.items,
+                        onGameSelected = onGameSelected,
+                        onPickFromBacklog = {
+                            onFilterSelected(CollectionFilter.InState(PlayStatus.State.BACKLOG))
+                        }
+                    )
+                    is NowPlayingState.Error -> RegionErrorView(onRetry = onRetryNowPlaying)
+                }
+            }
         }
-        Section(title = stringResource(R.string.home_collection_title)) {
+        Section(
+            title = stringResource(R.string.home_collection_title),
+            modifier = Modifier.testTag(HomeScreenViewTestTags.COLLECTION_SECTION)
+        ) {
             CollectionShortcuts(
                 onFilterSelected = onFilterSelected,
                 onBrowseAll = onBrowseAll,
                 onAddGame = onAddGame
             )
         }
-        Section(title = stringResource(R.string.home_summary_title)) {
-            StatsSummary(stats = stats)
+        Section(
+            title = stringResource(R.string.home_summary_title),
+            modifier = Modifier.testTag(HomeScreenViewTestTags.SUMMARY_SECTION)
+        ) {
+            when (summary) {
+                SummaryState.Loading -> RegionLoading()
+                is SummaryState.Loaded -> StatsSummary(summary = summary.summary)
+                is SummaryState.Error -> RegionErrorView(onRetry = onRetrySummary)
+            }
         }
     }
 }
@@ -103,8 +146,12 @@ fun HomeScreenView(
  * A titled section of the home screen.
  */
 @Composable
-private fun Section(title: String, content: @Composable () -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+private fun Section(
+    title: String,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
@@ -115,22 +162,72 @@ private fun Section(title: String, content: @Composable () -> Unit) {
 }
 
 /**
- * The carousel of games being played, or a message if there are none.
+ * The contents of a region of the screen while it is loading.
+ */
+@Composable
+private fun RegionLoading() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+/**
+ * The carousel of games being played or, if there are none, a prompt to pick one from the backlog.
  */
 @Composable
 private fun ContinuePlaying(
     playing: List<CollectionItem>,
-    onGameSelected: (CollectionItem) -> Unit
+    onGameSelected: (CollectionItem) -> Unit,
+    onPickFromBacklog: () -> Unit
 ) {
     if (playing.isEmpty()) {
+        PickFromBacklogPrompt(onPickFromBacklog = onPickFromBacklog)
+    } else {
+        GameCarousel(items = playing, onItemSelected = onGameSelected)
+    }
+}
+
+/**
+ * The prompt displayed when no game is being played, inviting the user to pick one from the
+ * backlog, with a shortcut to browse it.
+ */
+@Composable
+private fun PickFromBacklogPrompt(onPickFromBacklog: () -> Unit) {
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Filled.SportsEsports,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(40.dp)
+        )
         Text(
             text = stringResource(R.string.home_continue_playing_empty),
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-    } else {
-        GameCarousel(items = playing, onItemSelected = onGameSelected)
+        FilledTonalButton(
+            onClick = onPickFromBacklog,
+            contentPadding = ButtonDefaults.ButtonWithIconContentPadding
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Bookmark,
+                contentDescription = null,
+                modifier = Modifier.size(ButtonDefaults.IconSize)
+            )
+            Text(
+                text = stringResource(R.string.home_pick_from_backlog_label),
+                modifier = Modifier.padding(start = ButtonDefaults.IconSpacing)
+            )
+        }
     }
 }
 
@@ -228,7 +325,7 @@ private fun CollectionFilterChip(
  * figures.
  */
 @Composable
-private fun StatsSummary(stats: HomeStats) {
+private fun StatsSummary(summary: CollectionSummary) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -241,19 +338,19 @@ private fun StatsSummary(stats: HomeStats) {
             StatsGroup(
                 title = stringResource(R.string.home_summary_this_year),
                 stats = listOf(
-                    stats.finishedThisYear to stringResource(R.string.home_stat_finished),
-                    stats.replayedThisYear to stringResource(R.string.home_stat_replayed),
-                    stats.platinumThisYear to stringResource(R.string.home_stat_platinum)
+                    summary.finishedInYear to stringResource(R.string.home_stat_finished),
+                    summary.replayedInYear to stringResource(R.string.home_stat_replayed),
+                    summary.platinumInYear to stringResource(R.string.home_stat_platinum)
                 )
             )
             HorizontalDivider()
             StatsGroup(
                 title = stringResource(R.string.home_summary_all_time),
                 stats = listOf(
-                    stats.owned to stringResource(R.string.home_stat_owned),
-                    stats.played to stringResource(R.string.home_stat_played),
-                    stats.finished to stringResource(R.string.home_stat_finished),
-                    stats.platinum to stringResource(R.string.home_stat_platinum)
+                    summary.owned to stringResource(R.string.home_stat_owned),
+                    summary.played to stringResource(R.string.home_stat_played),
+                    summary.finished to stringResource(R.string.home_stat_finished),
+                    summary.platinum to stringResource(R.string.home_stat_platinum)
                 )
             )
         }
@@ -350,8 +447,14 @@ private fun PlayStatus.State.labelResId(): Int =
 
 // Testing & preview utilities
 
+object HomeScreenViewTestTags {
+    const val NOW_PLAYING_SECTION = "HomeNowPlayingSection"
+    const val COLLECTION_SECTION = "HomeCollectionSection"
+    const val SUMMARY_SECTION = "HomeSummarySection"
+}
+
 /**
- * PLACEHOLDER: Sample data used to visualize the home screen, while its state is not defined.
+ * Sample data used to visualize the home screen.
  */
 object HomeScreenSampleData {
     private val ps5 = Platform(1L, "PS5", "PlayStation 5")
@@ -365,18 +468,21 @@ object HomeScreenSampleData {
                 timeSpent = PlayTime(hours, minutes),
                 state = PlayStatus.State.PLAYING
             )
-        ).toItem()
+        )
 
-    val playing = listOf(
+    val entries = listOf(
         playingEntry(1L, "Elden Ring", ps5, 42, 10),
         playingEntry(2L, "The Legend of Zelda: Tears of the Kingdom", switch, 87, 45),
         playingEntry(3L, "Hades II", ps5, 12, 5)
     )
 
-    val stats = HomeStats(
-        finishedThisYear = 6,
-        replayedThisYear = 1,
-        platinumThisYear = 2,
+    val playing = entries.map { it.toItem() }
+
+    val summary = CollectionSummary(
+        year = Year.of(2026),
+        finishedInYear = 6,
+        replayedInYear = 1,
+        platinumInYear = 2,
         owned = 73,
         played = 32,
         finished = 23,
@@ -388,11 +494,16 @@ object HomeScreenSampleData {
 class HomeScreenViewPreviews {
 
     @Composable
-    private fun PreviewOf(playing: List<CollectionItem>) {
+    private fun PreviewOf(
+        nowPlaying: NowPlayingState,
+        summary: SummaryState = SummaryState.Loaded(HomeScreenSampleData.summary)
+    ) {
         DemoGameVaultTheme {
             HomeScreenView(
-                playing = playing,
-                stats = HomeScreenSampleData.stats,
+                nowPlaying = nowPlaying,
+                summary = summary,
+                onRetryNowPlaying = {},
+                onRetrySummary = {},
                 onGameSelected = {},
                 onFilterSelected = {},
                 onBrowseAll = {},
@@ -403,9 +514,27 @@ class HomeScreenViewPreviews {
 
     @Preview(showBackground = true, name = "Playing games")
     @Composable
-    fun PlayingPreview() = PreviewOf(HomeScreenSampleData.playing)
+    fun PlayingPreview() =
+        PreviewOf(NowPlayingState.Loaded(HomeScreenSampleData.playing, hasMore = false))
 
     @Preview(showBackground = true, name = "Nothing being played")
     @Composable
-    fun NothingPlayingPreview() = PreviewOf(emptyList())
+    fun NothingPlayingPreview() = PreviewOf(NowPlayingState.Loaded(emptyList(), hasMore = false))
+
+    @Preview(showBackground = true, name = "Loading")
+    @Composable
+    fun LoadingPreview() = PreviewOf(NowPlayingState.Loading, SummaryState.Loading)
+
+    @Preview(showBackground = true, name = "Summary error")
+    @Composable
+    fun SummaryErrorPreview() = PreviewOf(
+        nowPlaying = NowPlayingState.Loaded(HomeScreenSampleData.playing, hasMore = false),
+        summary = SummaryState.Error(RecoverablePersistenceException())
+    )
+
+    @Preview(showBackground = true, name = "Now playing error")
+    @Composable
+    fun NowPlayingErrorPreview() = PreviewOf(
+        nowPlaying = NowPlayingState.Error(RecoverablePersistenceException())
+    )
 }

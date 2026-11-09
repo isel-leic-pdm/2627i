@@ -22,7 +22,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import isel.dei.pdm.demos.gamevault.R
+import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeGameCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionItem
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 
@@ -32,16 +34,14 @@ import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
  *
  * DRAFT: The callbacks of screens that do not exist yet default to no-ops.
  *
- * @param playing The items of the collection entries currently being played.
- * @param stats The summary of the user's accomplishments.
+ * @param viewModel The view model for the screen.
  * @param onOpenSettings The callback to be invoked when the user requests the settings.
  * @param onOpenPlatforms The callback to be invoked when the user requests the platforms collection.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    playing: List<CollectionItem>,
-    stats: HomeStats,
+    viewModel: HomeViewModel,
     onOpenSettings: () -> Unit,
     onOpenPlatforms: () -> Unit,
     onAddGame: () -> Unit = { },
@@ -49,6 +49,9 @@ fun HomeScreen(
     onFilterSelected: (CollectionFilter) -> Unit = { },
     onBrowseAll: () -> Unit = { }
 ) {
+    val nowPlaying = viewModel.nowPlaying.collectAsStateWithLifecycle().value
+    val summary = viewModel.summary.collectAsStateWithLifecycle().value
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -67,8 +70,10 @@ fun HomeScreen(
         }
     ) { innerPadding ->
         HomeScreenView(
-            playing = playing,
-            stats = stats,
+            nowPlaying = nowPlaying,
+            summary = summary,
+            onRetryNowPlaying = viewModel::onRetryNowPlaying,
+            onRetrySummary = viewModel::onRetrySummary,
             onGameSelected = onGameSelected,
             onFilterSelected = onFilterSelected,
             onBrowseAll = onBrowseAll,
@@ -113,8 +118,7 @@ class HomeScreenPreviews {
     fun HomeScreenPreview() {
         DemoGameVaultTheme {
             HomeScreen(
-                playing = HomeScreenSampleData.playing,
-                stats = HomeScreenSampleData.stats,
+                viewModel = HomeViewModel(FakeGameCollectionRepository(HomeScreenSampleData.entries)),
                 onOpenSettings = {},
                 onOpenPlatforms = {}
             )

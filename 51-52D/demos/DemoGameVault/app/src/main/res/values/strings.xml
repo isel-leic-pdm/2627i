@@ -9,6 +9,7 @@
     <string name="home_add_game_label">Add game</string>
     <string name="home_continue_playing_title">Continue playing</string>
     <string name="home_continue_playing_empty">You are not playing anything right now.</string>
+    <string name="home_pick_from_backlog_label">Pick one from your backlog</string>
     <string name="home_collection_title">My collection</string>
     <string name="home_browse_all_label">Browse all</string>
     <string name="home_summary_title">Summary</string>
@@ -19,6 +20,9 @@
     <string name="home_stat_finished">finished</string>
     <string name="home_stat_replayed">replayed</string>
     <string name="home_stat_platinum">platinum</string>
+    <string name="home_region_error_message">Could not read your collection.</string>
+    <string name="home_region_error_tip">If this keeps happening, free up some storage space and restart the device.</string>
+    <string name="home_retry_button_label">Retry</string>
 
     <string name="play_status_none">None</string>
     <string name="play_status_backlog">Backlog</string>

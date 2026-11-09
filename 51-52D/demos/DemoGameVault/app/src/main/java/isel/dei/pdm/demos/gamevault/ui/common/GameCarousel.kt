@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import isel.dei.pdm.demos.gamevault.R
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionEntry
@@ -50,6 +51,13 @@ import java.time.LocalDate
  * chooses a very large font size. The full information is available in the game's screen.
  */
 const val MAX_OVERLAY_FONT_SCALE = 1.3f
+
+/**
+ * The carousel's height, unless one is specified through its modifier. Exposed so that the
+ * contents displayed in its place (e.g. while loading) can take the same space, preventing the
+ * layout from shifting when they are replaced by the carousel.
+ */
+val DEFAULT_CAROUSEL_HEIGHT: Dp = 220.dp
 
 /**
  * A carousel of collection items, each displayed as the game's cover with its name, platform
@@ -77,7 +85,7 @@ fun GameCarousel(
         contentPadding = contentPadding,
         modifier = modifier
             .fillMaxWidth()
-            .height(220.dp)
+            .height(DEFAULT_CAROUSEL_HEIGHT)
             .testTag(GameCarouselTestTags.CAROUSEL)
     ) { index ->
         val item = items[index]

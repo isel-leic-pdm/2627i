@@ -1,5 +1,6 @@
 package isel.dei.pdm.demos.gamevault
 
+import isel.dei.pdm.demos.gamevault.domain.collection.games.GameCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.search.CredentialsRepository
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformSearchService
@@ -22,4 +23,9 @@ interface DependenciesContainer {
      * The platform collection repository to be used by the app.
      */
     val platformCollectionRepository: PlatformCollectionRepository
+
+    /**
+     * The game collection repository to be used by the app.
+     */
+    val gameCollectionRepository: GameCollectionRepository
 }

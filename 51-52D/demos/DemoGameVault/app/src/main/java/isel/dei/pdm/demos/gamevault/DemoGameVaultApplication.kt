@@ -9,12 +9,15 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import isel.dei.pdm.demos.gamevault.adapters.datastore.DataStoreCredentialsRepository
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeCredentialsRepository
+import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeGameCollectionRepository
 import isel.dei.pdm.demos.gamevault.adapters.igdb.IgdbApi
 import isel.dei.pdm.demos.gamevault.adapters.igdb.IgdbPlatformSearchService
 import isel.dei.pdm.demos.gamevault.adapters.igdb.createIgdbHttpClient
 import isel.dei.pdm.demos.gamevault.adapters.room.GameVaultDatabase
 import isel.dei.pdm.demos.gamevault.adapters.room.RoomPlatformCollectionRepository
+import isel.dei.pdm.demos.gamevault.domain.collection.games.GameCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
+import isel.dei.pdm.demos.gamevault.home.HomeScreenSampleData
 import isel.dei.pdm.demos.gamevault.domain.search.CredentialsRepository
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformSearchService
 
@@ -70,5 +73,12 @@ class DemoGameVaultApplication : DependenciesContainer, Application() {
 
     override val platformCollectionRepository: PlatformCollectionRepository by lazy {
         RoomPlatformCollectionRepository(dao = database.platformDao())
+    }
+
+    override val gameCollectionRepository: GameCollectionRepository by lazy {
+        // TODO: Replace with the Room based implementation, once it exists. Meanwhile, the fake
+        //  (which is confined to the main thread) is seeded with sample data, so that the home
+        //  screen has something to display
+        FakeGameCollectionRepository(initialEntries = HomeScreenSampleData.entries)
     }
 }
