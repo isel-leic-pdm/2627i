@@ -32,5 +32,5 @@ interface GameSearchService {
      * @return The game details, or null if not found.
      * @throws SearchServiceException If the details cannot be fetched.
      */
-    suspend fun fetchGameDetails(gameId: Long): GameDetails?
+    suspend fun fetchGameDetails(gameId: Long): GameInfoDetails?
 }

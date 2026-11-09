@@ -142,7 +142,7 @@ class GameInfoTests {
     }
 
     @Test
-    fun `GameDetails holds game and detailed properties`() {
+    fun `GameInfoDetails holds game and detailed properties`() {
         // Arrange
         val game = GameInfo(id = 1L, name = "Elden Ring")
         val expectedDescription = "An action RPG game"
@@ -151,7 +151,7 @@ class GameInfoTests {
         val expectedGenres = listOf("Action", "RPG")
 
         // Act
-        val details = GameDetails(
+        val details = GameInfoDetails(
             game = game,
             description = expectedDescription,
             developers = expectedDevelopers,

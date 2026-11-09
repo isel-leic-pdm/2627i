@@ -14,7 +14,7 @@ import isel.dei.pdm.demos.gamevault.adapters.igdb.IgdbPlatformSearchService
 import isel.dei.pdm.demos.gamevault.adapters.igdb.createIgdbHttpClient
 import isel.dei.pdm.demos.gamevault.adapters.room.GameVaultDatabase
 import isel.dei.pdm.demos.gamevault.adapters.room.RoomPlatformCollectionRepository
-import isel.dei.pdm.demos.gamevault.domain.collection.PlatformCollectionRepository
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.search.CredentialsRepository
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformSearchService
 

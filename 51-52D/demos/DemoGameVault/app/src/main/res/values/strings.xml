@@ -1,6 +1,36 @@
 <resources>
     <string name="app_name">DemoGameVault</string>
 
+    <string name="home_title">Game Vault</string>
+
+    <string name="home_settings_description">Settings</string>
+    <string name="home_more_options_description">More options</string>
+    <string name="home_platforms_menu_label">My Platforms</string>
+    <string name="home_add_game_label">Add game</string>
+    <string name="home_continue_playing_title">Continue playing</string>
+    <string name="home_continue_playing_empty">You are not playing anything right now.</string>
+    <string name="home_collection_title">My collection</string>
+    <string name="home_browse_all_label">Browse all</string>
+    <string name="home_summary_title">Summary</string>
+    <string name="home_summary_this_year">This year</string>
+    <string name="home_summary_all_time">All time</string>
+    <string name="home_stat_owned">owned</string>
+    <string name="home_stat_played">played</string>
+    <string name="home_stat_finished">finished</string>
+    <string name="home_stat_replayed">replayed</string>
+    <string name="home_stat_platinum">platinum</string>
+
+    <string name="play_status_none">None</string>
+    <string name="play_status_backlog">Backlog</string>
+    <string name="play_status_playing">Playing</string>
+    <string name="play_status_paused">Paused</string>
+    <string name="play_status_finished">Finished</string>
+    <string name="play_status_dropped">Dropped</string>
+
+    <!-- All the game's achievements (e.g. trophies) were obtained. The term is platform specific,
+         so it is to become a user preference. -->
+    <string name="accomplishment_platinum">Platinum</string>
+
     <string name="settings_title">API Configuration</string>
     <string name="settings_client_id_label">IGDB Client ID</string>
     <string name="settings_client_secret_label">IGDB Client Secret</string>
@@ -46,6 +76,8 @@
     <string name="search_error_tip_service_unavailable">The search service is temporarily unavailable.\nTry again later.</string>
     <string name="search_error_tip_rate_limit_exceeded">Too many searches in a short time.\nWait a moment and try again.</string>
     <string name="search_error_tip_unexpected">Something unexpected happened.\nTry again later.</string>
+
+    <string name="game_card_platform_and_play_time">%1$s · %2$d h %3$02d min</string>
 
     <string name="image_placeholder">Image</string>
     <string name="image_not_available">Image not available</string>

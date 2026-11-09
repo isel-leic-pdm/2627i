@@ -21,7 +21,7 @@ import isel.dei.pdm.demos.gamevault.R
 import isel.dei.pdm.demos.gamevault.collection.platforms.PlatformCollectionScreenViewTestTags.EMPTY_MESSAGE_TAG
 import isel.dei.pdm.demos.gamevault.collection.platforms.PlatformCollectionScreenViewTestTags.LOADING_INDICATOR_TAG
 import isel.dei.pdm.demos.gamevault.collection.platforms.PlatformCollectionScreenViewTestTags.PLATFORM_LIST_TAG
-import isel.dei.pdm.demos.gamevault.domain.collection.Platform
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.ui.common.LabelledProgressIndicator
 import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItem
 import isel.dei.pdm.demos.gamevault.ui.common.toListItemModel

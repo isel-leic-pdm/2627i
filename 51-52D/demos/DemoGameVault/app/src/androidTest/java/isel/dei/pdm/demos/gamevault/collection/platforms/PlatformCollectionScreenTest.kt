@@ -14,8 +14,8 @@ import isel.dei.pdm.demos.gamevault.collection.platforms.PlatformCollectionScree
 import isel.dei.pdm.demos.gamevault.collection.platforms.PlatformCollectionScreenViewTestTags.LOADING_INDICATOR_TAG
 import isel.dei.pdm.demos.gamevault.domain.RecoverablePersistenceException
 import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
-import isel.dei.pdm.demos.gamevault.domain.collection.Platform
-import isel.dei.pdm.demos.gamevault.domain.collection.PlatformCollectionRepository
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.search.platforms.ScriptedPlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.ui.common.ErrorViewOverlayTestTags
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme

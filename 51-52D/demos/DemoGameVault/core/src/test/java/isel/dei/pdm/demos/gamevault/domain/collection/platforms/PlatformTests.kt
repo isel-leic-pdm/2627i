@@ -1,6 +1,7 @@
-package isel.dei.pdm.demos.gamevault.domain.collection
+package isel.dei.pdm.demos.gamevault.domain.collection.platforms
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
+import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
 import java.net.URI
 import java.time.Year
 import kotlin.test.Test
@@ -9,6 +10,8 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
 class PlatformTests {
+
+    private val igdbSource = SourceReference(SourceReference.Provider.IGDB, NonBlankString("167"))
 
     // Platform
 
@@ -21,6 +24,7 @@ class PlatformTests {
         assertNull(platform.logoUri)
         assertNull(platform.ownedSince)
         assertNull(platform.version)
+        assertNull(platform.source)
     }
 
     @Test
@@ -32,10 +36,12 @@ class PlatformTests {
             name = "PlayStation 5",
             logoUri = "https://example.com/ps5.png",
             ownedSince = 2020,
-            version = "Digital Edition"
+            version = "Digital Edition",
+            source = igdbSource
         )
 
         // Assert
+        assertEquals(igdbSource, platform.source)
         assertEquals(1L, platform.id)
         assertEquals(NonBlankString("PS5"), platform.abbreviation)
         assertEquals(NonBlankString("PlayStation 5"), platform.name)
@@ -53,6 +59,7 @@ class PlatformTests {
         assertNull(platform.logoUri)
         assertNull(platform.ownedSince)
         assertNull(platform.version)
+        assertNull(platform.source)
     }
 
     @Test
@@ -94,6 +101,7 @@ class PlatformTests {
         assertNull(newPlatform.logoUri)
         assertNull(newPlatform.ownedSince)
         assertNull(newPlatform.version)
+        assertNull(newPlatform.source)
     }
 
     @Test
@@ -104,10 +112,12 @@ class PlatformTests {
             name = "Nintendo Switch",
             logoUri = "https://example.com/switch.png",
             ownedSince = 2021,
-            version = "OLED"
+            version = "OLED",
+            source = igdbSource
         )
 
         // Assert
+        assertEquals(igdbSource, newPlatform.source)
         assertEquals(NonBlankString("NSW"), newPlatform.abbreviation)
         assertEquals(NonBlankString("Nintendo Switch"), newPlatform.name)
         assertEquals(URI.create("https://example.com/switch.png"), newPlatform.logoUri)
@@ -124,6 +134,7 @@ class PlatformTests {
         assertNull(newPlatform.logoUri)
         assertNull(newPlatform.ownedSince)
         assertNull(newPlatform.version)
+        assertNull(newPlatform.source)
     }
 
     @Test

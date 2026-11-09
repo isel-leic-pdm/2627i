@@ -1,7 +1,7 @@
 package isel.dei.pdm.demos.gamevault.collection.platforms
 
 import isel.dei.pdm.demos.gamevault.domain.PersistenceException
-import isel.dei.pdm.demos.gamevault.domain.collection.Platform
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 
 /**
  * Represents the possible states of the platform collection screen.

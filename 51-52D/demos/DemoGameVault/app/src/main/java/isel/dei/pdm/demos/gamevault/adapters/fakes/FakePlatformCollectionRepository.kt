@@ -1,8 +1,8 @@
 package isel.dei.pdm.demos.gamevault.adapters.fakes
 
-import isel.dei.pdm.demos.gamevault.domain.collection.NewPlatform
-import isel.dei.pdm.demos.gamevault.domain.collection.Platform
-import isel.dei.pdm.demos.gamevault.domain.collection.PlatformCollectionRepository
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.NewPlatform
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +25,8 @@ class FakePlatformCollectionRepository : PlatformCollectionRepository {
             name = platform.name,
             logoUri = platform.logoUri,
             ownedSince = platform.ownedSince,
-            version = platform.version
+            version = platform.version,
+            source = platform.source
         )
         _platforms.emit(_platforms.value + created)
         return newId

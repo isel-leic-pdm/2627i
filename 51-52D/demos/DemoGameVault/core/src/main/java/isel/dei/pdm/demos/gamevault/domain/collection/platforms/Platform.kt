@@ -1,6 +1,7 @@
-package isel.dei.pdm.demos.gamevault.domain.collection
+package isel.dei.pdm.demos.gamevault.domain.collection.platforms
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
+import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
 import java.net.URI
 import java.time.Year
 
@@ -13,6 +14,9 @@ import java.time.Year
  * @property logoUri The URI of the platform's logo, if available.
  * @property ownedSince The year the platform was acquired, if available.
  * @property version The platform's version (e.g. Pro, Digital Edition), if available.
+ * @property source The source from which the platform was obtained, or null if inserted manually.
+ * Note that it does not identify the platform: different versions of a platform may share the
+ * same source reference (e.g. IGDB uses the same identifier for PlayStation 5 and its Pro version).
  */
 data class Platform(
     val id: Long,
@@ -20,7 +24,8 @@ data class Platform(
     val name: NonBlankString,
     val logoUri: URI? = null,
     val ownedSince: Year? = null,
-    val version: NonBlankString? = null
+    val version: NonBlankString? = null,
+    val source: SourceReference? = null
 ) {
     /**
      * Convenience constructor that accepts instrinsic types (String and int).
@@ -33,14 +38,16 @@ data class Platform(
         name: String,
         logoUri: String? = null,
         ownedSince: Int? = null,
-        version: String? = null
+        version: String? = null,
+        source: SourceReference? = null
     ) : this(
         id = id,
         abbreviation = NonBlankString(abbreviation),
         name = NonBlankString(name),
         logoUri = logoUri?.let { URI.create(it) },
         ownedSince = ownedSince?.let { Year.of(it) },
-        version = version?.let { NonBlankString(it) }
+        version = version?.let { NonBlankString(it) },
+        source = source
     )
 }
 
@@ -51,13 +58,15 @@ data class Platform(
  * @property logoUri The URI of the platform's logo, if available.
  * @property ownedSince The year the platform was acquired, if available.
  * @property version The platform's version (e.g. Pro, Digital Edition), if available.
+ * @property source The source from which the platform was obtained, or null if inserted manually.
  */
 data class NewPlatform(
     val abbreviation: NonBlankString,
     val name: NonBlankString,
     val logoUri: URI? = null,
     val ownedSince: Year? = null,
-    val version: NonBlankString? = null
+    val version: NonBlankString? = null,
+    val source: SourceReference? = null
 ) {
     /**
      * Convenience constructor that accepts instrinsic types (String and int).
@@ -69,12 +78,14 @@ data class NewPlatform(
         name: String,
         logoUri: String? = null,
         ownedSince: Int? = null,
-        version: String? = null
+        version: String? = null,
+        source: SourceReference? = null
     ) : this(
         abbreviation = NonBlankString(abbreviation),
         name = NonBlankString(name),
         logoUri = logoUri?.let { URI.create(it) },
         ownedSince = ownedSince?.let { Year.of(it) },
-        version = version?.let { NonBlankString(it) }
+        version = version?.let { NonBlankString(it) },
+        source = source
     )
 }

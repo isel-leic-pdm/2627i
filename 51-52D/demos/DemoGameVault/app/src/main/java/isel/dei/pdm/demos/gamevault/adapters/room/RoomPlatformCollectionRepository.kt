@@ -5,9 +5,9 @@ import android.database.sqlite.SQLiteException
 import isel.dei.pdm.demos.gamevault.domain.PersistenceException
 import isel.dei.pdm.demos.gamevault.domain.RecoverablePersistenceException
 import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
-import isel.dei.pdm.demos.gamevault.domain.collection.NewPlatform
-import isel.dei.pdm.demos.gamevault.domain.collection.Platform
-import isel.dei.pdm.demos.gamevault.domain.collection.PlatformCollectionRepository
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.NewPlatform
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map

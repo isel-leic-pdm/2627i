@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "71078231e3b91dbe4baee0a4bed788a8",
+    "identityHash": "da4ab5a6811bf15fc5d6cbaef88562f2",
     "entities": [
       {
         "tableName": "platforms",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `abbreviation` TEXT NOT NULL COLLATE NOCASE, `name` TEXT NOT NULL COLLATE NOCASE, `version` TEXT NOT NULL COLLATE NOCASE, `logo_uri` TEXT, `owned_since` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `abbreviation` TEXT NOT NULL COLLATE NOCASE, `name` TEXT NOT NULL COLLATE NOCASE, `version` TEXT NOT NULL COLLATE NOCASE, `logo_uri` TEXT, `owned_since` INTEGER, `source_provider` TEXT, `source_id` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -41,6 +41,16 @@
             "fieldPath": "ownedSince",
             "columnName": "owned_since",
             "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "sourceProvider",
+            "columnName": "source_provider",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sourceId",
+            "columnName": "source_id",
+            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -66,7 +76,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '71078231e3b91dbe4baee0a4bed788a8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'da4ab5a6811bf15fc5d6cbaef88562f2')"
     ]
   }
 }

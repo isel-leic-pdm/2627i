@@ -9,7 +9,7 @@ import isel.dei.pdm.demos.gamevault.collection.platforms.PlatformCollectionScree
 import isel.dei.pdm.demos.gamevault.collection.platforms.PlatformCollectionScreenState.Loading
 import isel.dei.pdm.demos.gamevault.collection.platforms.PlatformCollectionScreenState.Results
 import isel.dei.pdm.demos.gamevault.domain.PersistenceException
-import isel.dei.pdm.demos.gamevault.domain.collection.PlatformCollectionRepository
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

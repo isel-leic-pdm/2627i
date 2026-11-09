@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.domain.collection
+package isel.dei.pdm.demos.gamevault.domain.collection.platforms
 
 import isel.dei.pdm.demos.gamevault.domain.PersistenceException
 import kotlinx.coroutines.flow.Flow

@@ -2,11 +2,14 @@ package isel.dei.pdm.demos.gamevault.search.platforms
 
 import androidx.lifecycle.SavedStateHandle
 import isel.dei.pdm.demos.gamevault.MainDispatcherRule
+import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.PersistenceException
 import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
-import isel.dei.pdm.demos.gamevault.domain.collection.NewPlatform
-import isel.dei.pdm.demos.gamevault.domain.collection.Platform
-import isel.dei.pdm.demos.gamevault.domain.collection.PlatformCollectionRepository
+import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
+import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference.Provider.IGDB
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.NewPlatform
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.search.NoConnectivityException
 import isel.dei.pdm.demos.gamevault.domain.search.SearchString
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
@@ -546,6 +549,7 @@ class SearchForPlatformViewModelTest {
         assertEquals(PS5_PRO.abbreviation, added.abbreviation)
         assertEquals(PS5_PRO.version, added.version)
         assertEquals(PS5_PRO.logoUri, added.logoUri)
+        assertEquals(SourceReference(IGDB, NonBlankString("5")), added.source)
     }
 
     @Test
@@ -780,7 +784,8 @@ class ControlledPlatformCollectionRepository(
                 name = platform.name,
                 logoUri = platform.logoUri,
                 ownedSince = platform.ownedSince,
-                version = platform.version
+                version = platform.version,
+                source = platform.source
             )
         }
         return id

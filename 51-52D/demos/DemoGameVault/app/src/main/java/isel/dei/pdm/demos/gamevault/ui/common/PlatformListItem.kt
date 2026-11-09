@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import isel.dei.pdm.demos.gamevault.R
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
-import isel.dei.pdm.demos.gamevault.domain.collection.Platform
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 import java.net.URI

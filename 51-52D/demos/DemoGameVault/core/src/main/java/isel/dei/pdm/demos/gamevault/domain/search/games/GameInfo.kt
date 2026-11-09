@@ -52,14 +52,16 @@ data class GameInfo(
 }
 
 /**
- * Represents the full set of information shown on the details screen.
+ * Represents the detailed game information as provided by the game search service. It is shown to
+ * the user to help deciding whether this is the game to add to the collection. Once added, the
+ * vault keeps its own copy of the details (see the collection's GameDetails).
  * @property game The basic game information.
  * @property description A summary or description of the game.
  * @property developers The developers of the game.
  * @property publishers The publishers of the game.
  * @property genres The genres of the game.
  */
-data class GameDetails(
+data class GameInfoDetails(
     val game: GameInfo,
     val description: String?,
     val developers: List<String>,

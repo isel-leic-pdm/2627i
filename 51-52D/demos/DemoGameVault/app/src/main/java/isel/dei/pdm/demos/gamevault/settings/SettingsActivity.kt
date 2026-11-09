@@ -1,5 +1,6 @@
 package isel.dei.pdm.demos.gamevault.settings
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -34,6 +35,12 @@ class SettingsActivity : ComponentActivity() {
                     onBack = { finish() }
                 )
             }
+        }
+    }
+
+    companion object {
+        fun navigate(from: ComponentActivity) {
+            from.startActivity(Intent(from, SettingsActivity::class.java))
         }
     }
 }

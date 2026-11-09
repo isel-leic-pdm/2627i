@@ -19,7 +19,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.test.platform.app.InstrumentationRegistry
 import isel.dei.pdm.demos.gamevault.R
 import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
-import isel.dei.pdm.demos.gamevault.domain.collection.PlatformCollectionRepository
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.search.NoConnectivityException
 import isel.dei.pdm.demos.gamevault.domain.search.RateLimitExceededException
 import isel.dei.pdm.demos.gamevault.domain.search.SearchServiceException

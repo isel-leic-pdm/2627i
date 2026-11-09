@@ -1,9 +1,9 @@
 package isel.dei.pdm.demos.gamevault.search.platforms
 
 import isel.dei.pdm.demos.gamevault.domain.PersistenceException
-import isel.dei.pdm.demos.gamevault.domain.collection.NewPlatform
-import isel.dei.pdm.demos.gamevault.domain.collection.Platform
-import isel.dei.pdm.demos.gamevault.domain.collection.PlatformCollectionRepository
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.NewPlatform
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.search.SearchString
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformSearchService
@@ -80,7 +80,8 @@ class ScriptedPlatformCollectionRepository(
                 name = platform.name,
                 logoUri = platform.logoUri,
                 ownedSince = platform.ownedSince,
-                version = platform.version
+                version = platform.version,
+                source = platform.source
             )
         }
         return id

@@ -3,9 +3,11 @@ package isel.dei.pdm.demos.gamevault.adapters.room
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
-import isel.dei.pdm.demos.gamevault.domain.collection.NewPlatform
-import isel.dei.pdm.demos.gamevault.domain.collection.Platform
+import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.NewPlatform
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
@@ -73,6 +75,27 @@ class RoomPlatformCollectionRepositoryTest {
             ownedSince = 2021
         )
         assertEquals(expected, sut.getById(id))
+    }
+
+    @Test
+    fun add_platform_with_source_persists_the_source() = runTest {
+        // Arrange
+        val source = SourceReference(SourceReference.Provider.IGDB, NonBlankString("167"))
+
+        // Act
+        val id = sut.add(ps5Pro.copy(source = source))
+
+        // Assert
+        assertEquals(source, sut.getById(id)?.source)
+    }
+
+    @Test
+    fun add_platform_without_source_persists_no_source() = runTest {
+        // Act
+        val id = sut.add(switch)
+
+        // Assert
+        assertNull(sut.getById(id)?.source)
     }
 
     @Test
@@ -207,6 +230,22 @@ class RoomPlatformCollectionRepositoryTest {
         // Arrange
         database.openHelper.writableDatabase.execSQL(
             "INSERT INTO platforms (abbreviation, name, version) VALUES ('X', '  ', '')"
+        )
+
+        // Act & Assert
+        try {
+            sut.getAll()
+            fail("Expected UnrecoverablePersistenceException")
+        } catch (_: UnrecoverablePersistenceException) {
+        }
+    }
+
+    @Test
+    fun corrupted_stored_source_is_reported_as_unrecoverable() = runTest {
+        // Arrange - An unknown provider
+        database.openHelper.writableDatabase.execSQL(
+            "INSERT INTO platforms (abbreviation, name, version, source_provider, source_id) " +
+                "VALUES ('X', 'Xbox', '', 'UNKNOWN', '42')"
         )
 
         // Act & Assert

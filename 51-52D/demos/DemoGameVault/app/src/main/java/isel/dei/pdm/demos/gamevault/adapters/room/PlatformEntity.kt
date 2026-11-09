@@ -4,8 +4,10 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import isel.dei.pdm.demos.gamevault.domain.collection.NewPlatform
-import isel.dei.pdm.demos.gamevault.domain.collection.Platform
+import isel.dei.pdm.demos.gamevault.domain.NonBlankString
+import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.NewPlatform
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 
 /**
  * The database representation of a platform in the user's collection.
@@ -20,6 +22,9 @@ import isel.dei.pdm.demos.gamevault.domain.collection.Platform
  * @property version The platform's version (e.g. Pro), or empty if it has none.
  * @property logoUri The URI of the platform's logo, if available.
  * @property ownedSince The year the platform was acquired, if available.
+ * @property sourceProvider The name of the provider the platform was obtained from (see
+ * [SourceReference.Provider]), or null if inserted manually.
+ * @property sourceId The platform's identifier in that provider, or null if inserted manually.
  */
 @Entity(
     tableName = "platforms",
@@ -37,7 +42,11 @@ data class PlatformEntity(
     @ColumnInfo(name = "logo_uri")
     val logoUri: String?,
     @ColumnInfo(name = "owned_since")
-    val ownedSince: Int?
+    val ownedSince: Int?,
+    @ColumnInfo(name = "source_provider")
+    val sourceProvider: String? = null,
+    @ColumnInfo(name = "source_id")
+    val sourceId: String? = null
 )
 
 /**
@@ -48,7 +57,9 @@ fun NewPlatform.toEntity(): PlatformEntity = PlatformEntity(
     name = name.value,
     version = version?.value.orEmpty(),
     logoUri = logoUri?.toString(),
-    ownedSince = ownedSince?.value
+    ownedSince = ownedSince?.value,
+    sourceProvider = source?.provider?.name,
+    sourceId = source?.externalId?.value
 )
 
 /**
@@ -61,5 +72,21 @@ fun PlatformEntity.toPlatform(): Platform = Platform(
     name = name,
     logoUri = logoUri,
     ownedSince = ownedSince,
-    version = version.ifEmpty { null }
+    version = version.ifEmpty { null },
+    source = toSourceReference()
 )
+
+/**
+ * Converts the stored source columns to the corresponding source reference. Both columns are
+ * expected to be either filled or null.
+ * @throws IllegalArgumentException if the stored data does not meet the domain requirements.
+ */
+private fun PlatformEntity.toSourceReference(): SourceReference? {
+    if (sourceProvider == null && sourceId == null) return null
+    requireNotNull(sourceProvider) { "Source identifier stored without provider" }
+    requireNotNull(sourceId) { "Source provider stored without identifier" }
+    return SourceReference(
+        provider = SourceReference.Provider.valueOf(sourceProvider),
+        externalId = NonBlankString(sourceId)
+    )
+}
