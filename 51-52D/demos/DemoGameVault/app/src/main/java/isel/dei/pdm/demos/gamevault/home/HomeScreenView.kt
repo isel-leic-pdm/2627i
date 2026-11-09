@@ -39,10 +39,10 @@ import androidx.compose.ui.unit.dp
 import isel.dei.pdm.demos.gamevault.R
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionEntry
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionItem
-import isel.dei.pdm.demos.gamevault.domain.collection.games.toItem
 import isel.dei.pdm.demos.gamevault.domain.collection.games.Game
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayTime
+import isel.dei.pdm.demos.gamevault.domain.collection.games.toItem
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.ui.common.GameCarousel
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
