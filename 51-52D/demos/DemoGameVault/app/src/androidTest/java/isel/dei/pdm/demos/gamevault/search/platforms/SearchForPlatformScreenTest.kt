@@ -35,7 +35,7 @@ import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformViewModel.
 import isel.dei.pdm.demos.gamevault.ui.common.ErrorViewOverlayTestTags
 import isel.dei.pdm.demos.gamevault.ui.common.ImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
-import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItemTestTags
+import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItemViewTestTags
 import isel.dei.pdm.demos.gamevault.ui.common.SearchBoxTestTags
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 import org.junit.Assert.assertEquals
@@ -270,7 +270,7 @@ class SearchForPlatformScreenTest {
         composeTestRule.onNodeWithText(PS4.name.value).performClick()
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.ADDED_ICON, useUnmergedTree = true)
+            .onNodeWithTag(PlatformListItemViewTestTags.ADDED_ICON, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 

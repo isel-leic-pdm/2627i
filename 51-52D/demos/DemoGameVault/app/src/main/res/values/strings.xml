@@ -82,6 +82,8 @@
     <string name="search_error_tip_unexpected">Something unexpected happened.\nTry again later.</string>
 
     <string name="game_card_platform_and_play_time">%1$s · %2$d h %3$02d min</string>
+    <string name="collection_item_play_time">%1$d h</string>
+    <string name="collection_item_play_time_minutes">%1$d min</string>
 
     <string name="image_placeholder">Image</string>
     <string name="image_not_available">Image not available</string>

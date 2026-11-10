@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.ui.common
+package isel.dei.pdm.demos.gamevault.home
 
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableFloatStateOf

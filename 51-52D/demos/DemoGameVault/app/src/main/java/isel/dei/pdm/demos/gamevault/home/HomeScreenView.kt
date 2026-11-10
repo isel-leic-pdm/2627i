@@ -15,12 +15,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.Flag
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ButtonDefaults
@@ -52,8 +46,11 @@ import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayTime
 import isel.dei.pdm.demos.gamevault.domain.collection.games.toItem
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
-import isel.dei.pdm.demos.gamevault.ui.common.DEFAULT_CAROUSEL_HEIGHT
-import isel.dei.pdm.demos.gamevault.ui.common.GameCarousel
+import isel.dei.pdm.demos.gamevault.collection.games.color
+import isel.dei.pdm.demos.gamevault.collection.games.icon
+import isel.dei.pdm.demos.gamevault.collection.games.PlatinumIcon
+import isel.dei.pdm.demos.gamevault.collection.games.labelResId
+import isel.dei.pdm.demos.gamevault.collection.games.platinumColor
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 import java.time.LocalDate
 import java.time.Year
@@ -219,7 +216,7 @@ private fun PickFromBacklogPrompt(onPickFromBacklog: () -> Unit) {
             contentPadding = ButtonDefaults.ButtonWithIconContentPadding
         ) {
             Icon(
-                imageVector = Icons.Filled.Bookmark,
+                imageVector = PlayStatus.State.BACKLOG.icon(),
                 contentDescription = null,
                 modifier = Modifier.size(ButtonDefaults.IconSize)
             )
@@ -394,16 +391,8 @@ private fun Stat(value: String, label: String) {
  */
 private fun CollectionFilter.icon(): ImageVector =
     when (this) {
-        is CollectionFilter.InState -> when (state) {
-            PlayStatus.State.PLAYING -> Icons.Filled.PlayArrow
-            PlayStatus.State.BACKLOG -> Icons.Filled.Bookmark
-            PlayStatus.State.PAUSED -> Icons.Filled.Pause
-            PlayStatus.State.FINISHED -> Icons.Filled.Flag
-            PlayStatus.State.DROPPED -> Icons.Filled.Block
-            // Not offered as a shortcut
-            PlayStatus.State.NONE -> Icons.Filled.Bookmark
-        }
-        CollectionFilter.WithPlatinum -> Icons.Filled.EmojiEvents
+        is CollectionFilter.InState -> state.icon()
+        CollectionFilter.WithPlatinum -> PlatinumIcon
     }
 
 /**
@@ -414,9 +403,8 @@ private fun CollectionFilter.icon(): ImageVector =
 @Composable
 private fun CollectionFilter.iconColor(): Color =
     when (this) {
-        CollectionFilter.InState(PlayStatus.State.PLAYING) -> MaterialTheme.colorScheme.primary
-        CollectionFilter.WithPlatinum -> MaterialTheme.colorScheme.tertiary
-        else -> MaterialTheme.colorScheme.onSurfaceVariant
+        is CollectionFilter.InState -> state.color()
+        CollectionFilter.WithPlatinum -> platinumColor()
     }
 
 /**
@@ -429,20 +417,6 @@ private fun CollectionFilter.labelResId(): Int =
         // TODO: The term used for platinum (e.g. Platinum, All achievements) is to become a user
         //  preference, as it is platform specific
         CollectionFilter.WithPlatinum -> R.string.accomplishment_platinum
-    }
-
-/**
- * The label displayed to the user for each play status.
- */
-@StringRes
-private fun PlayStatus.State.labelResId(): Int =
-    when (this) {
-        PlayStatus.State.NONE -> R.string.play_status_none
-        PlayStatus.State.BACKLOG -> R.string.play_status_backlog
-        PlayStatus.State.PLAYING -> R.string.play_status_playing
-        PlayStatus.State.PAUSED -> R.string.play_status_paused
-        PlayStatus.State.FINISHED -> R.string.play_status_finished
-        PlayStatus.State.DROPPED -> R.string.play_status_dropped
     }
 
 // Testing & preview utilities

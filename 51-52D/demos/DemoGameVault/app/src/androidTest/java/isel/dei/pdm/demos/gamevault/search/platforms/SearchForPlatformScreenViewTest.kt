@@ -26,7 +26,7 @@ import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenView
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenViewTestTags.SEARCH_INDICATOR_TAG
 import isel.dei.pdm.demos.gamevault.ui.common.ImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
-import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItemTestTags
+import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItemViewTestTags
 import isel.dei.pdm.demos.gamevault.ui.common.SearchBoxTestTags
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 import org.junit.Assert.assertEquals
@@ -223,13 +223,13 @@ class SearchForPlatformScreenViewTest {
         )
 
         composeTestRule
-            .onAllNodesWithTag(PlatformListItemTestTags.ADD_BUTTON)
+            .onAllNodesWithTag(PlatformListItemViewTestTags.ADD_BUTTON)
             .assertCountEquals(1)
         composeTestRule
-            .onAllNodesWithTag(PlatformListItemTestTags.ADDING_INDICATOR)
+            .onAllNodesWithTag(PlatformListItemViewTestTags.ADDING_INDICATOR)
             .assertCountEquals(1)
         composeTestRule
-            .onAllNodesWithTag(PlatformListItemTestTags.ADDED_ICON, useUnmergedTree = true)
+            .onAllNodesWithTag(PlatformListItemViewTestTags.ADDED_ICON, useUnmergedTree = true)
             .assertCountEquals(1)
     }
 

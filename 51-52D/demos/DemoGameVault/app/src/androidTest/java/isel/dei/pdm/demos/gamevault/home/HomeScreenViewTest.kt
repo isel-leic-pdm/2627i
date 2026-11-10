@@ -18,7 +18,6 @@ import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.home.HomeScreenViewTestTags.COLLECTION_SECTION
 import isel.dei.pdm.demos.gamevault.home.HomeScreenViewTestTags.NOW_PLAYING_SECTION
 import isel.dei.pdm.demos.gamevault.home.HomeScreenViewTestTags.SUMMARY_SECTION
-import isel.dei.pdm.demos.gamevault.ui.common.GameCarouselTestTags
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule

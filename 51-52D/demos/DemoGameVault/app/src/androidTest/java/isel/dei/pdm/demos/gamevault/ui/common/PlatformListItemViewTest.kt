@@ -16,7 +16,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
-class PlatformListItemTest {
+class PlatformListItemViewTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -41,7 +41,7 @@ class PlatformListItemTest {
     private fun setItemContent(item: PlatformListItemModel, onSelected: () -> Unit = {}) {
         composeTestRule.setContent {
             CompositionLocalProvider(LocalImageLoader provides successLoader) {
-                PlatformListItem(item = item, onSelected = onSelected)
+                PlatformListItemView(item = item, onSelected = onSelected)
             }
         }
     }
@@ -53,19 +53,19 @@ class PlatformListItemTest {
         setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.ADDABLE))
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.ITEM)
+            .onNodeWithTag(PlatformListItemViewTestTags.ITEM)
             .assertIsDisplayed()
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.NAME, useUnmergedTree = true)
+            .onNodeWithTag(PlatformListItemViewTestTags.NAME, useUnmergedTree = true)
             .assertIsDisplayed()
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.ABBREVIATION, useUnmergedTree = true)
+            .onNodeWithTag(PlatformListItemViewTestTags.ABBREVIATION, useUnmergedTree = true)
             .assertIsDisplayed()
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.LOGO, useUnmergedTree = true)
+            .onNodeWithTag(PlatformListItemViewTestTags.LOGO, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 
@@ -75,7 +75,7 @@ class PlatformListItemTest {
         setItemContent(versionedPlatform.toListItemModel(PlatformListItemMode.ADDABLE))
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.VERSION, useUnmergedTree = true)
+            .onNodeWithTag(PlatformListItemViewTestTags.VERSION, useUnmergedTree = true)
             .assertIsDisplayed()
 
         composeTestRule
@@ -88,7 +88,7 @@ class PlatformListItemTest {
         setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.ADDABLE))
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.VERSION, useUnmergedTree = true)
+            .onNodeWithTag(PlatformListItemViewTestTags.VERSION, useUnmergedTree = true)
             .assertDoesNotExist()
     }
 
@@ -99,7 +99,7 @@ class PlatformListItemTest {
         setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.ADDABLE))
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.ADD_BUTTON)
+            .onNodeWithTag(PlatformListItemViewTestTags.ADD_BUTTON)
             .assertIsDisplayed()
     }
 
@@ -108,7 +108,7 @@ class PlatformListItemTest {
         setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.ADDING))
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.ADDING_INDICATOR)
+            .onNodeWithTag(PlatformListItemViewTestTags.ADDING_INDICATOR)
             .assertIsDisplayed()
     }
 
@@ -117,7 +117,7 @@ class PlatformListItemTest {
         setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.ADDED))
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.ADDED_ICON, useUnmergedTree = true)
+            .onNodeWithTag(PlatformListItemViewTestTags.ADDED_ICON, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 
@@ -126,7 +126,7 @@ class PlatformListItemTest {
         setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.NAVIGABLE))
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.CHEVRON_ICON, useUnmergedTree = true)
+            .onNodeWithTag(PlatformListItemViewTestTags.CHEVRON_ICON, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 
@@ -141,7 +141,7 @@ class PlatformListItemTest {
         )
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.ITEM)
+            .onNodeWithTag(PlatformListItemViewTestTags.ITEM)
             .performClick()
 
         assertTrue(selected)
@@ -156,7 +156,7 @@ class PlatformListItemTest {
         )
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.ADD_BUTTON)
+            .onNodeWithTag(PlatformListItemViewTestTags.ADD_BUTTON)
             .performClick()
 
         assertTrue(selected)
@@ -171,7 +171,7 @@ class PlatformListItemTest {
         )
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.ITEM)
+            .onNodeWithTag(PlatformListItemViewTestTags.ITEM)
             .performClick()
 
         assertTrue(selected)
@@ -182,7 +182,7 @@ class PlatformListItemTest {
         setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.ADDING))
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.ITEM)
+            .onNodeWithTag(PlatformListItemViewTestTags.ITEM)
             .assertHasNoClickAction()
     }
 
@@ -191,7 +191,7 @@ class PlatformListItemTest {
         setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.ADDED))
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemTestTags.ITEM)
+            .onNodeWithTag(PlatformListItemViewTestTags.ITEM)
             .assertHasNoClickAction()
     }
 }

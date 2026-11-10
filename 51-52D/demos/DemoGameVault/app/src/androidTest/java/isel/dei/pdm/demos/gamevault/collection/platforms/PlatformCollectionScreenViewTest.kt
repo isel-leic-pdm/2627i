@@ -21,7 +21,7 @@ import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.ui.common.ImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
-import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItemTestTags
+import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItemViewTestTags
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -102,7 +102,7 @@ class PlatformCollectionScreenViewTest {
         setViewContent(PlatformCollectionScreenState.Results(listOf(PS5_PRO, PS5, SWITCH)))
 
         composeTestRule.onNodeWithTag(PLATFORM_LIST_TAG).assertIsDisplayed()
-        composeTestRule.onAllNodesWithTag(PlatformListItemTestTags.ITEM).assertCountEquals(3)
+        composeTestRule.onAllNodesWithTag(PlatformListItemViewTestTags.ITEM).assertCountEquals(3)
         composeTestRule.onNodeWithText(SWITCH.name.value).assertIsDisplayed()
         composeTestRule.onNodeWithTag(LOADING_INDICATOR_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(EMPTY_MESSAGE_TAG).assertDoesNotExist()
@@ -113,10 +113,10 @@ class PlatformCollectionScreenViewTest {
         setViewContent(PlatformCollectionScreenState.Results(listOf(PS5_PRO, SWITCH)))
 
         composeTestRule
-            .onAllNodesWithTag(PlatformListItemTestTags.CHEVRON_ICON, useUnmergedTree = true)
+            .onAllNodesWithTag(PlatformListItemViewTestTags.CHEVRON_ICON, useUnmergedTree = true)
             .assertCountEquals(2)
         composeTestRule
-            .onAllNodesWithTag(PlatformListItemTestTags.ADD_BUTTON)
+            .onAllNodesWithTag(PlatformListItemViewTestTags.ADD_BUTTON)
             .assertCountEquals(0)
     }
 

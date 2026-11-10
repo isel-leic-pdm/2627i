@@ -91,7 +91,7 @@ fun PlatformCollectionScreen(
             )
             else -> PlatformCollectionScreenView(
                 state = currentState,
-                // TODO: Navigate to the platform details screen, once it exists
+                // TODO: Navigate to list of games of the platform, once the screen exists
                 onPlatformSelected = { },
                 modifier = contentModifier
             )

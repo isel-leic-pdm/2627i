@@ -39,7 +39,7 @@ import java.net.URI
  * @param modifier The modifier to be applied to the layout.
  */
 @Composable
-fun PlatformListItem(
+fun PlatformListItemView(
     item: PlatformListItemModel,
     onSelected: () -> Unit,
     modifier: Modifier = Modifier,
@@ -50,7 +50,7 @@ fun PlatformListItem(
         modifier = modifier
             .fillMaxWidth()
             .then(if (isClickable) Modifier.clickable(onClick = onSelected) else Modifier)
-            .testTag(PlatformListItemTestTags.ITEM),
+            .testTag(PlatformListItemViewTestTags.ITEM),
         shape = MaterialTheme.shapes.medium,
     ) {
         ListItem(
@@ -58,7 +58,7 @@ fun PlatformListItem(
                 Text(
                     text = item.name.value,
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.testTag(PlatformListItemTestTags.NAME),
+                    modifier = Modifier.testTag(PlatformListItemViewTestTags.NAME),
                 )
             },
             supportingContent = {
@@ -66,13 +66,13 @@ fun PlatformListItem(
                     Text(
                         text = item.abbreviation.value,
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.testTag(PlatformListItemTestTags.ABBREVIATION),
+                        modifier = Modifier.testTag(PlatformListItemViewTestTags.ABBREVIATION),
                     )
                     if (item.version != null) {
                         Text(
                             text = " · ${item.version.value}",
                             style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.testTag(PlatformListItemTestTags.VERSION),
+                            modifier = Modifier.testTag(PlatformListItemViewTestTags.VERSION),
                         )
                     }
                 }
@@ -83,7 +83,7 @@ fun PlatformListItem(
                     contentDescription = item.name.value,
                     modifier = Modifier
                         .size(56.dp)
-                        .testTag(PlatformListItemTestTags.LOGO),
+                        .testTag(PlatformListItemViewTestTags.LOGO),
                 )
             },
             trailingContent = {
@@ -91,7 +91,7 @@ fun PlatformListItem(
                     PlatformListItemMode.ADDABLE -> {
                         IconButton(
                             onClick = onSelected,
-                            modifier = Modifier.testTag(PlatformListItemTestTags.ADD_BUTTON)
+                            modifier = Modifier.testTag(PlatformListItemViewTestTags.ADD_BUTTON)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
@@ -103,7 +103,7 @@ fun PlatformListItem(
                         CircularProgressIndicator(
                             modifier = Modifier
                                 .size(24.dp)
-                                .testTag(PlatformListItemTestTags.ADDING_INDICATOR),
+                                .testTag(PlatformListItemViewTestTags.ADDING_INDICATOR),
                             strokeWidth = 2.dp
                         )
                     }
@@ -112,14 +112,14 @@ fun PlatformListItem(
                             imageVector = Icons.Default.Check,
                             contentDescription = stringResource(R.string.search_platform_added_description),
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.testTag(PlatformListItemTestTags.ADDED_ICON)
+                            modifier = Modifier.testTag(PlatformListItemViewTestTags.ADDED_ICON)
                         )
                     }
                     PlatformListItemMode.NAVIGABLE -> {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                             contentDescription = null,
-                            modifier = Modifier.testTag(PlatformListItemTestTags.CHEVRON_ICON)
+                            modifier = Modifier.testTag(PlatformListItemViewTestTags.CHEVRON_ICON)
                         )
                     }
                 }
@@ -129,7 +129,7 @@ fun PlatformListItem(
 }
 
 /**
- * Represents the presentation mode of a [PlatformListItem].
+ * Represents the presentation mode of a [PlatformListItemView].
  */
 enum class PlatformListItemMode {
     ADDABLE,    // Item can be added to the collection
@@ -185,7 +185,7 @@ fun Platform.toListItemModel(mode: PlatformListItemMode = PlatformListItemMode.N
 
 // Testing & preview utilities
 
-object PlatformListItemTestTags {
+object PlatformListItemViewTestTags {
     const val ITEM = "PlatformListItem"
     const val LOGO = "PlatformLogo"
     const val NAME = "PlatformName"
@@ -198,7 +198,7 @@ object PlatformListItemTestTags {
 }
 
 @Suppress("Unused")
-class PlatformListItemPreviews {
+class PlatformListItemViewPreviews {
 
     private val platformModel = PlatformListItemModel(
         id = 1L,
@@ -213,7 +213,7 @@ class PlatformListItemPreviews {
     @Composable
     fun AddablePreview() {
         DemoGameVaultTheme {
-            PlatformListItem(
+            PlatformListItemView(
                 item = platformModel,
                 onSelected = {},
                 modifier = Modifier.padding(16.dp),
@@ -225,7 +225,7 @@ class PlatformListItemPreviews {
     @Composable
     fun AddingPreview() {
         DemoGameVaultTheme {
-            PlatformListItem(
+            PlatformListItemView(
                 item = platformModel.copy(mode = PlatformListItemMode.ADDING),
                 onSelected = {},
                 modifier = Modifier.padding(16.dp),
@@ -237,7 +237,7 @@ class PlatformListItemPreviews {
     @Composable
     fun AddedPreview() {
         DemoGameVaultTheme {
-            PlatformListItem(
+            PlatformListItemView(
                 item = platformModel.copy(mode = PlatformListItemMode.ADDED),
                 onSelected = {},
                 modifier = Modifier.padding(16.dp),
@@ -249,7 +249,7 @@ class PlatformListItemPreviews {
     @Composable
     fun NavigablePreview() {
         DemoGameVaultTheme {
-            PlatformListItem(
+            PlatformListItemView(
                 item = platformModel.copy(mode = PlatformListItemMode.NAVIGABLE),
                 onSelected = {},
                 modifier = Modifier.padding(16.dp),

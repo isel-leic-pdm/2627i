@@ -23,7 +23,7 @@ import isel.dei.pdm.demos.gamevault.collection.platforms.PlatformCollectionScree
 import isel.dei.pdm.demos.gamevault.collection.platforms.PlatformCollectionScreenViewTestTags.PLATFORM_LIST_TAG
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.ui.common.LabelledProgressIndicator
-import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItem
+import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItemView
 import isel.dei.pdm.demos.gamevault.ui.common.toListItemModel
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 
@@ -82,7 +82,7 @@ private fun PlatformList(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(items = platforms, key = { it.id }) { platform ->
-            PlatformListItem(
+            PlatformListItemView(
                 item = platform.toListItemModel(),
                 onSelected = { onPlatformSelected(platform) }
             )

@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.ui.common
+package isel.dei.pdm.demos.gamevault.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

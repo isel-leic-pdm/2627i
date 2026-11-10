@@ -29,7 +29,7 @@ import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenViewTestTags.PLATFORM_LIST_TAG
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenViewTestTags.SEARCH_INDICATOR_TAG
 import isel.dei.pdm.demos.gamevault.ui.common.LabelledProgressIndicator
-import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItem
+import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItemView
 import isel.dei.pdm.demos.gamevault.ui.common.SearchBox
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 
@@ -136,7 +136,7 @@ private fun SearchResults(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(items = items, key = { it.key }) { itemState ->
-                    PlatformListItem(
+                    PlatformListItemView(
                         item = itemState.toListItemModel(),
                         onSelected = { onAddPlatform(itemState.platform) }
                     )
