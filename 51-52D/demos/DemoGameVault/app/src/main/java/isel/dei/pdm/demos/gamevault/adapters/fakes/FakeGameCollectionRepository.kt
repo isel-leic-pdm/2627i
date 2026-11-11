@@ -18,7 +18,7 @@ import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import java.time.Year
+import isel.dei.pdm.demos.gamevault.domain.Year
 import java.util.Locale
 import kotlin.time.Instant
 

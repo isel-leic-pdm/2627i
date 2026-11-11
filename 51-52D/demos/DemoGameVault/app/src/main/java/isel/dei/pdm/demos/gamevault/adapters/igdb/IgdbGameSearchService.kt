@@ -1,5 +1,6 @@
 package isel.dei.pdm.demos.gamevault.adapters.igdb
 
+import isel.dei.pdm.demos.gamevault.domain.Uri
 import isel.dei.pdm.demos.gamevault.domain.search.SearchString
 import isel.dei.pdm.demos.gamevault.domain.search.UnexpectedServiceException
 import isel.dei.pdm.demos.gamevault.domain.search.games.GameInfo
@@ -11,10 +12,10 @@ import isel.dei.pdm.demos.gamevault.domain.toNonBlankStringOrNull
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
-import java.net.URI
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneOffset
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Instant
 
 /**
  * A [GameSearchService] that searches for games in IGDB.
@@ -203,8 +204,8 @@ internal fun IgdbGame.toGameInfo(): GameInfo? {
         id = id,
         name = name,
         releaseDate = firstReleaseDate?.toLocalDate(),
-        coverUri = cover?.let { URI.create(coverUri(it.imageId)) },
-        thumbnailUri = cover?.let { URI.create(thumbnailUri(it.imageId)) },
+        coverUri = cover?.let { Uri(coverUri(it.imageId)) },
+        thumbnailUri = cover?.let { Uri(thumbnailUri(it.imageId)) },
         category = GAME_TYPES.entries.firstOrNull { it.value == gameType }?.key,
         platforms = platforms.mapNotNull { it.toGamePlatform() }
     )
@@ -244,7 +245,7 @@ private fun IgdbGamePlatform.toGamePlatform(): GamePlatform? {
  * The date of this instant, given in seconds since the epoch, in UTC.
  */
 private fun Long.toLocalDate(): LocalDate =
-    Instant.ofEpochSecond(this).atOffset(ZoneOffset.UTC).toLocalDate()
+    Instant.fromEpochSeconds(this).toLocalDateTime(TimeZone.UTC).date
 
 /**
  * The URI of the cover with the given image identifier. IGDB images are available in several

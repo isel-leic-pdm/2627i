@@ -19,7 +19,10 @@ tasks.withType<KotlinCompile>().configureEach {
 }
 
 dependencies {
-    implementation(libs.kotlinx.coroutines.android)
+    // The repositories' contracts expose flows, so their users need coroutines too
+    api(libs.kotlinx.coroutines.core)
+    // The domain types expose dates, so their users need the date types too
+    api(libs.kotlinx.datetime)
     testImplementation(libs.junit)
     testImplementation(kotlin("test"))
 }

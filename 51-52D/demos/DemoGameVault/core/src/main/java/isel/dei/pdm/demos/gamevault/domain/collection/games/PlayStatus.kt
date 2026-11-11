@@ -1,7 +1,7 @@
 package isel.dei.pdm.demos.gamevault.domain.collection.games
 
-import java.time.LocalDate
-import java.time.Year
+import isel.dei.pdm.demos.gamevault.domain.Year
+import kotlinx.datetime.LocalDate
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -41,7 +41,7 @@ data class Accomplishment(val achievedOn: LocalDate) {
     /**
      * Whether the accomplishment happened in the given [year].
      */
-    fun isIn(year: Year): Boolean = achievedOn.year == year.value
+    fun isIn(year: Year): Boolean = achievedOn in year
 }
 
 /**

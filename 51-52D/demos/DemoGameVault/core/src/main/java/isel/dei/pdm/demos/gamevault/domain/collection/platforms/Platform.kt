@@ -1,9 +1,9 @@
 package isel.dei.pdm.demos.gamevault.domain.collection.platforms
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
+import isel.dei.pdm.demos.gamevault.domain.Uri
+import isel.dei.pdm.demos.gamevault.domain.Year
 import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
-import java.net.URI
-import java.time.Year
 
 /**
  * Represents a platform in the user's collection.
@@ -29,7 +29,7 @@ data class Platform(
     val id: Long,
     val abbreviation: NonBlankString,
     val name: NonBlankString,
-    val logoUri: URI? = null,
+    val logoUri: Uri? = null,
     val ownedSince: Year? = null,
     val version: NonBlankString? = null,
     val source: SourceReference? = null
@@ -37,7 +37,7 @@ data class Platform(
     /**
      * Convenience constructor that accepts instrinsic types (String and int).
      * @throws IllegalArgumentException if any of the arguments does not meet the requirements for
-     * being a [NonBlankString] or a [URI].
+     * being a [NonBlankString] or a [Uri].
      */
     constructor(
         id: Long,
@@ -51,8 +51,8 @@ data class Platform(
         id = id,
         abbreviation = NonBlankString(abbreviation),
         name = NonBlankString(name),
-        logoUri = logoUri?.let { URI.create(it) },
-        ownedSince = ownedSince?.let { Year.of(it) },
+        logoUri = logoUri?.let { Uri(it) },
+        ownedSince = ownedSince?.let { Year(it) },
         version = version?.let { NonBlankString(it) },
         source = source
     )
@@ -97,7 +97,7 @@ fun List<Platform>.distinctGamePlatforms(): List<Platform> =
 data class NewPlatform(
     val abbreviation: NonBlankString,
     val name: NonBlankString,
-    val logoUri: URI? = null,
+    val logoUri: Uri? = null,
     val ownedSince: Year? = null,
     val version: NonBlankString? = null,
     val source: SourceReference? = null
@@ -105,7 +105,7 @@ data class NewPlatform(
     /**
      * Convenience constructor that accepts instrinsic types (String and int).
      * @throws IllegalArgumentException if any of the arguments does not meet the requirements for
-     * being a [NonBlankString] or a [URI].
+     * being a [NonBlankString] or a [Uri].
      */
     constructor(
         abbreviation: String,
@@ -117,8 +117,8 @@ data class NewPlatform(
     ) : this(
         abbreviation = NonBlankString(abbreviation),
         name = NonBlankString(name),
-        logoUri = logoUri?.let { URI.create(it) },
-        ownedSince = ownedSince?.let { Year.of(it) },
+        logoUri = logoUri?.let { Uri(it) },
+        ownedSince = ownedSince?.let { Year(it) },
         version = version?.let { NonBlankString(it) },
         source = source
     )

@@ -1,6 +1,6 @@
 package isel.dei.pdm.demos.gamevault.domain.collection.games
 
-import java.time.Year
+import isel.dei.pdm.demos.gamevault.domain.Year
 
 /**
  * The summary of the accomplishments in the user's collection. All figures count games (not

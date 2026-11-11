@@ -43,7 +43,7 @@ import isel.dei.pdm.demos.gamevault.search.games.SearchForGamesScreenViewTestTag
 import isel.dei.pdm.demos.gamevault.ui.common.LabelledProgressIndicator
 import isel.dei.pdm.demos.gamevault.ui.common.SearchBox
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 /**
  * The view used to search for games.
@@ -354,13 +354,13 @@ class SearchForGamesScreenViewPreviews {
     private val filters = GameSearchFilters(platforms = listOf(ps5, pc, switch))
 
     private val ff7 = GameInfo(
-        1L, "Final Fantasy VII", LocalDate.of(1997, 1, 31), category = GameInfo.Category.MAIN_GAME
+        1L, "Final Fantasy VII", LocalDate(1997, 1, 31), category = GameInfo.Category.MAIN_GAME
     )
     private val ff7Remake = GameInfo(
-        2L, "Final Fantasy VII Remake", LocalDate.of(2020, 4, 10), category = GameInfo.Category.REMAKE
+        2L, "Final Fantasy VII Remake", LocalDate(2020, 4, 10), category = GameInfo.Category.REMAKE
     )
     private val ff7Rebirth = GameInfo(
-        3L, "Final Fantasy VII Rebirth", LocalDate.of(2024, 2, 29), category = GameInfo.Category.MAIN_GAME
+        3L, "Final Fantasy VII Rebirth", LocalDate(2024, 2, 29), category = GameInfo.Category.MAIN_GAME
     )
 
     // A game released for several of the user's platforms has one item per platform

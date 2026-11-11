@@ -14,6 +14,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.core.graphics.createBitmap
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
+import isel.dei.pdm.demos.gamevault.domain.Uri
+import isel.dei.pdm.demos.gamevault.domain.Year
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionItem
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayTime
@@ -22,7 +24,6 @@ import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import java.net.URI
 
 class CollectionItemViewTest {
 
@@ -39,9 +40,9 @@ class CollectionItemViewTest {
     private val sampleItem = CollectionItem(
         gameId = 1L,
         name = NonBlankString("Elden Ring"),
-        releaseYear = 2022,
+        releaseYear = Year(2022),
         coverUri = null,
-        thumbnailUri = URI.create("http://example.com/elden-ring.png"),
+        thumbnailUri = Uri("http://example.com/elden-ring.png"),
         platformAbbreviations = listOf(NonBlankString("PS5")),
         state = PlayStatus.State.PLAYING,
         timeSpent = PlayTime(45, 30),

@@ -1,7 +1,8 @@
 package isel.dei.pdm.demos.gamevault.domain.collection.games
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
-import java.net.URI
+import isel.dei.pdm.demos.gamevault.domain.Uri
+import isel.dei.pdm.demos.gamevault.domain.Year
 
 /**
  * The information of a collection entry needed to display it in listings (e.g. the carousel of
@@ -25,9 +26,9 @@ import java.net.URI
 data class CollectionItem(
     val gameId: Long,
     val name: NonBlankString,
-    val releaseYear: Int?,
-    val coverUri: URI?,
-    val thumbnailUri: URI?,
+    val releaseYear: Year?,
+    val coverUri: Uri?,
+    val thumbnailUri: Uri?,
     val platformAbbreviations: List<NonBlankString>,
     val state: PlayStatus.State,
     val timeSpent: PlayTime,
@@ -44,7 +45,7 @@ data class CollectionItem(
 fun CollectionEntry.toItem(): CollectionItem = CollectionItem(
     gameId = game.id,
     name = game.name,
-    releaseYear = game.releaseDate?.year,
+    releaseYear = game.releaseDate?.let { Year.of(it) },
     coverUri = game.coverUri,
     thumbnailUri = game.thumbnailUri,
     platformAbbreviations = platforms.map { it.abbreviation },

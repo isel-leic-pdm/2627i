@@ -2,7 +2,7 @@ package isel.dei.pdm.demos.gamevault.domain.collection.games
 
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.distinctGamePlatforms
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Instant

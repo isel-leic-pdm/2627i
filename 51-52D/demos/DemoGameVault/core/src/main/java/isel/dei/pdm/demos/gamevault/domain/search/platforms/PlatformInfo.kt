@@ -1,7 +1,7 @@
 package isel.dei.pdm.demos.gamevault.domain.search.platforms
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
-import java.net.URI
+import isel.dei.pdm.demos.gamevault.domain.Uri
 
 /**
  * Represents the platform where a game can be played, as provided by the platform search service.
@@ -18,15 +18,15 @@ data class PlatformInfo(
     val id: Long,
     val abbreviation: NonBlankString,
     val name: NonBlankString,
-    val logoUri: URI? = null,
+    val logoUri: Uri? = null,
     val version: NonBlankString? = null
 ) {
     /**
      * Convenience constructor that accepts strings for abbreviation, name, logo URI and version.
      * @throws IllegalArgumentException if any of the strings does not meet the requirements for
-     * being a [NonBlankString] or a [URI].
+     * being a [NonBlankString] or a [Uri].
      * @see NonBlankString
-     * @see URI
+     * @see Uri
      */
     @Throws(IllegalArgumentException::class)
     constructor(
@@ -39,7 +39,7 @@ data class PlatformInfo(
         id = id,
         abbreviation = NonBlankString(abbreviation),
         name = NonBlankString(name),
-        logoUri = logoUri?.let { URI.create(it) },
+        logoUri = logoUri?.let { Uri(it) },
         version = version?.let { NonBlankString(it) }
     )
 }

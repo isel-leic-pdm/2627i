@@ -9,7 +9,7 @@ import isel.dei.pdm.demos.gamevault.domain.search.games.GamePlatform
 import isel.dei.pdm.demos.gamevault.domain.search.games.GameSearchService
 import isel.dei.pdm.demos.gamevault.domain.search.games.PlatformCriterion
 import kotlinx.coroutines.delay
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -44,7 +44,7 @@ class FakeGameSearchService : GameSearchService {
      */
     private val catalogue: List<GameInfoDetails> = listOf(
         game(
-            1L, "Elden Ring", LocalDate.of(2022, 2, 25), "elden_ring", Category.MAIN_GAME,
+            1L, "Elden Ring", LocalDate(2022, 2, 25), "elden_ring", Category.MAIN_GAME,
             listOf(pc, ps4, ps5, xboxOne, xboxSeries),
             "An action RPG set in the Lands Between.",
             developers = listOf("FromSoftware"),
@@ -52,7 +52,7 @@ class FakeGameSearchService : GameSearchService {
             genres = listOf("Role-playing (RPG)", "Adventure")
         ),
         game(
-            2L, "Elden Ring: Shadow of the Erdtree", LocalDate.of(2024, 6, 21), "erdtree", Category.DLC,
+            2L, "Elden Ring: Shadow of the Erdtree", LocalDate(2024, 6, 21), "erdtree", Category.DLC,
             listOf(pc, ps4, ps5, xboxOne, xboxSeries),
             "An expansion that takes the player to the Land of Shadow.",
             developers = listOf("FromSoftware"),
@@ -60,7 +60,7 @@ class FakeGameSearchService : GameSearchService {
             genres = listOf("Role-playing (RPG)", "Adventure")
         ),
         game(
-            3L, "Demon's Souls", LocalDate.of(2009, 2, 5), "demons_souls_2009", Category.MAIN_GAME,
+            3L, "Demon's Souls", LocalDate(2009, 2, 5), "demons_souls_2009", Category.MAIN_GAME,
             listOf(ps3),
             "A dark fantasy action RPG set in the kingdom of Boletaria.",
             developers = listOf("FromSoftware"),
@@ -68,7 +68,7 @@ class FakeGameSearchService : GameSearchService {
             genres = listOf("Role-playing (RPG)")
         ),
         game(
-            4L, "Demon's Souls", LocalDate.of(2020, 11, 12), "demons_souls_2020", Category.REMAKE,
+            4L, "Demon's Souls", LocalDate(2020, 11, 12), "demons_souls_2020", Category.REMAKE,
             listOf(ps5),
             "A remake of the 2009 game, rebuilt from the ground up.",
             developers = listOf("Bluepoint Games"),
@@ -76,7 +76,7 @@ class FakeGameSearchService : GameSearchService {
             genres = listOf("Role-playing (RPG)")
         ),
         game(
-            5L, "Final Fantasy VII", LocalDate.of(1997, 1, 31), "ff7", Category.MAIN_GAME,
+            5L, "Final Fantasy VII", LocalDate(1997, 1, 31), "ff7", Category.MAIN_GAME,
             listOf(ps1, pc, ps4, switch, xboxOne),
             "Cloud Strife joins the eco-terrorist group AVALANCHE to fight the Shinra corporation.",
             developers = listOf("Square"),
@@ -84,7 +84,7 @@ class FakeGameSearchService : GameSearchService {
             genres = listOf("Role-playing (RPG)")
         ),
         game(
-            6L, "Final Fantasy VII Remake", LocalDate.of(2020, 4, 10), "ff7_remake", Category.REMAKE,
+            6L, "Final Fantasy VII Remake", LocalDate(2020, 4, 10), "ff7_remake", Category.REMAKE,
             listOf(ps4),
             "The first part of the reimagining of Final Fantasy VII, set in the city of Midgar.",
             developers = listOf("Square Enix"),
@@ -92,7 +92,7 @@ class FakeGameSearchService : GameSearchService {
             genres = listOf("Role-playing (RPG)", "Hack and slash/Beat 'em up")
         ),
         game(
-            7L, "Final Fantasy VII Remake Intergrade", LocalDate.of(2021, 6, 10), "ff7_intergrade",
+            7L, "Final Fantasy VII Remake Intergrade", LocalDate(2021, 6, 10), "ff7_intergrade",
             // An expanded game in IGDB, which is none of the supported categories
             category = null,
             platforms = listOf(ps5, pc, switch2, xboxSeries),
@@ -102,7 +102,7 @@ class FakeGameSearchService : GameSearchService {
             genres = listOf("Role-playing (RPG)")
         ),
         game(
-            8L, "Final Fantasy VII Rebirth", LocalDate.of(2024, 2, 29), "ff7_rebirth", Category.MAIN_GAME,
+            8L, "Final Fantasy VII Rebirth", LocalDate(2024, 2, 29), "ff7_rebirth", Category.MAIN_GAME,
             listOf(ps5, pc),
             "The second part of the reimagining of Final Fantasy VII, beyond Midgar.",
             developers = listOf("Square Enix"),
@@ -110,7 +110,7 @@ class FakeGameSearchService : GameSearchService {
             genres = listOf("Role-playing (RPG)", "Adventure")
         ),
         game(
-            9L, "Final Fantasy VII Remake & Rebirth Twin Pack", LocalDate.of(2025, 1, 23), "ff7_twin_pack",
+            9L, "Final Fantasy VII Remake & Rebirth Twin Pack", LocalDate(2025, 1, 23), "ff7_twin_pack",
             Category.BUNDLE,
             listOf(ps5, pc),
             "Both parts of the Final Fantasy VII remake project released so far.",
@@ -119,7 +119,7 @@ class FakeGameSearchService : GameSearchService {
             genres = listOf("Role-playing (RPG)")
         ),
         game(
-            10L, "The Last of Us", LocalDate.of(2013, 6, 14), "tlou", Category.MAIN_GAME,
+            10L, "The Last of Us", LocalDate(2013, 6, 14), "tlou", Category.MAIN_GAME,
             listOf(ps3),
             "Joel and Ellie cross a post-pandemic United States.",
             developers = listOf("Naughty Dog"),
@@ -127,7 +127,7 @@ class FakeGameSearchService : GameSearchService {
             genres = listOf("Shooter", "Adventure")
         ),
         game(
-            11L, "The Last of Us Remastered", LocalDate.of(2014, 7, 29), "tlou_remastered", Category.REMASTER,
+            11L, "The Last of Us Remastered", LocalDate(2014, 7, 29), "tlou_remastered", Category.REMASTER,
             listOf(ps4),
             "The 2013 game, remastered for the PlayStation 4, with its expansion included.",
             developers = listOf("Naughty Dog"),
@@ -135,7 +135,7 @@ class FakeGameSearchService : GameSearchService {
             genres = listOf("Shooter", "Adventure")
         ),
         game(
-            12L, "The Last of Us Part I", LocalDate.of(2022, 9, 2), "tlou_part_1", Category.REMAKE,
+            12L, "The Last of Us Part I", LocalDate(2022, 9, 2), "tlou_part_1", Category.REMAKE,
             listOf(ps5, pc),
             "A remake of the 2013 game.",
             developers = listOf("Naughty Dog"),
@@ -143,7 +143,7 @@ class FakeGameSearchService : GameSearchService {
             genres = listOf("Shooter", "Adventure")
         ),
         game(
-            13L, "The Legend of Zelda: Breath of the Wild", LocalDate.of(2017, 3, 3), "botw",
+            13L, "The Legend of Zelda: Breath of the Wild", LocalDate(2017, 3, 3), "botw",
             Category.MAIN_GAME,
             listOf(switch),
             "Link awakens in a ruined Hyrule, to defeat Calamity Ganon.",
@@ -152,7 +152,7 @@ class FakeGameSearchService : GameSearchService {
             genres = listOf("Adventure", "Role-playing (RPG)")
         ),
         game(
-            14L, "The Legend of Zelda: Tears of the Kingdom", LocalDate.of(2023, 5, 12), "totk",
+            14L, "The Legend of Zelda: Tears of the Kingdom", LocalDate(2023, 5, 12), "totk",
             Category.MAIN_GAME,
             listOf(switch),
             "Link explores the skies, lands and depths of Hyrule.",
@@ -162,7 +162,7 @@ class FakeGameSearchService : GameSearchService {
         ),
         game(
             15L, "The Legend of Zelda: Tears of the Kingdom - Nintendo Switch 2 Edition",
-            LocalDate.of(2025, 6, 5), "totk_switch_2", Category.REMASTER,
+            LocalDate(2025, 6, 5), "totk_switch_2", Category.REMASTER,
             listOf(switch2),
             "Tears of the Kingdom, enhanced for the Nintendo Switch 2.",
             developers = listOf("Nintendo EPD"),
@@ -170,7 +170,7 @@ class FakeGameSearchService : GameSearchService {
             genres = listOf("Adventure", "Role-playing (RPG)")
         ),
         game(
-            16L, "Hades", LocalDate.of(2020, 9, 17), "hades", Category.MAIN_GAME,
+            16L, "Hades", LocalDate(2020, 9, 17), "hades", Category.MAIN_GAME,
             listOf(pc, switch, ps4, ps5, xboxOne, xboxSeries),
             "Zagreus fights his way out of the Underworld.",
             developers = listOf("Supergiant Games"),
@@ -178,7 +178,7 @@ class FakeGameSearchService : GameSearchService {
             genres = listOf("Role-playing (RPG)", "Hack and slash/Beat 'em up", "Indie")
         ),
         game(
-            17L, "Hades II", LocalDate.of(2025, 9, 25), "hades_2", Category.MAIN_GAME,
+            17L, "Hades II", LocalDate(2025, 9, 25), "hades_2", Category.MAIN_GAME,
             listOf(pc, switch, switch2),
             "Melinoë battles beyond the Underworld against the Titan of Time.",
             developers = listOf("Supergiant Games"),

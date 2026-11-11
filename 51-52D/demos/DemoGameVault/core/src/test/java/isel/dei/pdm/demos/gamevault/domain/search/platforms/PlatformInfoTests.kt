@@ -1,7 +1,7 @@
 package isel.dei.pdm.demos.gamevault.domain.search.platforms
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
-import java.net.URI
+import isel.dei.pdm.demos.gamevault.domain.Uri
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -38,7 +38,7 @@ class PlatformInfoTests {
         assertEquals(1L, sut.id)
         assertEquals(NonBlankString("PS5"), sut.abbreviation)
         assertEquals(NonBlankString("PlayStation 5"), sut.name)
-        assertEquals(URI.create("https://example.com/ps5.png"), sut.logoUri)
+        assertEquals(Uri("https://example.com/ps5.png"), sut.logoUri)
         assertEquals(NonBlankString("Digital Edition"), sut.version)
     }
 

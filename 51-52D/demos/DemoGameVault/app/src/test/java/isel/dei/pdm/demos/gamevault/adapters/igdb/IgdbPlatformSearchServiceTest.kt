@@ -1,11 +1,9 @@
 package isel.dei.pdm.demos.gamevault.adapters.igdb
 
 import io.ktor.client.engine.mock.MockEngine
-import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.toByteArray
 import io.ktor.client.request.HttpRequestData
-import io.ktor.client.request.HttpResponseData
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
@@ -27,11 +25,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.IOException
 import kotlin.test.assertFailsWith
-
-/**
- * A scripted reply to a request.
- */
-private typealias Reply = suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData
 
 class IgdbPlatformSearchServiceTest {
 

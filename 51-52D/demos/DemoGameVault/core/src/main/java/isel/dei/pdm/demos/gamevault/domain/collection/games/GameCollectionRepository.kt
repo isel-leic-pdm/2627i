@@ -4,7 +4,7 @@ import isel.dei.pdm.demos.gamevault.domain.LimitedResult
 import isel.dei.pdm.demos.gamevault.domain.PersistenceException
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import kotlinx.coroutines.flow.Flow
-import java.time.Year
+import isel.dei.pdm.demos.gamevault.domain.Year
 import kotlin.time.Instant
 
 /**

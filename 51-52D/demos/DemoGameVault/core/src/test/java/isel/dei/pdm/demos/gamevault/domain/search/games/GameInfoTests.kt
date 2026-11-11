@@ -1,8 +1,8 @@
 package isel.dei.pdm.demos.gamevault.domain.search.games
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
-import java.net.URI
-import java.time.LocalDate
+import isel.dei.pdm.demos.gamevault.domain.Uri
+import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -16,9 +16,9 @@ class GameInfoTests {
         // Arrange
         val expectedId = 100L
         val expectedName = NonBlankString("Elden Ring")
-        val expectedReleaseDate = LocalDate.of(2022, 2, 25)
-        val expectedCoverUri = URI.create("https://example.com/cover.jpg")
-        val expectedThumbnailUri = URI.create("https://example.com/thumb.jpg")
+        val expectedReleaseDate = LocalDate(2022, 2, 25)
+        val expectedCoverUri = Uri("https://example.com/cover.jpg")
+        val expectedThumbnailUri = Uri("https://example.com/thumb.jpg")
 
         // Act
         val sut = GameInfo(
@@ -42,7 +42,7 @@ class GameInfoTests {
         // Arrange
         val expectedId = 100L
         val expectedName = "Elden Ring"
-        val expectedReleaseDate = LocalDate.of(2022, 2, 25)
+        val expectedReleaseDate = LocalDate(2022, 2, 25)
         val expectedCoverUriString = "https://example.com/cover.jpg"
         val expectedThumbnailUriString = "https://example.com/thumb.jpg"
 
@@ -59,8 +59,8 @@ class GameInfoTests {
         assertEquals(expectedId, sut.id)
         assertEquals(expectedName, sut.name.value)
         assertEquals(expectedReleaseDate, sut.releaseDate)
-        assertEquals(URI.create(expectedCoverUriString), sut.coverUri)
-        assertEquals(URI.create(expectedThumbnailUriString), sut.thumbnailUri)
+        assertEquals(Uri(expectedCoverUriString), sut.coverUri)
+        assertEquals(Uri(expectedThumbnailUriString), sut.thumbnailUri)
     }
 
     @Test

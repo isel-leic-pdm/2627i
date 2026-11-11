@@ -2,7 +2,7 @@ package isel.dei.pdm.demos.gamevault.domain.collection.games
 
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus.State
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -22,7 +22,7 @@ class CollectionEntryTests {
     private val switch = Platform(2L, "Switch", "Nintendo Switch")
     private val addedAt = Instant.parse("2026-01-15T10:00:00Z")
     private val sessionStart = Instant.parse("2026-11-08T20:00:00Z")
-    private val completedOn = LocalDate.of(2026, 11, 8)
+    private val completedOn = LocalDate(2026, 11, 8)
 
     private fun entry(
         state: State = State.PLAYING,
@@ -215,7 +215,7 @@ class CollectionEntryTests {
     fun `completing a later run during a session keeps it active`() {
         // Arrange
         val replaying = entry(
-            completedRuns = listOf(Accomplishment(LocalDate.of(2025, 1, 1))),
+            completedRuns = listOf(Accomplishment(LocalDate(2025, 1, 1))),
             sessionStartTime = sessionStart
         )
 

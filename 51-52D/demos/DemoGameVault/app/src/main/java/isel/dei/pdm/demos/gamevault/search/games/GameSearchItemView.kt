@@ -34,7 +34,7 @@ import isel.dei.pdm.demos.gamevault.ui.common.AddStatus
 import isel.dei.pdm.demos.gamevault.ui.common.AddStatusIndicator
 import isel.dei.pdm.demos.gamevault.ui.common.AsyncImage
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 /**
  * Composable used to display a game on one of the user's platforms inside the list of game search
@@ -161,7 +161,7 @@ class GameSearchItemViewPreviews {
     private val eldenRing = GameInfo(
         id = 1L,
         name = "Elden Ring",
-        releaseDate = LocalDate.of(2022, 2, 25),
+        releaseDate = LocalDate(2022, 2, 25),
         thumbnailUri = "https://fake.url/elden-ring.png",
         category = GameInfo.Category.MAIN_GAME
     )
@@ -196,7 +196,7 @@ class GameSearchItemViewPreviews {
                 id = 2L,
                 name = "The Legend of Zelda: Tears of the Kingdom – Collector's Edition",
                 category = GameInfo.Category.BUNDLE,
-                releaseDate = LocalDate.of(2025, 2, 25),
+                releaseDate = LocalDate(2025, 2, 25),
             ),
             switch
         )

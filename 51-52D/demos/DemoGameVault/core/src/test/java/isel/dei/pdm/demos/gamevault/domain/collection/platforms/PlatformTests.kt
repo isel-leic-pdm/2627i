@@ -2,8 +2,8 @@ package isel.dei.pdm.demos.gamevault.domain.collection.platforms
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
-import java.net.URI
-import java.time.Year
+import isel.dei.pdm.demos.gamevault.domain.Uri
+import isel.dei.pdm.demos.gamevault.domain.Year
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -100,8 +100,8 @@ class PlatformTests {
         assertEquals(1L, platform.id)
         assertEquals(NonBlankString("PS5"), platform.abbreviation)
         assertEquals(NonBlankString("PlayStation 5"), platform.name)
-        assertEquals(URI.create("https://example.com/ps5.png"), platform.logoUri)
-        assertEquals(Year.of(2020), platform.ownedSince)
+        assertEquals(Uri("https://example.com/ps5.png"), platform.logoUri)
+        assertEquals(Year(2020), platform.ownedSince)
         assertEquals(NonBlankString("Digital Edition"), platform.version)
     }
 
@@ -175,8 +175,8 @@ class PlatformTests {
         assertEquals(igdbSource, newPlatform.source)
         assertEquals(NonBlankString("NSW"), newPlatform.abbreviation)
         assertEquals(NonBlankString("Nintendo Switch"), newPlatform.name)
-        assertEquals(URI.create("https://example.com/switch.png"), newPlatform.logoUri)
-        assertEquals(Year.of(2021), newPlatform.ownedSince)
+        assertEquals(Uri("https://example.com/switch.png"), newPlatform.logoUri)
+        assertEquals(Year(2021), newPlatform.ownedSince)
         assertEquals(NonBlankString("OLED"), newPlatform.version)
     }
 

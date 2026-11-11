@@ -19,7 +19,7 @@ import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 class GameSearchItemViewTest {
 
@@ -39,7 +39,7 @@ class GameSearchItemViewTest {
     private val sampleGame = GameInfo(
         id = 1L,
         name = "Elden Ring",
-        releaseDate = LocalDate.of(2022, 2, 25),
+        releaseDate = LocalDate(2022, 2, 25),
         thumbnailUri = "http://example.com/elden-ring.png"
     )
 

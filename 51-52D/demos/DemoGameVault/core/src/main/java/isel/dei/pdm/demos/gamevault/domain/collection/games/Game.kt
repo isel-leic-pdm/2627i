@@ -2,9 +2,8 @@ package isel.dei.pdm.demos.gamevault.domain.collection.games
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
-import java.net.URI
-import java.time.LocalDate
-import java.util.Locale
+import isel.dei.pdm.demos.gamevault.domain.Uri
+import kotlinx.datetime.LocalDate
 
 /**
  * Represents a game in the user's vault, independently of how it was obtained (from a search
@@ -22,14 +21,14 @@ data class Game(
     val id: Long,
     val name: NonBlankString,
     val releaseDate: LocalDate? = null,
-    val coverUri: URI? = null,
-    val thumbnailUri: URI? = null,
+    val coverUri: Uri? = null,
+    val thumbnailUri: Uri? = null,
     val source: SourceReference? = null
 ) {
     /**
      * Convenience constructor that accepts strings for the name, cover and thumbnail URIs.
      * @throws IllegalArgumentException if any of the arguments does not meet the requirements for
-     * being a [NonBlankString] or a [URI].
+     * being a [NonBlankString] or a [Uri].
      */
     @Throws(IllegalArgumentException::class)
     constructor(
@@ -43,8 +42,8 @@ data class Game(
         id = id,
         name = NonBlankString(name),
         releaseDate = releaseDate,
-        coverUri = coverUri?.let { URI.create(it) },
-        thumbnailUri = thumbnailUri?.let { URI.create(it) },
+        coverUri = coverUri?.let { Uri(it) },
+        thumbnailUri = thumbnailUri?.let { Uri(it) },
         source = source
     )
 
@@ -67,14 +66,14 @@ data class Game(
 data class NewGame(
     val name: NonBlankString,
     val releaseDate: LocalDate? = null,
-    val coverUri: URI? = null,
-    val thumbnailUri: URI? = null,
+    val coverUri: Uri? = null,
+    val thumbnailUri: Uri? = null,
     val source: SourceReference? = null
 ) {
     /**
      * Convenience constructor that accepts strings for the name, cover and thumbnail URIs.
      * @throws IllegalArgumentException if any of the arguments does not meet the requirements for
-     * being a [NonBlankString] or a [URI].
+     * being a [NonBlankString] or a [Uri].
      */
     @Throws(IllegalArgumentException::class)
     constructor(
@@ -86,8 +85,8 @@ data class NewGame(
     ) : this(
         name = NonBlankString(name),
         releaseDate = releaseDate,
-        coverUri = coverUri?.let { URI.create(it) },
-        thumbnailUri = thumbnailUri?.let { URI.create(it) },
+        coverUri = coverUri?.let { Uri(it) },
+        thumbnailUri = thumbnailUri?.let { Uri(it) },
         source = source
     )
 
@@ -125,9 +124,11 @@ private val whitespace = Regex("\\s+")
 
 /**
  * The name used to compare games: lower case, without punctuation, and with single spaces.
+ * Kotlin's lowercase is locale invariant, so the comparison does not depend on the device's
+ * language (e.g. Turkish, where the lower case of 'I' is not 'i').
  */
 private fun NonBlankString.normalized(): String =
-    value.lowercase(Locale.ROOT)
+    value.lowercase()
         .replace(punctuation, " ")
         .replace(whitespace, " ")
         .trim()

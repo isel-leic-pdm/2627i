@@ -37,7 +37,7 @@ import isel.dei.pdm.demos.gamevault.domain.collection.games.toItem
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.ui.common.AsyncImage
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 /**
  * Composable used to display a collection item inside a list of games (e.g. when browsing the
@@ -165,30 +165,30 @@ object CollectionItemViewTestTags {
 class CollectionItemViewPreviews {
 
     private val zelda = CollectionEntry(
-        game = Game(1L, "The Legend of Zelda: Tears of the Kingdom", LocalDate.of(2023, 5, 12), coverUri = null),
+        game = Game(1L, "The Legend of Zelda: Tears of the Kingdom", LocalDate(2023, 5, 12), coverUri = null),
         platforms = setOf(Platform(2L, "Switch", "Nintendo Switch")),
         playStatus = PlayStatus(
             timeSpent = PlayTime(120, 15),
             state = PlayStatus.State.FINISHED,
-            completedRuns = listOf(Accomplishment(LocalDate.of(2023, 8, 20)))
+            completedRuns = listOf(Accomplishment(LocalDate(2023, 8, 20)))
         )
     ).toItem()
 
     private val eldenRing = CollectionEntry(
-        game = Game(2L, "Elden Ring", LocalDate.of(2022, 2, 25), coverUri = null),
+        game = Game(2L, "Elden Ring", LocalDate(2022, 2, 25), coverUri = null),
         platforms = setOf(Platform(1L, "PS5", "PlayStation 5")),
         playStatus = PlayStatus(PlayTime(45, 30), PlayStatus.State.PLAYING)
     ).toItem()
 
     private val hades = CollectionEntry(
-        game = Game(3L, "Hades II", LocalDate.of(2025, 9, 25), coverUri = null),
+        game = Game(3L, "Hades II", LocalDate(2025, 9, 25), coverUri = null),
         // Owned on several platforms
         platforms = setOf(Platform(2L, "Switch", "Nintendo Switch"), Platform(3L, "PC", "PC")),
         playStatus = PlayStatus(state = PlayStatus.State.BACKLOG)
     ).toItem()
 
     private val celeste = CollectionEntry(
-        game = Game(4L, "Celeste", LocalDate.of(2018, 1, 25), coverUri = null),
+        game = Game(4L, "Celeste", LocalDate(2018, 1, 25), coverUri = null),
         platforms = setOf(Platform(2L, "Switch", "Nintendo Switch")),
         playStatus = PlayStatus()
     ).toItem()

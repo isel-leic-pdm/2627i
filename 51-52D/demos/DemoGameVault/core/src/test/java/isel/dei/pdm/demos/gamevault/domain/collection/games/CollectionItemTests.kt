@@ -3,8 +3,9 @@ package isel.dei.pdm.demos.gamevault.domain.collection.games
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus.State
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
-import java.net.URI
-import java.time.LocalDate
+import isel.dei.pdm.demos.gamevault.domain.Uri
+import isel.dei.pdm.demos.gamevault.domain.Year
+import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -18,12 +19,12 @@ class CollectionItemTests {
     private val game = Game(
         id = 7L,
         name = "Elden Ring",
-        releaseDate = LocalDate.of(2022, 2, 25),
+        releaseDate = LocalDate(2022, 2, 25),
         coverUri = "content://vault/covers/7.jpg",
         thumbnailUri = "content://vault/thumbnails/7.jpg"
     )
     private val platform = Platform(1L, "PS5", "PlayStation 5", logoUri = "https://example.com/ps5.png")
-    private val march = LocalDate.of(2026, 3, 12)
+    private val march = LocalDate(2026, 3, 12)
 
     // CollectionEntry to CollectionItem
 
@@ -43,9 +44,9 @@ class CollectionItemTests {
         val expected = CollectionItem(
             gameId = 7L,
             name = NonBlankString("Elden Ring"),
-            releaseYear = 2022,
-            coverUri = URI.create("content://vault/covers/7.jpg"),
-            thumbnailUri = URI.create("content://vault/thumbnails/7.jpg"),
+            releaseYear = Year(2022),
+            coverUri = Uri("content://vault/covers/7.jpg"),
+            thumbnailUri = Uri("content://vault/thumbnails/7.jpg"),
             platformAbbreviations = listOf(NonBlankString("PS5")),
             state = State.PLAYING,
             timeSpent = PlayTime(42, 10),

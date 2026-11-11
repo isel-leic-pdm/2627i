@@ -16,9 +16,9 @@ import isel.dei.pdm.demos.gamevault.domain.collection.games.StartSessionResult
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 import org.junit.Test
-import java.time.Year
+import isel.dei.pdm.demos.gamevault.domain.Year
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
@@ -33,8 +33,8 @@ class FakeGameCollectionRepositoryTest {
     private val ps5 = Platform(1L, "PS5", "PlayStation 5")
     private val switch = Platform(2L, "Switch", "Nintendo Switch")
     private val now = Instant.parse("2026-11-09T20:00:00Z")
-    private val thisYear = Year.of(2026)
-    private val march = LocalDate.of(2026, 3, 12)
+    private val thisYear = Year(2026)
+    private val march = LocalDate(2026, 3, 12)
     private val playingStatus = PlayStatus(PlayTime(12, 30), State.PLAYING)
 
     private fun entry(
@@ -288,7 +288,7 @@ class FakeGameCollectionRepositoryTest {
     @Test
     fun `summary follows the domain rules`() = runTest {
         // Arrange
-        val lastYear = LocalDate.of(2025, 6, 1)
+        val lastYear = LocalDate(2025, 6, 1)
         val sut = FakeGameCollectionRepository(
             listOf(
                 entry(1L, "Backlogged"),

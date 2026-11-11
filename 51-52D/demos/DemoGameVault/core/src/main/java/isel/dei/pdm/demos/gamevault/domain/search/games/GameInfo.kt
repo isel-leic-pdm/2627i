@@ -1,8 +1,8 @@
 package isel.dei.pdm.demos.gamevault.domain.search.games
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
-import java.net.URI
-import java.time.LocalDate
+import isel.dei.pdm.demos.gamevault.domain.Uri
+import kotlinx.datetime.LocalDate
 
 /**
  * Represents the game information as provided by the game search service.
@@ -20,8 +20,8 @@ data class GameInfo(
     val id: Long,
     val name: NonBlankString,
     val releaseDate: LocalDate?,
-    val coverUri: URI?,
-    val thumbnailUri: URI?,
+    val coverUri: Uri?,
+    val thumbnailUri: Uri?,
     val category: Category? = null,
     val platforms: List<GamePlatform> = emptyList()
 ) {
@@ -40,7 +40,7 @@ data class GameInfo(
     /**
      * Convenience constructor that accepts a string for the name, cover and thumbnail URIs.
      * @throws IllegalArgumentException if any of the strings does not meet the requirements for
-     * being a [NonBlankString] or a [URI].
+     * being a [NonBlankString] or a [Uri].
      */
     @Throws
     constructor(
@@ -55,8 +55,8 @@ data class GameInfo(
         id = id,
         name = NonBlankString(name),
         releaseDate = releaseDate,
-        coverUri = coverUri?.let { URI.create(it) },
-        thumbnailUri = thumbnailUri?.let { URI.create(it) },
+        coverUri = coverUri?.let { Uri(it) },
+        thumbnailUri = thumbnailUri?.let { Uri(it) },
         category = category,
         platforms = platforms
     )

@@ -21,10 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import isel.dei.pdm.demos.gamevault.R
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
+import isel.dei.pdm.demos.gamevault.domain.Uri
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
-import java.net.URI
 
 /**
  * Composable used to display information of a particular platform inside a list of platforms.
@@ -137,7 +137,7 @@ data class PlatformListItemModel(
     val id: Long,
     val abbreviation: NonBlankString,
     val name: NonBlankString,
-    val logoUri: URI?,
+    val logoUri: Uri?,
     val version: NonBlankString? = null,
     val mode: PlatformListItemMode = PlatformListItemMode.ADDABLE
 )
@@ -187,7 +187,7 @@ class PlatformListItemViewPreviews {
         id = 1L,
         abbreviation = NonBlankString("PS5"),
         name = NonBlankString("PlayStation 5"),
-        logoUri = URI.create("http://example.com/ps5.png"),
+        logoUri = Uri("http://example.com/ps5.png"),
         version = NonBlankString("Pro"),
         mode = PlatformListItemMode.ADDABLE
     )

@@ -33,7 +33,7 @@ import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import java.time.Year
+import isel.dei.pdm.demos.gamevault.domain.Year
 import kotlin.test.assertIs
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
@@ -46,7 +46,7 @@ class HomeViewModelTest {
 
     private val ps5 = Platform(1L, "PS5", "PlayStation 5")
     private val now = Instant.parse("2026-11-09T20:00:00Z")
-    private val thisYear = Year.of(2026)
+    private val thisYear = Year(2026)
 
     private fun entry(id: Long, name: String, state: State, sessionStart: Instant? = null) =
         CollectionEntry(
@@ -177,12 +177,12 @@ class HomeViewModelTest {
         // Act - The app goes to the background and returns after the year changed
         collector.cancel()
         advanceTimeBy(STOP_TIMEOUT + 1.milliseconds)
-        year = thisYear.plusYears(1)
+        year = Year(thisYear.value + 1)
         collectStates(viewModel)
 
         // Assert
         val state = assertIs<SummaryState.Loaded>(viewModel.summary.value)
-        assertEquals(thisYear.plusYears(1), state.summary.year)
+        assertEquals(Year(thisYear.value + 1), state.summary.year)
     }
 
     // Observation lifecycle

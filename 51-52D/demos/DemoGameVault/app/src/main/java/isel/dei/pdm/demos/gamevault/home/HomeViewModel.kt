@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
-import java.time.Year
+import isel.dei.pdm.demos.gamevault.domain.Year
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -46,7 +46,7 @@ import kotlin.time.Duration.Companion.seconds
 class HomeViewModel(
     private val collectionRepo: GameCollectionRepository,
     private val nowPlayingLimit: Int = DEFAULT_NOW_PLAYING_LIMIT,
-    private val currentYear: () -> Year = { Year.now() }
+    private val currentYear: () -> Year = { Year.current() }
 ) : ViewModel() {
 
     /**

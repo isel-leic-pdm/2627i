@@ -1,8 +1,8 @@
 package isel.dei.pdm.demos.gamevault.domain.collection.games
 
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus.State
-import java.time.LocalDate
-import java.time.Year
+import isel.dei.pdm.demos.gamevault.domain.Year
+import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -15,10 +15,10 @@ import kotlin.time.Duration.Companion.seconds
 
 class PlayStatusTests {
 
-    private val thisYear = Year.of(2026)
-    private val lastYear = LocalDate.of(2025, 6, 1)
-    private val march = LocalDate.of(2026, 3, 12)
-    private val october = LocalDate.of(2026, 10, 3)
+    private val thisYear = Year(2026)
+    private val lastYear = LocalDate(2025, 6, 1)
+    private val march = LocalDate(2026, 3, 12)
+    private val october = LocalDate(2026, 10, 3)
 
     // PlayTime
 
@@ -90,7 +90,7 @@ class PlayStatusTests {
     @Test
     fun `Accomplishment is in the year of its date`() {
         assertTrue(Accomplishment(march).isIn(thisYear))
-        assertFalse(Accomplishment(march).isIn(Year.of(2025)))
+        assertFalse(Accomplishment(march).isIn(Year(2025)))
     }
 
     // PlayStatus construction
@@ -389,7 +389,7 @@ class PlayStatusTests {
         val status = PlayStatus(PlayTime(80, 0), State.PLAYING, platinum = Accomplishment(october))
 
         assertTrue(status.obtainedPlatinumIn(thisYear))
-        assertFalse(status.obtainedPlatinumIn(Year.of(2025)))
+        assertFalse(status.obtainedPlatinumIn(Year(2025)))
     }
 
     @Test

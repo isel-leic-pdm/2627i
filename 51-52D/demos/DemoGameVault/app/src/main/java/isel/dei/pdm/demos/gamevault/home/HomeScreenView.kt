@@ -52,8 +52,8 @@ import isel.dei.pdm.demos.gamevault.collection.games.PlatinumIcon
 import isel.dei.pdm.demos.gamevault.collection.games.labelResId
 import isel.dei.pdm.demos.gamevault.collection.games.platinumColor
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
-import java.time.LocalDate
-import java.time.Year
+import isel.dei.pdm.demos.gamevault.domain.Year
+import kotlinx.datetime.LocalDate
 
 /**
  * The view used to display the home screen contents: the games being played, the collection
@@ -436,7 +436,7 @@ object HomeScreenSampleData {
 
     private fun playingEntry(id: Long, name: String, platform: Platform, hours: Int, minutes: Int) =
         CollectionEntry(
-            game = Game(id, name, LocalDate.of(2023, 1, 1), coverUri = null),
+            game = Game(id, name, LocalDate(2023, 1, 1), coverUri = null),
             platforms = setOf(platform),
             playStatus = PlayStatus(
                 timeSpent = PlayTime(hours, minutes),
@@ -453,7 +453,7 @@ object HomeScreenSampleData {
     val playing = entries.map { it.toItem() }
 
     val summary = CollectionSummary(
-        year = Year.of(2026),
+        year = Year(2026),
         finishedInYear = 6,
         replayedInYear = 1,
         platinumInYear = 2,

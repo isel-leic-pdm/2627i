@@ -3,8 +3,8 @@ package isel.dei.pdm.demos.gamevault.domain.collection.games
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
 import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference.Provider.IGDB
-import java.net.URI
-import java.time.LocalDate
+import isel.dei.pdm.demos.gamevault.domain.Uri
+import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -36,7 +36,7 @@ class GameTests {
         val game = Game(
             id = 1L,
             name = "Elden Ring",
-            releaseDate = LocalDate.of(2022, 2, 25),
+            releaseDate = LocalDate(2022, 2, 25),
             coverUri = "content://vault/covers/1.jpg",
             thumbnailUri = "https://example.com/thumb.jpg",
             source = igdb("119133")
@@ -45,9 +45,9 @@ class GameTests {
         // Assert
         assertEquals(1L, game.id)
         assertEquals(NonBlankString("Elden Ring"), game.name)
-        assertEquals(LocalDate.of(2022, 2, 25), game.releaseDate)
-        assertEquals(URI.create("content://vault/covers/1.jpg"), game.coverUri)
-        assertEquals(URI.create("https://example.com/thumb.jpg"), game.thumbnailUri)
+        assertEquals(LocalDate(2022, 2, 25), game.releaseDate)
+        assertEquals(Uri("content://vault/covers/1.jpg"), game.coverUri)
+        assertEquals(Uri("https://example.com/thumb.jpg"), game.thumbnailUri)
         assertEquals(igdb("119133"), game.source)
     }
 
@@ -91,15 +91,15 @@ class GameTests {
         // Act
         val newGame = NewGame(
             name = "Hades II",
-            releaseDate = LocalDate.of(2025, 9, 25),
+            releaseDate = LocalDate(2025, 9, 25),
             coverUri = "content://vault/covers/2.jpg",
             source = igdb("277143")
         )
 
         // Assert
         assertEquals(NonBlankString("Hades II"), newGame.name)
-        assertEquals(LocalDate.of(2025, 9, 25), newGame.releaseDate)
-        assertEquals(URI.create("content://vault/covers/2.jpg"), newGame.coverUri)
+        assertEquals(LocalDate(2025, 9, 25), newGame.releaseDate)
+        assertEquals(Uri("content://vault/covers/2.jpg"), newGame.coverUri)
         assertNull(newGame.thumbnailUri)
         assertEquals(igdb("277143"), newGame.source)
     }
@@ -131,23 +131,23 @@ class GameTests {
 
     @Test
     fun `games with equal names and release years are the same game`() {
-        val game = Game(1L, "God of War", LocalDate.of(2018, 4, 20))
-        val other = Game(2L, "God of War", LocalDate.of(2018, 1, 1))
+        val game = Game(1L, "God of War", LocalDate(2018, 4, 20))
+        val other = Game(2L, "God of War", LocalDate(2018, 1, 1))
 
         assertTrue(game isSameGameAs other)
     }
 
     @Test
     fun `games with equal names and different release years are not the same game`() {
-        val original = Game(1L, "God of War", LocalDate.of(2005, 3, 22))
-        val reboot = Game(2L, "God of War", LocalDate.of(2018, 4, 20))
+        val original = Game(1L, "God of War", LocalDate(2005, 3, 22))
+        val reboot = Game(2L, "God of War", LocalDate(2018, 4, 20))
 
         assertFalse(original isSameGameAs reboot)
     }
 
     @Test
     fun `games with equal names are the same game when a release year is unknown`() {
-        val game = Game(1L, "Hades II", LocalDate.of(2025, 9, 25))
+        val game = Game(1L, "Hades II", LocalDate(2025, 9, 25))
         val withoutDate = Game(2L, "Hades II")
 
         assertTrue(game isSameGameAs withoutDate)
@@ -190,9 +190,9 @@ class GameTests {
 
     @Test
     fun `NewGame is the same game as a game in the vault following the same rules`() {
-        val inVault = Game(1L, "God of War", LocalDate.of(2018, 4, 20))
+        val inVault = Game(1L, "God of War", LocalDate(2018, 4, 20))
 
-        assertTrue(NewGame("God of War", LocalDate.of(2018, 4, 20)) isSameGameAs inVault)
-        assertFalse(NewGame("God of War", LocalDate.of(2005, 3, 22)) isSameGameAs inVault)
+        assertTrue(NewGame("God of War", LocalDate(2018, 4, 20)) isSameGameAs inVault)
+        assertFalse(NewGame("God of War", LocalDate(2005, 3, 22)) isSameGameAs inVault)
     }
 }

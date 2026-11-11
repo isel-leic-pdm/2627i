@@ -43,7 +43,7 @@ import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayTime
 import isel.dei.pdm.demos.gamevault.domain.collection.games.toItem
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 /**
  * The maximum font scale used in the text displayed on top of the covers. Together with the
@@ -182,17 +182,17 @@ class GameCarouselPreviews {
 
     private val sampleItems = listOf(
         CollectionEntry(
-            game = Game(1L, "Elden Ring", LocalDate.of(2022, 2, 25), coverUri = null),
+            game = Game(1L, "Elden Ring", LocalDate(2022, 2, 25), coverUri = null),
             platforms = setOf(ps5),
             playStatus = PlayStatus(PlayTime(42, 10), PlayStatus.State.PLAYING)
         ),
         CollectionEntry(
-            game = Game(2L, "The Legend of Zelda: Tears of the Kingdom", LocalDate.of(2023, 5, 12), coverUri = null),
+            game = Game(2L, "The Legend of Zelda: Tears of the Kingdom", LocalDate(2023, 5, 12), coverUri = null),
             platforms = setOf(switch),
             playStatus = PlayStatus(PlayTime(87, 45), PlayStatus.State.PLAYING)
         ),
         CollectionEntry(
-            game = Game(3L, "Hades II", LocalDate.of(2025, 9, 25), coverUri = null),
+            game = Game(3L, "Hades II", LocalDate(2025, 9, 25), coverUri = null),
             // Owned on several platforms
             platforms = setOf(ps5, switch),
             playStatus = PlayStatus(PlayTime(12, 5), PlayStatus.State.PLAYING)

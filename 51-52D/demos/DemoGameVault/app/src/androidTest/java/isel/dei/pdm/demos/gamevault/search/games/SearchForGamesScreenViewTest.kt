@@ -47,7 +47,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 class SearchForGamesScreenViewTest {
 
@@ -63,9 +63,9 @@ class SearchForGamesScreenViewTest {
             selectedPlatform = SWITCH
         )
 
-        val TOTK = GameInfo(1L, "Tears of the Kingdom", LocalDate.of(2023, 5, 12))
-        val BOTW = GameInfo(2L, "Breath of the Wild", LocalDate.of(2017, 3, 3))
-        val ECHOES = GameInfo(3L, "Echoes of Wisdom", LocalDate.of(2024, 9, 26))
+        val TOTK = GameInfo(1L, "Tears of the Kingdom", LocalDate(2023, 5, 12))
+        val BOTW = GameInfo(2L, "Breath of the Wild", LocalDate(2017, 3, 3))
+        val ECHOES = GameInfo(3L, "Echoes of Wisdom", LocalDate(2024, 9, 26))
 
         /**
          * Longer than the search box's debounce delay.
