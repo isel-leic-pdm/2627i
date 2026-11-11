@@ -92,7 +92,7 @@ fun CollectionItemView(
                 )
                 Spacer(modifier = Modifier.size(2.dp))
                 Text(
-                    text = item.platformAbbreviation.value,
+                    text = item.platformAbbreviations.joinToString(", ") { it.value },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
@@ -166,7 +166,7 @@ class CollectionItemViewPreviews {
 
     private val zelda = CollectionEntry(
         game = Game(1L, "The Legend of Zelda: Tears of the Kingdom", LocalDate.of(2023, 5, 12), coverUri = null),
-        platform = Platform(2L, "Switch", "Nintendo Switch"),
+        platforms = setOf(Platform(2L, "Switch", "Nintendo Switch")),
         playStatus = PlayStatus(
             timeSpent = PlayTime(120, 15),
             state = PlayStatus.State.FINISHED,
@@ -176,19 +176,20 @@ class CollectionItemViewPreviews {
 
     private val eldenRing = CollectionEntry(
         game = Game(2L, "Elden Ring", LocalDate.of(2022, 2, 25), coverUri = null),
-        platform = Platform(1L, "PS5", "PlayStation 5"),
+        platforms = setOf(Platform(1L, "PS5", "PlayStation 5")),
         playStatus = PlayStatus(PlayTime(45, 30), PlayStatus.State.PLAYING)
     ).toItem()
 
     private val hades = CollectionEntry(
         game = Game(3L, "Hades II", LocalDate.of(2025, 9, 25), coverUri = null),
-        platform = Platform(1L, "PS5", "PlayStation 5"),
+        // Owned on several platforms
+        platforms = setOf(Platform(2L, "Switch", "Nintendo Switch"), Platform(3L, "PC", "PC")),
         playStatus = PlayStatus(state = PlayStatus.State.BACKLOG)
     ).toItem()
 
     private val celeste = CollectionEntry(
         game = Game(4L, "Celeste", LocalDate.of(2018, 1, 25), coverUri = null),
-        platform = Platform(2L, "Switch", "Nintendo Switch"),
+        platforms = setOf(Platform(2L, "Switch", "Nintendo Switch")),
         playStatus = PlayStatus()
     ).toItem()
 

@@ -35,6 +35,7 @@ class FakeGameCollectionRepositoryTest {
     private val now = Instant.parse("2026-11-09T20:00:00Z")
     private val thisYear = Year.of(2026)
     private val march = LocalDate.of(2026, 3, 12)
+    private val playingStatus = PlayStatus(PlayTime(12, 30), State.PLAYING)
 
     private fun entry(
         id: Long,
@@ -42,7 +43,7 @@ class FakeGameCollectionRepositoryTest {
         platform: Platform = ps5,
         status: PlayStatus = PlayStatus(state = State.BACKLOG),
         sessionStart: Instant? = null
-    ) = CollectionEntry(Game(id, name), platform, status, sessionStartTime = sessionStart)
+    ) = CollectionEntry(Game(id, name), setOf(platform), status, sessionStartTime = sessionStart)
 
     private fun playing(id: Long, name: String, platform: Platform = ps5) =
         entry(id, name, platform, PlayStatus(PlayTime(1, 0), State.PLAYING))
@@ -86,7 +87,7 @@ class FakeGameCollectionRepositoryTest {
         val gameId = assertIs<AddGameResult.Added>(result).gameId
         val entry = sut.observeEntry(gameId).first()
         assertEquals("Elden Ring", entry?.game?.name?.value)
-        assertEquals(ps5, entry?.platform)
+        assertEquals(setOf(ps5), entry?.platforms)
         assertEquals(State.BACKLOG, entry?.playStatus?.state)
         assertEquals(details.toGameDetails(entry!!.game), sut.observeDetails(gameId).first())
     }
@@ -106,24 +107,77 @@ class FakeGameCollectionRepositoryTest {
     }
 
     @Test
-    fun `add of the same game reports it and adds nothing`() = runTest {
+    fun `add of the same game on another platform adds the platform to its entry`() = runTest {
         // Arrange
-        val sut = FakeGameCollectionRepository(listOf(entry(1L, "The Legend of Zelda: Breath of the Wild")))
+        val existing = entry(1L, "The Legend of Zelda: Breath of the Wild", switch, playingStatus)
+        val sut = FakeGameCollectionRepository(listOf(existing))
 
         // Act
-        val result = sut.add(NewGame("the legend of zelda breath of the wild"), switch)
+        val result = sut.add(
+            NewGame("the legend of zelda breath of the wild"),
+            ps5,
+            playStatus = PlayStatus(state = State.BACKLOG),
+            details = NewGameDetails(notes = NonBlankString("Ignored"))
+        )
 
-        // Assert
-        assertEquals(1L, assertIs<AddGameResult.AlreadyInCollection>(result).existing.id)
+        // Assert - No entry is added, and the play status and details are kept
+        assertEquals(1L, assertIs<AddGameResult.PlatformAdded>(result).existing.id)
         assertEquals(1, sut.names().size)
+        val entry = sut.observeEntry(1L).first()
+        assertEquals(listOf(switch, ps5), entry?.platforms?.toList())
+        assertEquals(playingStatus, entry?.playStatus)
+        assertNull(sut.observeDetails(1L).first()?.notes)
     }
 
     @Test
-    fun `findSameGame finds the same game, or null`() = runTest {
-        val sut = FakeGameCollectionRepository(listOf(entry(1L, "Hades")))
+    fun `add of the same game on a platform it is owned on changes nothing`() = runTest {
+        // Arrange
+        val existing = entry(1L, "The Legend of Zelda: Breath of the Wild", switch)
+        val sut = FakeGameCollectionRepository(listOf(existing))
 
-        assertEquals(1L, sut.findSameGame(NewGame("HADES"))?.id)
-        assertNull(sut.findSameGame(NewGame("Hades II")))
+        // Act - Even if given an outdated copy of the platform
+        val result = sut.add(NewGame("The Legend of Zelda: Breath of the Wild"), switch.copy(logoUri = null))
+
+        // Assert
+        assertEquals(1L, assertIs<AddGameResult.AlreadyOwnedOnPlatform>(result).existing.id)
+        assertEquals(existing, sut.observeEntry(1L).first())
+    }
+
+    @Test
+    fun `findSameEntry finds the entry of the same game, or null`() = runTest {
+        val existing = entry(1L, "Hades")
+        val sut = FakeGameCollectionRepository(listOf(existing))
+
+        assertEquals(existing, sut.findSameEntry(NewGame("HADES")))
+        assertNull(sut.findSameEntry(NewGame("Hades II")))
+    }
+
+    @Test
+    fun `findSameEntry tells the platforms the game is owned on, regardless of versions`() = runTest {
+        // Arrange
+        val ps5Slim = Platform(3L, "PS5", "PlayStation 5", version = "Slim")
+        val sut = FakeGameCollectionRepository(listOf(entry(1L, "Hades", ps5)))
+
+        // Act
+        val entry = sut.findSameEntry(NewGame("Hades"))
+
+        // Assert - Games are oblivious of versions: owned on the PS5 is owned on the PS5 Slim
+        assertTrue(entry!!.isOwnedOn(ps5Slim))
+        assertFalse(entry.isOwnedOn(switch))
+    }
+
+    @Test
+    fun `add of the same game on another version of a platform it is owned on changes nothing`() = runTest {
+        // Arrange
+        val existing = entry(1L, "Hades", ps5)
+        val sut = FakeGameCollectionRepository(listOf(existing))
+
+        // Act
+        val result = sut.add(NewGame("Hades"), Platform(3L, "PS5", "PlayStation 5", version = "Pro"))
+
+        // Assert
+        assertEquals(1L, assertIs<AddGameResult.AlreadyOwnedOnPlatform>(result).existing.id)
+        assertEquals(existing, sut.observeEntry(1L).first())
     }
 
     // Listing
@@ -174,6 +228,22 @@ class FakeGameCollectionRepositoryTest {
             listOf("Hades"),
             sut.names(CollectionQuery(state = State.PLAYING, platformId = ps5.id))
         )
+    }
+
+    @Test
+    fun `platform criterion matches games owned on the platform among others`() = runTest {
+        // Arrange
+        val sut = FakeGameCollectionRepository(
+            listOf(
+                CollectionEntry(Game(1L, "Hades"), setOf(ps5, switch)),
+                entry(2L, "Celeste", switch),
+                entry(3L, "Bloodborne", ps5)
+            )
+        )
+
+        // Act & Assert
+        assertEquals(listOf("Celeste", "Hades"), sut.names(CollectionQuery(platformId = switch.id)))
+        assertEquals(listOf("Bloodborne", "Hades"), sut.names(CollectionQuery(platformId = ps5.id)))
     }
 
     @Test

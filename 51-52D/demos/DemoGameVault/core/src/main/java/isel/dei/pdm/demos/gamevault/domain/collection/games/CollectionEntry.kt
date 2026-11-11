@@ -1,6 +1,7 @@
 package isel.dei.pdm.demos.gamevault.domain.collection.games
 
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.distinctGamePlatforms
 import java.time.LocalDate
 import kotlin.time.Clock
 import kotlin.time.Duration
@@ -8,19 +9,27 @@ import kotlin.time.Instant
 
 /**
  * Represents an entry in the user's game collection.
- * An entry consists of a game, the platform it's owned on, its playing status,
+ * An entry consists of a game, the platforms it's owned on, its playing status,
  * and the date it was added to the collection.
  *
  * The collection has at most one entry per game, and at most one active play session overall
  * (the user does not play two games at the same time). Both rules involve several entries, so
  * they are enforced by the collection's repository, not by this class.
  *
+ * The user may own the game on several platforms (e.g. bought for the PS5 and for the PC). The
+ * play status is the game's, regardless of the platforms it is played on. Games are oblivious of
+ * the platforms' versions (see [Platform.isSameGamePlatformAs]): a game owned on the PS5 Slim is
+ * owned on the PS5, whatever its version.
+ *
  * Play time is logged through play sessions: starting a session registers its start time, and
  * ending it adds the elapsed time to the time spent playing. Only the total is kept. Play time
  * may also be added directly (e.g. if the user forgot to start a session).
  *
  * @property game The catalog game entry.
- * @property platform The platform the game is owned on.
+ * @property platforms The platforms the game is owned on, in the order they were added. There is
+ * at least one, and no two of them are versions of the same platform (see [isOwnedOn]). Each one
+ * is the version of the collection through which the game was registered as owned on the
+ * platform, which is merely a reference: its version is irrelevant.
  * @property playStatus The user's playing status for this game.
  * @property addedAt The date the game was added to the collection.
  * @property sessionStartTime The time when the current play session started, or null if no
@@ -28,12 +37,16 @@ import kotlin.time.Instant
  */
 data class CollectionEntry(
     val game: Game,
-    val platform: Platform,
+    val platforms: Set<Platform>,
     val playStatus: PlayStatus = PlayStatus(),
     val addedAt: Instant = Clock.System.now(),
     val sessionStartTime: Instant? = null
 ) {
     init {
+        require(platforms.isNotEmpty()) { "The game must be owned on at least one platform" }
+        require(platforms.toList().distinctGamePlatforms().size == platforms.size) {
+            "The platforms cannot include versions of the same platform"
+        }
         require(sessionStartTime == null || playStatus.state == PlayStatus.State.PLAYING) {
             "Games with an active play session must be in the PLAYING state"
         }
@@ -44,6 +57,26 @@ data class CollectionEntry(
      */
     val isSessionActive: Boolean
         get() = sessionStartTime != null
+
+    /**
+     * Checks whether the game is owned on the given platform, regardless of its version (see
+     * [Platform.isSameGamePlatformAs]). For example, a game owned on the PS5 is owned on the PS5
+     * Slim.
+     * @param platform The platform to check.
+     */
+    fun isOwnedOn(platform: Platform): Boolean =
+        platforms.any { it.isSameGamePlatformAs(platform) }
+
+    /**
+     * Registers that the game is also owned on the given platform. The play status is kept, as
+     * it is the game's, regardless of the platform. Has no effect if the game is already owned on
+     * the platform (see [isOwnedOn]).
+     * @param platform The platform the game is also owned on.
+     * @return A new [CollectionEntry] owned on the platform, or this entry if it already was.
+     */
+    fun addPlatform(platform: Platform): CollectionEntry =
+        if (isOwnedOn(platform)) this
+        else copy(platforms = platforms + platform)
 
     /**
      * Updates the state of the entry's play status. See [PlayStatus.updateState].

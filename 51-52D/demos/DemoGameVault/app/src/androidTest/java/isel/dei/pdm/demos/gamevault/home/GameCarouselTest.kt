@@ -41,7 +41,7 @@ class GameCarouselTest {
     private fun entry(id: Long, name: String, platform: Platform, hours: Int = 0, minutes: Int = 0) =
         CollectionEntry(
             game = Game(id, name, releaseDate = null, coverUri = null),
-            platform = platform,
+            platforms = setOf(platform),
             playStatus = PlayStatus(PlayTime(hours, minutes), PlayStatus.State.PLAYING)
         ).toItem()
 

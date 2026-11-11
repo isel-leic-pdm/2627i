@@ -17,6 +17,7 @@ import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformSearchServic
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformViewModel.Companion.DEFAULT_SEARCH_INDICATOR_DELAY
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformViewModel.Companion.QUERY_KEY
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformViewModel.Companion.STOP_TIMEOUT
+import isel.dei.pdm.demos.gamevault.ui.common.AddStatus
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,6 +25,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -115,7 +117,7 @@ class SearchForPlatformViewModelTest {
         assertIs<UnrecoverablePersistenceException>(outcome.error)
     }
 
-    private fun SearchForPlatformViewModel.statusOf(platform: PlatformInfo): PlatformAddStatus {
+    private fun SearchForPlatformViewModel.statusOf(platform: PlatformInfo): AddStatus {
         val state = state.value
         assertIs<SearchForPlatformScreenState.Results>(state)
         return state.items.first { it.platform == platform }.addStatus
@@ -259,7 +261,7 @@ class SearchForPlatformViewModelTest {
         assertIs<SearchForPlatformScreenState.Results>(state)
         assertEquals(PS5_QUERY, state.query)
         assertEquals(listOf(PS5, PS5_PRO), state.items.map { it.platform })
-        assertTrue(state.items.all { it.addStatus == PlatformAddStatus.NOT_ADDED })
+        assertTrue(state.items.all { it.addStatus == AddStatus.NOT_ADDED })
     }
 
     @Test
@@ -455,8 +457,8 @@ class SearchForPlatformViewModelTest {
         val viewModel = createViewModelWithPs5Results()
 
         // Assert
-        assertEquals(PlatformAddStatus.NOT_ADDED, viewModel.statusOf(PS5))
-        assertEquals(PlatformAddStatus.ADDED, viewModel.statusOf(PS5_PRO))
+        assertEquals(AddStatus.NOT_ADDED, viewModel.statusOf(PS5))
+        assertEquals(AddStatus.ADDED, viewModel.statusOf(PS5_PRO))
     }
 
     @Test
@@ -470,8 +472,8 @@ class SearchForPlatformViewModelTest {
         searchService.complete(SWITCH_QUERY, listOf(SWITCH, SWITCH_OLED))
 
         // Assert
-        assertEquals(PlatformAddStatus.ADDED, viewModel.statusOf(SWITCH))
-        assertEquals(PlatformAddStatus.NOT_ADDED, viewModel.statusOf(SWITCH_OLED))
+        assertEquals(AddStatus.ADDED, viewModel.statusOf(SWITCH))
+        assertEquals(AddStatus.NOT_ADDED, viewModel.statusOf(SWITCH_OLED))
     }
 
     @Test
@@ -485,8 +487,8 @@ class SearchForPlatformViewModelTest {
         searchService.complete(SWITCH_QUERY, listOf(SWITCH, SWITCH_OLED))
 
         // Assert
-        assertEquals(PlatformAddStatus.NOT_ADDED, viewModel.statusOf(SWITCH))
-        assertEquals(PlatformAddStatus.ADDED, viewModel.statusOf(SWITCH_OLED))
+        assertEquals(AddStatus.NOT_ADDED, viewModel.statusOf(SWITCH))
+        assertEquals(AddStatus.ADDED, viewModel.statusOf(SWITCH_OLED))
     }
 
     @Test
@@ -498,7 +500,7 @@ class SearchForPlatformViewModelTest {
         repository.preload(Platform(1L, "PS5", "PlayStation 5", version = "Standard"))
 
         // Assert
-        assertEquals(PlatformAddStatus.ADDED, viewModel.statusOf(PS5))
+        assertEquals(AddStatus.ADDED, viewModel.statusOf(PS5))
     }
 
     @Test
@@ -514,7 +516,7 @@ class SearchForPlatformViewModelTest {
         searchService.complete(PS5_QUERY, listOf(PS5))
 
         // Assert
-        assertEquals(PlatformAddStatus.NOT_ADDED, viewModel.statusOf(PS5))
+        assertEquals(AddStatus.NOT_ADDED, viewModel.statusOf(PS5))
     }
 
     // Adding platforms
@@ -528,8 +530,8 @@ class SearchForPlatformViewModelTest {
         viewModel.onAddPlatform(PS5_PRO)
 
         // Assert
-        assertEquals(PlatformAddStatus.ADDING, viewModel.statusOf(PS5_PRO))
-        assertEquals(PlatformAddStatus.NOT_ADDED, viewModel.statusOf(PS5))
+        assertEquals(AddStatus.ADDING, viewModel.statusOf(PS5_PRO))
+        assertEquals(AddStatus.NOT_ADDED, viewModel.statusOf(PS5))
     }
 
     @Test
@@ -542,7 +544,7 @@ class SearchForPlatformViewModelTest {
         repository.completeAdd()
 
         // Assert
-        assertEquals(PlatformAddStatus.ADDED, viewModel.statusOf(PS5_PRO))
+        assertEquals(AddStatus.ADDED, viewModel.statusOf(PS5_PRO))
         assertNull(viewModel.addOutcome.value)
         val added = repository.platforms.first().single()
         assertEquals(PS5_PRO.name, added.name)
@@ -562,7 +564,7 @@ class SearchForPlatformViewModelTest {
         repository.failAdd(UnrecoverablePersistenceException())
 
         // Assert
-        assertEquals(PlatformAddStatus.NOT_ADDED, viewModel.statusOf(PS5_PRO))
+        assertEquals(AddStatus.NOT_ADDED, viewModel.statusOf(PS5_PRO))
         viewModel.assertFailedOutcomeFor(PS5_PRO)
     }
 
@@ -609,7 +611,7 @@ class SearchForPlatformViewModelTest {
 
         // Assert - The user can see it was added, so there is nothing to report
         assertNull(viewModel.addOutcome.value)
-        assertEquals(PlatformAddStatus.ADDED, viewModel.statusOf(PS5_PRO))
+        assertEquals(AddStatus.ADDED, viewModel.statusOf(PS5_PRO))
     }
 
     @Test
@@ -625,7 +627,7 @@ class SearchForPlatformViewModelTest {
         searchService.complete(PS5_QUERY, listOf(PS5, PS5_PRO))
 
         // Assert
-        assertEquals(PlatformAddStatus.ADDED, viewModel.statusOf(PS5_PRO))
+        assertEquals(AddStatus.ADDED, viewModel.statusOf(PS5_PRO))
     }
 
     @Test
@@ -747,10 +749,11 @@ class ControlledPlatformSearchService : PlatformSearchService {
 /**
  * A [PlatformCollectionRepository] implementation whose additions only complete when told so by
  * tests, in the order they were requested.
- * @param readError If not null, the error thrown when collecting [platforms].
+ * @param readError If not null, the error thrown when collecting [platforms]. It can be changed
+ * afterward, affecting subsequent collections (e.g. to simulate a recovery).
  */
 class ControlledPlatformCollectionRepository(
-    private val readError: PersistenceException? = null
+    var readError: PersistenceException? = null
 ) : PlatformCollectionRepository {
 
     private val _platforms = MutableStateFlow<List<Platform>>(emptyList())
@@ -768,9 +771,10 @@ class ControlledPlatformCollectionRepository(
     val pendingAdds: Int
         get() = pending.size
 
-    override val platforms: Flow<List<Platform>> =
-        if (readError == null) _platforms
-        else flow { throw readError }
+    override val platforms: Flow<List<Platform>> = flow {
+        readError?.let { throw it }
+        emitAll(_platforms)
+    }
 
     override suspend fun add(platform: NewPlatform): Long {
         val completion = CompletableDeferred<Unit>()

@@ -14,8 +14,9 @@ import kotlin.time.Instant
  * implementable as a fixed query), instead of offering general purpose search operations.
  *
  * The collection has at most one entry per game, so entries are identified by their game's
- * identifier. It also has at most one active play session overall. Implementations must enforce
- * both rules, as they involve several entries.
+ * identifier. A game owned on several platforms has a single entry, owned on all of them (see
+ * [CollectionEntry.platforms]). The collection also has at most one active play session overall.
+ * Implementations must enforce both rules, as they involve several entries.
  *
  * Listings are made of lightweight [CollectionItem]s, while the complete [CollectionEntry] is only
  * provided when working with a single game. Instead of being paginated, listings are limited:
@@ -32,25 +33,33 @@ interface GameCollectionRepository {
     // Adding games
 
     /**
-     * Finds the game in the collection that is the same as the given one (see
-     * [NewGame.isSameGameAs]). Meant, for example, to signal search results that are already in
-     * the collection.
+     * Finds the entry of the game in the collection that is the same as the given one (see
+     * [NewGame.isSameGameAs]). Meant, for example, to signal the search results that are already
+     * in the collection, on each of the platforms they are owned on (see
+     * [CollectionEntry.isOwnedOn]).
      * @param game The game to look for.
-     * @return The game in the collection, or null if not found.
+     * @return The entry of the game in the collection, or null if not found.
      * @throws PersistenceException If the collection cannot be read.
      */
-    suspend fun findSameGame(game: NewGame): Game?
+    suspend fun findSameEntry(game: NewGame): CollectionEntry?
 
     /**
      * Adds the given game to the collection, with its details, owned on the given platform. Both
      * are stored atomically.
+     *
+     * If the same game is already in the collection (see [NewGame.isSameGameAs]), no entry is
+     * added: the existing entry becomes owned on the given platform too (see
+     * [CollectionEntry.addPlatform]), and the given play status and details are ignored, as the
+     * entry already has its own. Nothing changes if the existing entry is already owned on the
+     * platform.
      * @param game The game to add.
      * @param platform The platform the game is owned on.
      * @param playStatus The game's initial play status (e.g. BACKLOG, or the progress obtained
-     * from an import).
-     * @param details The game's details.
-     * @return [AddGameResult.Added], or [AddGameResult.AlreadyInCollection] if the same game is
-     * already in the collection (see [NewGame.isSameGameAs]), in which case nothing is added.
+     * from an import). Only used if the game is not in the collection yet.
+     * @param details The game's details. Only used if the game is not in the collection yet.
+     * @return [AddGameResult.Added] if the game was not in the collection,
+     * [AddGameResult.PlatformAdded] if it was, but not owned on the platform, or
+     * [AddGameResult.AlreadyOwnedOnPlatform] if it already was owned on the platform.
      * @throws PersistenceException If the game cannot be added.
      */
     suspend fun add(
@@ -171,9 +180,18 @@ sealed interface AddGameResult {
     data class Added(val gameId: Long) : AddGameResult
 
     /**
-     * The game was not added, because the same game is already in the collection.
+     * The same game was already in the collection, and it is now also owned on the platform.
+     * @property existing The game in the collection, which may differ from the added one (e.g.
+     * if the user edited its name).
      */
-    data class AlreadyInCollection(val existing: Game) : AddGameResult
+    data class PlatformAdded(val existing: Game) : AddGameResult
+
+    /**
+     * Nothing changed, because the same game was already in the collection, owned on the
+     * platform.
+     * @property existing The game in the collection.
+     */
+    data class AlreadyOwnedOnPlatform(val existing: Game) : AddGameResult
 }
 
 /**

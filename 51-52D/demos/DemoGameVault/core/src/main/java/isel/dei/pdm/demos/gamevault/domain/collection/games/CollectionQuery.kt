@@ -10,8 +10,8 @@ import isel.dei.pdm.demos.gamevault.domain.NonBlankString
  *
  * @property state Only entries in this play state, or any state if null.
  * @property platinumOnly Only entries whose platinum was obtained.
- * @property platformId Only entries owned on the platform with this identifier, or any platform
- * if null.
+ * @property platformId Only entries owned on the platform with this identifier (among others, as
+ * games may be owned on several platforms), or any platform if null.
  * @property nameContains Only entries whose game's name contains this text, ignoring case, or any
  * name if null.
  * @property initial Only entries whose game's name is listed under this initial, for alphabetical

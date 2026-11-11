@@ -1,6 +1,7 @@
 package isel.dei.pdm.demos.gamevault.search.platforms
 
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
+import isel.dei.pdm.demos.gamevault.ui.common.AddStatus
 import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItemMode
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -17,13 +18,13 @@ class PlatformSearchItemUiStateTest {
     fun each_add_status_is_displayed_in_the_corresponding_list_item_mode() {
         // Arrange
         val expectedModes = mapOf(
-            PlatformAddStatus.NOT_ADDED to PlatformListItemMode.ADDABLE,
-            PlatformAddStatus.ADDING to PlatformListItemMode.ADDING,
-            PlatformAddStatus.ADDED to PlatformListItemMode.ADDED
+            AddStatus.NOT_ADDED to PlatformListItemMode.ADDABLE,
+            AddStatus.ADDING to PlatformListItemMode.ADDING,
+            AddStatus.ADDED to PlatformListItemMode.ADDED
         )
 
         // Act & Assert - Fails if a new status is added without being mapped here
-        assertEquals(PlatformAddStatus.entries.toSet(), expectedModes.keys)
+        assertEquals(AddStatus.entries.toSet(), expectedModes.keys)
         expectedModes.forEach { (status, mode) ->
             assertEquals(mode, PlatformSearchItemUiState(PS5, status).toListItemModel().mode)
         }
@@ -57,7 +58,7 @@ class PlatformSearchItemUiStateTest {
     @Test
     fun key_does_not_depend_on_the_add_status() {
         // Act
-        val keys = PlatformAddStatus.entries.map { PlatformSearchItemUiState(PS5, it).key }
+        val keys = AddStatus.entries.map { PlatformSearchItemUiState(PS5, it).key }
 
         // Assert - Otherwise, list items would be recreated (losing their state) as they are added
         assertEquals(1, keys.toSet().size)

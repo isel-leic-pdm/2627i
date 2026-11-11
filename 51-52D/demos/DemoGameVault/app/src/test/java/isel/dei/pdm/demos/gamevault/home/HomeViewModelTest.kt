@@ -51,7 +51,7 @@ class HomeViewModelTest {
     private fun entry(id: Long, name: String, state: State, sessionStart: Instant? = null) =
         CollectionEntry(
             game = Game(id, name),
-            platform = ps5,
+            platforms = setOf(ps5),
             playStatus = PlayStatus(PlayTime(1, 0), state),
             sessionStartTime = sessionStart
         )

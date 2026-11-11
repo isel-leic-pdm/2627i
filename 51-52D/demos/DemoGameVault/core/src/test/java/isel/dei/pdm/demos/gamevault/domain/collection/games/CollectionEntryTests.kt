@@ -19,6 +19,7 @@ class CollectionEntryTests {
 
     private val game = Game(1L, "Elden Ring")
     private val platform = Platform(1L, "PS5", "PlayStation 5")
+    private val switch = Platform(2L, "Switch", "Nintendo Switch")
     private val addedAt = Instant.parse("2026-01-15T10:00:00Z")
     private val sessionStart = Instant.parse("2026-11-08T20:00:00Z")
     private val completedOn = LocalDate.of(2026, 11, 8)
@@ -30,7 +31,7 @@ class CollectionEntryTests {
         sessionStartTime: Instant? = null
     ) = CollectionEntry(
         game = game,
-        platform = platform,
+        platforms = setOf(platform),
         playStatus = PlayStatus(timeSpent, state, completedRuns),
         addedAt = addedAt,
         sessionStartTime = sessionStartTime
@@ -43,7 +44,7 @@ class CollectionEntryTests {
     @Test
     fun `CollectionEntry has default play status and no active session by default`() {
         // Act
-        val entry = CollectionEntry(game, platform)
+        val entry = CollectionEntry(game, setOf(platform))
 
         // Assert
         assertEquals(PlayStatus(), entry.playStatus)
@@ -57,11 +58,28 @@ class CollectionEntryTests {
         val before = Clock.System.now()
 
         // Act
-        val entry = CollectionEntry(game, platform)
+        val entry = CollectionEntry(game, setOf(platform))
 
         // Assert
         val after = Clock.System.now()
         assertTrue(entry.addedAt in before..after)
+    }
+
+    @Test
+    fun `CollectionEntry must be owned on at least one platform`() {
+        assertFailsWith<IllegalArgumentException> {
+            CollectionEntry(game, emptySet())
+        }
+    }
+
+    @Test
+    fun `CollectionEntry platforms cannot include versions of the same platform`() {
+        // Games are oblivious of versions: owned on the PS5 Slim is owned on the PS5
+        val slim = Platform(3L, "PS5", "PlayStation 5", version = "Slim")
+
+        assertFailsWith<IllegalArgumentException> {
+            CollectionEntry(game, setOf(platform, slim))
+        }
     }
 
     @Test
@@ -70,6 +88,44 @@ class CollectionEntryTests {
         assertFailsWith<IllegalArgumentException> {
             entry(state = State.PAUSED, sessionStartTime = sessionStart)
         }
+    }
+
+    // Platforms
+
+    @Test
+    fun `isOwnedOn recognizes the platforms regardless of their versions`() {
+        val entry = entry()
+
+        assertTrue(entry.isOwnedOn(platform))
+        assertTrue(entry.isOwnedOn(Platform(3L, "PS5", "PlayStation 5", version = "Slim")))
+        assertFalse(entry.isOwnedOn(switch))
+    }
+
+    @Test
+    fun `addPlatform adds the platform after the existing ones and keeps the rest of the entry`() {
+        // Arrange
+        val entry = entry(state = State.FINISHED, completedRuns = listOf(Accomplishment(completedOn)))
+
+        // Act
+        val updated = entry.addPlatform(switch)
+
+        // Assert
+        assertEquals(listOf(platform, switch), updated.platforms.toList())
+        assertEquals(entry.playStatus, updated.playStatus)
+        assertEquals(entry.game, updated.game)
+        assertEquals(entry.addedAt, updated.addedAt)
+    }
+
+    @Test
+    fun `addPlatform has no effect if the game is already owned on the platform`() {
+        // Arrange
+        val entry = entry()
+
+        // Act - Even if given another version of the platform
+        val updated = entry.addPlatform(Platform(3L, "PS5", "PlayStation 5", version = "Pro"))
+
+        // Assert
+        assertEquals(entry, updated)
     }
 
     // Play status operations: each one updates the play status only
@@ -117,7 +173,7 @@ class CollectionEntryTests {
             entry.addPlayTime(30.minutes)
         ).forEach { updated ->
             assertEquals(game, updated.game)
-            assertEquals(platform, updated.platform)
+            assertEquals(setOf(platform), updated.platforms)
             assertEquals(addedAt, updated.addedAt)
             assertNull(updated.sessionStartTime)
         }

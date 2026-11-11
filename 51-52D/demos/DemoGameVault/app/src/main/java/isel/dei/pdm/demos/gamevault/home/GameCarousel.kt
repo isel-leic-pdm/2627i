@@ -150,7 +150,7 @@ private fun CarouselItemScope.GameCarouselItem(item: CollectionItem, onSelected:
                 Text(
                     text = stringResource(
                         R.string.game_card_platform_and_play_time,
-                        item.platformAbbreviation.value,
+                        item.platformAbbreviations.joinToString(", ") { it.value },
                         item.timeSpent.hours,
                         item.timeSpent.minutes
                     ),
@@ -183,17 +183,18 @@ class GameCarouselPreviews {
     private val sampleItems = listOf(
         CollectionEntry(
             game = Game(1L, "Elden Ring", LocalDate.of(2022, 2, 25), coverUri = null),
-            platform = ps5,
+            platforms = setOf(ps5),
             playStatus = PlayStatus(PlayTime(42, 10), PlayStatus.State.PLAYING)
         ),
         CollectionEntry(
             game = Game(2L, "The Legend of Zelda: Tears of the Kingdom", LocalDate.of(2023, 5, 12), coverUri = null),
-            platform = switch,
+            platforms = setOf(switch),
             playStatus = PlayStatus(PlayTime(87, 45), PlayStatus.State.PLAYING)
         ),
         CollectionEntry(
             game = Game(3L, "Hades II", LocalDate.of(2025, 9, 25), coverUri = null),
-            platform = ps5,
+            // Owned on several platforms
+            platforms = setOf(ps5, switch),
             playStatus = PlayStatus(PlayTime(12, 5), PlayStatus.State.PLAYING)
         )
     ).map { it.toItem() }

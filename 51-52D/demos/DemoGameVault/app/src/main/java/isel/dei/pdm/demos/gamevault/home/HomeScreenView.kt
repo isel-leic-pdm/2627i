@@ -437,7 +437,7 @@ object HomeScreenSampleData {
     private fun playingEntry(id: Long, name: String, platform: Platform, hours: Int, minutes: Int) =
         CollectionEntry(
             game = Game(id, name, LocalDate.of(2023, 1, 1), coverUri = null),
-            platform = platform,
+            platforms = setOf(platform),
             playStatus = PlayStatus(
                 timeSpent = PlayTime(hours, minutes),
                 state = PlayStatus.State.PLAYING

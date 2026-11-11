@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import isel.dei.pdm.demos.gamevault.DependenciesContainer
 import isel.dei.pdm.demos.gamevault.collection.platforms.PlatformCollectionActivity
+import isel.dei.pdm.demos.gamevault.search.games.SearchForGamesActivity
 import isel.dei.pdm.demos.gamevault.settings.SettingsActivity
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 
@@ -34,7 +35,8 @@ class HomeActivity : ComponentActivity() {
                 HomeScreen(
                     viewModel = viewModel,
                     onOpenSettings = { SettingsActivity.navigate(this) },
-                    onOpenPlatforms = { PlatformCollectionActivity.navigate(this) }
+                    onOpenPlatforms = { PlatformCollectionActivity.navigate(this) },
+                    onAddGame = { SearchForGamesActivity.navigate(this) }
                 )
             }
         }

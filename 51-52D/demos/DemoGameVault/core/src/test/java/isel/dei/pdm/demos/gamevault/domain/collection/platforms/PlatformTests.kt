@@ -7,11 +7,66 @@ import java.time.Year
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class PlatformTests {
 
     private val igdbSource = SourceReference(SourceReference.Provider.IGDB, NonBlankString("167"))
+
+    // Platforms as far as games are concerned
+
+    @Test
+    fun `versions of a platform obtained from the provider are the same game platform`() {
+        val ps5 = Platform(1L, "PS5", "PlayStation 5", source = igdbSource)
+        val slim = Platform(2L, "PS5", "PlayStation 5 Slim", version = "Slim", source = igdbSource)
+
+        assertTrue(ps5.isSameGamePlatformAs(slim))
+        assertTrue(slim.isSameGamePlatformAs(ps5))
+    }
+
+    @Test
+    fun `platforms obtained from the provider are told apart by its identifiers, not by names`() {
+        // Arrange - Even if they share the abbreviation
+        val ps5 = Platform(1L, "PS", "PlayStation 5", source = igdbSource)
+        val ps4 = Platform(
+            2L, "PS", "PlayStation 4",
+            source = SourceReference(SourceReference.Provider.IGDB, NonBlankString("48"))
+        )
+
+        // Act & Assert
+        assertFalse(ps5.isSameGamePlatformAs(ps4))
+    }
+
+    @Test
+    fun `platforms inserted manually are the same game platform if they share the name or abbreviation`() {
+        val ps5 = Platform(1L, "PS5", "PlayStation 5")
+
+        assertTrue(ps5.isSameGamePlatformAs(Platform(2L, "PS5", "Sony PS5", version = "Slim")))
+        assertTrue(ps5.isSameGamePlatformAs(Platform(3L, "P5", "playstation 5")))
+        assertFalse(ps5.isSameGamePlatformAs(Platform(4L, "PS4", "PlayStation 4")))
+    }
+
+    @Test
+    fun `platforms from a provider and inserted manually are compared by name or abbreviation`() {
+        val ps5 = Platform(1L, "PS5", "PlayStation 5", source = igdbSource)
+
+        assertTrue(ps5.isSameGamePlatformAs(Platform(2L, "PS5", "My PS5")))
+        assertFalse(ps5.isSameGamePlatformAs(Platform(3L, "NSW", "Nintendo Switch")))
+    }
+
+    @Test
+    fun `distinctGamePlatforms keeps the first version of each platform, in order`() {
+        // Arrange
+        val pro = Platform(1L, "PS5", "PlayStation 5", version = "Pro", source = igdbSource)
+        val switch = Platform(2L, "NSW", "Nintendo Switch")
+        val ps5 = Platform(3L, "PS5", "PlayStation 5", source = igdbSource)
+        val oled = Platform(4L, "NSW", "Nintendo Switch", version = "OLED")
+
+        // Act & Assert
+        assertEquals(listOf(pro, switch), listOf(pro, switch, ps5, oled).distinctGamePlatforms())
+    }
 
     // Platform
 

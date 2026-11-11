@@ -24,9 +24,10 @@ import isel.dei.pdm.demos.gamevault.domain.search.SearchString
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenViewTestTags.PLATFORM_LIST_TAG
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenViewTestTags.SEARCH_INDICATOR_TAG
+import isel.dei.pdm.demos.gamevault.ui.common.AddStatus
+import isel.dei.pdm.demos.gamevault.ui.common.AddStatusIndicatorTestTags
 import isel.dei.pdm.demos.gamevault.ui.common.ImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
-import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItemViewTestTags
 import isel.dei.pdm.demos.gamevault.ui.common.SearchBoxTestTags
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 import org.junit.Assert.assertEquals
@@ -215,21 +216,21 @@ class SearchForPlatformScreenViewTest {
             SearchForPlatformScreenState.Results(
                 QUERY,
                 listOf(
-                    PlatformSearchItemUiState(PS5, PlatformAddStatus.NOT_ADDED),
-                    PlatformSearchItemUiState(PS5_PRO, PlatformAddStatus.ADDING),
-                    PlatformSearchItemUiState(PS4, PlatformAddStatus.ADDED)
+                    PlatformSearchItemUiState(PS5, AddStatus.NOT_ADDED),
+                    PlatformSearchItemUiState(PS5_PRO, AddStatus.ADDING),
+                    PlatformSearchItemUiState(PS4, AddStatus.ADDED)
                 )
             )
         )
 
         composeTestRule
-            .onAllNodesWithTag(PlatformListItemViewTestTags.ADD_BUTTON)
+            .onAllNodesWithTag(AddStatusIndicatorTestTags.ADD_ICON, useUnmergedTree = true)
             .assertCountEquals(1)
         composeTestRule
-            .onAllNodesWithTag(PlatformListItemViewTestTags.ADDING_INDICATOR)
+            .onAllNodesWithTag(AddStatusIndicatorTestTags.ADDING_INDICATOR)
             .assertCountEquals(1)
         composeTestRule
-            .onAllNodesWithTag(PlatformListItemViewTestTags.ADDED_ICON, useUnmergedTree = true)
+            .onAllNodesWithTag(AddStatusIndicatorTestTags.ADDED_ICON, useUnmergedTree = true)
             .assertCountEquals(1)
     }
 
@@ -254,7 +255,7 @@ class SearchForPlatformScreenViewTest {
     fun selecting_an_added_platform_does_not_trigger_onAddPlatform() {
         var addedPlatform: PlatformInfo? = null
         setViewContent(
-            state = SearchForPlatformScreenState.Results(QUERY, listOf(PlatformSearchItemUiState(PS4, PlatformAddStatus.ADDED))),
+            state = SearchForPlatformScreenState.Results(QUERY, listOf(PlatformSearchItemUiState(PS4, AddStatus.ADDED))),
             onAddPlatform = { addedPlatform = it }
         )
 

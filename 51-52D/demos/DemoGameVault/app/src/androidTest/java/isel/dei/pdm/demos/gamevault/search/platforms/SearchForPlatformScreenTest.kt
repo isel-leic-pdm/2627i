@@ -18,6 +18,7 @@ import androidx.core.graphics.createBitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.test.platform.app.InstrumentationRegistry
 import isel.dei.pdm.demos.gamevault.R
+import isel.dei.pdm.demos.gamevault.ui.common.AddStatusIndicatorTestTags
 import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.search.NoConnectivityException
@@ -35,7 +36,6 @@ import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformViewModel.
 import isel.dei.pdm.demos.gamevault.ui.common.ErrorViewOverlayTestTags
 import isel.dei.pdm.demos.gamevault.ui.common.ImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
-import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItemViewTestTags
 import isel.dei.pdm.demos.gamevault.ui.common.SearchBoxTestTags
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 import org.junit.Assert.assertEquals
@@ -270,7 +270,7 @@ class SearchForPlatformScreenTest {
         composeTestRule.onNodeWithText(PS4.name.value).performClick()
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemViewTestTags.ADDED_ICON, useUnmergedTree = true)
+            .onNodeWithTag(AddStatusIndicatorTestTags.ADDED_ICON, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 

@@ -10,6 +10,10 @@ import isel.dei.pdm.demos.gamevault.domain.NonBlankString
  * It enables, for example, recognizing the same element when importing a collection, or
  * refreshing the element's information from its source.
  *
+ * The provider is recorded as part of the provenance, but the app uses a single search provider
+ * at a time (see the search services): the search operations assume that elements with a source
+ * were obtained from it.
+ *
  * @property provider The provider of the information.
  * @property externalId The element's identifier, as assigned by the provider. It is a string,
  * because providers use different kinds of identifiers (e.g. numbers or slugs).

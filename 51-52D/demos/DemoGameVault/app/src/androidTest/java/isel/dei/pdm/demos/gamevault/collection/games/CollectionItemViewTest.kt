@@ -42,7 +42,7 @@ class CollectionItemViewTest {
         releaseYear = 2022,
         coverUri = null,
         thumbnailUri = URI.create("http://example.com/elden-ring.png"),
-        platformAbbreviation = NonBlankString("PS5"),
+        platformAbbreviations = listOf(NonBlankString("PS5")),
         state = PlayStatus.State.PLAYING,
         timeSpent = PlayTime(45, 30),
         isFinished = false,
@@ -87,6 +87,17 @@ class CollectionItemViewTest {
         composeTestRule
             .onNodeWithTag(CollectionItemViewTestTags.THUMBNAIL, useUnmergedTree = true)
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun collection_item_displays_all_the_platforms_the_game_is_owned_on() {
+        setItemContent(
+            sampleItem.copy(platformAbbreviations = listOf(NonBlankString("PS5"), NonBlankString("PC")))
+        )
+
+        composeTestRule
+            .onNodeWithTag(CollectionItemViewTestTags.PLATFORM, useUnmergedTree = true)
+            .assertTextEquals("PS5, PC")
     }
 
     // Time spent

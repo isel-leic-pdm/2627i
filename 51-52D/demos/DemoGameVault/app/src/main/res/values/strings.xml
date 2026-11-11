@@ -75,6 +75,31 @@
     <string name="search_platform_added_message">%1$s added to your collection</string>
     <string name="search_platform_add_failed_message">Could not add %1$s to your collection</string>
 
+    <string name="search_game_title">Add Game</string>
+    <string name="search_game_back_description">Back</string>
+    <string name="search_game_error_message">Could not search for games.</string>
+    <string name="search_game_platforms_error_message">Could not read your platforms.</string>
+    <string name="search_game_retry_button_label">Retry</string>
+    <string name="search_game_add_platform_button_label">Add platform</string>
+    <string name="search_game_added_message">%1$s (%2$s) added to your collection</string>
+    <string name="search_game_add_failed_message">Could not add %1$s (%2$s) to your collection</string>
+    <string name="search_game_results_label">Available Games in IGDB</string>
+    <string name="search_no_games_found">No games found</string>
+    <string name="search_game_add_description">Add game</string>
+    <string name="search_game_added_description">Game in collection</string>
+    <string name="search_game_start_hint">Type the name of a game</string>
+    <string name="search_game_searching">Searching games…</string>
+    <string name="search_game_no_platforms">Your collection has no platforms yet.\nAdd a platform before adding games.</string>
+    <string name="search_game_platform_filter_label">Platform</string>
+    <string name="search_game_platform_all">All</string>
+    <string name="search_game_category_filter_label">Category</string>
+    <string name="search_game_category_any">Any</string>
+    <string name="search_game_category_main_game">Main game</string>
+    <string name="search_game_category_dlc">DLC</string>
+    <string name="search_game_category_bundle">Bundle</string>
+    <string name="search_game_category_remake">Remake</string>
+    <string name="search_game_category_remaster">Remaster</string>
+
     <string name="search_error_tip_no_connectivity">Check your internet connection and try again.</string>
     <string name="search_error_tip_unauthenticated">Check the IGDB credentials in the settings and try again.</string>
     <string name="search_error_tip_service_unavailable">The search service is temporarily unavailable.\nTry again later.</string>

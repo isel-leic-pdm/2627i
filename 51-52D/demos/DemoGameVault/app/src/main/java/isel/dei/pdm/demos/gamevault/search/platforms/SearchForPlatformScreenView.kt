@@ -28,6 +28,7 @@ import isel.dei.pdm.demos.gamevault.domain.search.SearchString
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenViewTestTags.PLATFORM_LIST_TAG
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenViewTestTags.SEARCH_INDICATOR_TAG
+import isel.dei.pdm.demos.gamevault.ui.common.AddStatus
 import isel.dei.pdm.demos.gamevault.ui.common.LabelledProgressIndicator
 import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItemView
 import isel.dei.pdm.demos.gamevault.ui.common.SearchBox
@@ -181,15 +182,15 @@ class SearchForPlatformScreenViewPreviews {
     private val sampleItems = listOf(
         PlatformSearchItemUiState(
             PlatformInfo(5L, "PS5", "PlayStation 5", "https://fake.url/ps5.png", "Standard"),
-            addStatus = PlatformAddStatus.NOT_ADDED
+            addStatus = AddStatus.NOT_ADDED
         ),
         PlatformSearchItemUiState(
             PlatformInfo(5L, "PS5", "PlayStation 5", "https://fake.url/ps5.png", "Pro"),
-            addStatus = PlatformAddStatus.ADDED
+            addStatus = AddStatus.ADDED
         ),
         PlatformSearchItemUiState(
             PlatformInfo(4L, "PS4", "PlayStation 4", "https://fake.url/ps4.png"),
-            addStatus = PlatformAddStatus.ADDING
+            addStatus = AddStatus.ADDING
         )
     )
 

@@ -1,6 +1,5 @@
 package isel.dei.pdm.demos.gamevault.search.platforms
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -21,13 +20,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import isel.dei.pdm.demos.gamevault.R
-import isel.dei.pdm.demos.gamevault.domain.search.NoConnectivityException
-import isel.dei.pdm.demos.gamevault.domain.search.RateLimitExceededException
-import isel.dei.pdm.demos.gamevault.domain.search.SearchServiceException
-import isel.dei.pdm.demos.gamevault.domain.search.ServiceUnavailableException
-import isel.dei.pdm.demos.gamevault.domain.search.UnauthenticatedException
-import isel.dei.pdm.demos.gamevault.domain.search.UnexpectedServiceException
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
+import isel.dei.pdm.demos.gamevault.search.tipResId
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenTestTags.BACK_BUTTON_TAG
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenTestTags.SCREEN_TAG
 import isel.dei.pdm.demos.gamevault.ui.common.ErrorViewOverlay
@@ -123,19 +117,6 @@ private fun addOutcomeMessageOf(outcome: AddPlatformOutcome): String =
  */
 private val PlatformInfo.displayName: String
     get() = version?.let { "${name.value} ${it.value}" } ?: name.value
-
-/**
- * The tip displayed to the user for the given search error, hinting on what can be done about it.
- */
-@StringRes
-private fun SearchServiceException.tipResId(): Int =
-    when (this) {
-        is NoConnectivityException -> R.string.search_error_tip_no_connectivity
-        is UnauthenticatedException -> R.string.search_error_tip_unauthenticated
-        is ServiceUnavailableException -> R.string.search_error_tip_service_unavailable
-        is RateLimitExceededException -> R.string.search_error_tip_rate_limit_exceeded
-        is UnexpectedServiceException -> R.string.search_error_tip_unexpected
-    }
 
 // Testing utilities
 

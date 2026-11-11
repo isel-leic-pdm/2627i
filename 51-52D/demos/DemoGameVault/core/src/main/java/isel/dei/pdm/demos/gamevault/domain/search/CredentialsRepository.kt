@@ -12,7 +12,8 @@ data class Secrets(val clientId: String, val clientSecret: String)
 /**
  * Contract to be supported by the repository that stores the client's secrets.
  * The application uses a BYOK approach, meaning the user must provide his own client credentials
- * to use when accessing the game search web API.
+ * to use when accessing the game search web API. They are the credentials of the app's single
+ * search provider (see the search services), so there is a single set of them.
  *
  * All operations report failures uniformly, by throwing a [PersistenceException]: the flows when
  * collected, and the suspending functions when called. Implementations must translate the errors

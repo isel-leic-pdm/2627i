@@ -22,6 +22,7 @@ import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenStat
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenState.Results
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenState.Search
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenState.Start
+import isel.dei.pdm.demos.gamevault.ui.common.AddStatus
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,17 +61,17 @@ class SearchForPlatformViewModel(
 
     /**
      * The state of the screen regarding the search. In [Results], all items are
-     * [PlatformAddStatus.NOT_ADDED]: their actual status is computed when publishing [state].
+     * [AddStatus.NOT_ADDED]: their actual status is computed when publishing [state].
      */
     private val _searchState = MutableStateFlow<SearchForPlatformScreenState>(Start)
 
     /**
-     * The additions to the collection requested in this screen: [PlatformAddStatus.ADDING] while
-     * in progress, and [PlatformAddStatus.ADDED] once completed. Completed additions are kept so
+     * The additions to the collection requested in this screen: [AddStatus.ADDING] while
+     * in progress, and [AddStatus.ADDED] once completed. Completed additions are kept so
      * that the platform is displayed as added even before the collection reflects it. Failed
      * additions are removed.
      */
-    private val _additions = MutableStateFlow<Map<PlatformInfo, PlatformAddStatus>>(emptyMap())
+    private val _additions = MutableStateFlow<Map<PlatformInfo, AddStatus>>(emptyMap())
 
     /**
      * The add outcomes to be reported to the user, in the order they occurred.
@@ -176,17 +177,17 @@ class SearchForPlatformViewModel(
         if (state !is Results)
             return
         val item = state.items.find { it.platform == platform }
-        if (item == null || item.addStatus != PlatformAddStatus.NOT_ADDED)
+        if (item == null || item.addStatus != AddStatus.NOT_ADDED)
             return
         // The published state may not yet reflect a previous request (e.g. a double tap)
         if (platform in _additions.value)
             return
 
-        _additions.update { it + (platform to PlatformAddStatus.ADDING) }
+        _additions.update { it + (platform to AddStatus.ADDING) }
         viewModelScope.launch {
             val outcome = try {
                 collectionRepo.add(platform.toNewPlatform())
-                _additions.update { it + (platform to PlatformAddStatus.ADDED) }
+                _additions.update { it + (platform to AddStatus.ADDED) }
                 AddPlatformOutcome.Added(platform)
             } catch (e: PersistenceException) {
                 _additions.update { it - platform }
@@ -280,11 +281,11 @@ class SearchForPlatformViewModel(
 private fun addStatusOf(
     platform: PlatformInfo,
     collection: List<Platform>,
-    additions: Map<PlatformInfo, PlatformAddStatus>
-): PlatformAddStatus =
+    additions: Map<PlatformInfo, AddStatus>
+): AddStatus =
     additions[platform]
-        ?: if (collection.any { platform.matches(it) }) PlatformAddStatus.ADDED
-        else PlatformAddStatus.NOT_ADDED
+        ?: if (collection.any { platform.matches(it) }) AddStatus.ADDED
+        else AddStatus.NOT_ADDED
 
 /**
  * Checks whether this platform and the given platform in the collection have the same name and

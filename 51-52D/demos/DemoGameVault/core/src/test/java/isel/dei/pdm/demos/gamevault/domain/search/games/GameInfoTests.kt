@@ -81,6 +81,38 @@ class GameInfoTests {
         assertNull(sut.releaseDate)
         assertNull(sut.coverUri)
         assertNull(sut.thumbnailUri)
+        assertNull(sut.category)
+        assertEquals(emptyList(), sut.platforms)
+    }
+
+    @Test
+    fun `secondary constructor keeps category and platforms`() {
+        // Arrange
+        val expectedPlatforms = listOf(
+            GamePlatform(167L, NonBlankString("PlayStation 5"), NonBlankString("PS5")),
+            GamePlatform(6L, NonBlankString("PC (Microsoft Windows)"), NonBlankString("PC"))
+        )
+
+        // Act
+        val sut = GameInfo(
+            id = 1L,
+            name = "Demon's Souls",
+            category = GameInfo.Category.REMAKE,
+            platforms = expectedPlatforms
+        )
+
+        // Assert
+        assertEquals(GameInfo.Category.REMAKE, sut.category)
+        assertEquals(expectedPlatforms, sut.platforms)
+    }
+
+    @Test
+    fun `GamePlatform abbreviation is absent by default`() {
+        // Act
+        val sut = GamePlatform(id = 1L, name = NonBlankString("Arcade"))
+
+        // Assert
+        assertNull(sut.abbreviation)
     }
 
     @Test

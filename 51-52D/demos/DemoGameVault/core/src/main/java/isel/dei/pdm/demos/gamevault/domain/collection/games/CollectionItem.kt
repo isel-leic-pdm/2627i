@@ -13,7 +13,9 @@ import java.net.URI
  * @property releaseYear The game's release year, if known. Distinguishes games with the same name.
  * @property coverUri The URI of the game's cover image, if available.
  * @property thumbnailUri The URI of the game's thumbnail image, if available.
- * @property platformAbbreviation The abbreviation of the platform the game is owned on.
+ * @property platformAbbreviations The abbreviations of the platforms the game is owned on, in the
+ * order the platforms were added. There is at least one. Versions are not included, as games are
+ * oblivious of them (see [CollectionEntry.platforms]).
  * @property state The game's play state.
  * @property timeSpent The total time spent playing the game.
  * @property isFinished Whether the game was finished at least once (see [PlayStatus.isFinished]).
@@ -26,7 +28,7 @@ data class CollectionItem(
     val releaseYear: Int?,
     val coverUri: URI?,
     val thumbnailUri: URI?,
-    val platformAbbreviation: NonBlankString,
+    val platformAbbreviations: List<NonBlankString>,
     val state: PlayStatus.State,
     val timeSpent: PlayTime,
     val isFinished: Boolean,
@@ -45,7 +47,7 @@ fun CollectionEntry.toItem(): CollectionItem = CollectionItem(
     releaseYear = game.releaseDate?.year,
     coverUri = game.coverUri,
     thumbnailUri = game.thumbnailUri,
-    platformAbbreviation = platform.abbreviation,
+    platformAbbreviations = platforms.map { it.abbreviation },
     state = playStatus.state,
     timeSpent = playStatus.timeSpent,
     isFinished = playStatus.isFinished,

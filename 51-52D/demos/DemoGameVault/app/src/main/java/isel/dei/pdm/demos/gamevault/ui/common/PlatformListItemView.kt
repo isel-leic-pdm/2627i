@@ -7,11 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -87,46 +83,36 @@ fun PlatformListItemView(
                 )
             },
             trailingContent = {
-                when (item.mode) {
-                    PlatformListItemMode.ADDABLE -> {
-                        IconButton(
-                            onClick = onSelected,
-                            modifier = Modifier.testTag(PlatformListItemViewTestTags.ADD_BUTTON)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = stringResource(R.string.search_platform_add_description),
-                            )
-                        }
-                    }
-                    PlatformListItemMode.ADDING -> {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .testTag(PlatformListItemViewTestTags.ADDING_INDICATOR),
-                            strokeWidth = 2.dp
-                        )
-                    }
-                    PlatformListItemMode.ADDED -> {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = stringResource(R.string.search_platform_added_description),
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.testTag(PlatformListItemViewTestTags.ADDED_ICON)
-                        )
-                    }
-                    PlatformListItemMode.NAVIGABLE -> {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                            contentDescription = null,
-                            modifier = Modifier.testTag(PlatformListItemViewTestTags.CHEVRON_ICON)
-                        )
-                    }
+                val addStatus = item.mode.addStatusOrNull
+                if (addStatus != null) {
+                    AddStatusIndicator(
+                        status = addStatus,
+                        addDescription = stringResource(R.string.search_platform_add_description),
+                        addedDescription = stringResource(R.string.search_platform_added_description)
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null,
+                        modifier = Modifier.testTag(PlatformListItemViewTestTags.CHEVRON_ICON)
+                    )
                 }
             },
         )
     }
 }
+
+/**
+ * The addition status displayed in each mode, or null for the modes that are not about adding the
+ * platform to the collection.
+ */
+private val PlatformListItemMode.addStatusOrNull: AddStatus?
+    get() = when (this) {
+        PlatformListItemMode.ADDABLE -> AddStatus.NOT_ADDED
+        PlatformListItemMode.ADDING -> AddStatus.ADDING
+        PlatformListItemMode.ADDED -> AddStatus.ADDED
+        PlatformListItemMode.NAVIGABLE -> null
+    }
 
 /**
  * Represents the presentation mode of a [PlatformListItemView].
@@ -191,9 +177,6 @@ object PlatformListItemViewTestTags {
     const val NAME = "PlatformName"
     const val ABBREVIATION = "PlatformAbbreviation"
     const val VERSION = "PlatformVersion"
-    const val ADD_BUTTON = "PlatformAddButton"
-    const val ADDING_INDICATOR = "PlatformAddingIndicator"
-    const val ADDED_ICON = "PlatformAddedIcon"
     const val CHEVRON_ICON = "PlatformChevronIcon"
 }
 

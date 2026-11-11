@@ -21,6 +21,7 @@ import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.ui.common.ImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
+import isel.dei.pdm.demos.gamevault.ui.common.AddStatusIndicatorTestTags
 import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItemViewTestTags
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 import org.junit.Assert.assertEquals
@@ -116,7 +117,7 @@ class PlatformCollectionScreenViewTest {
             .onAllNodesWithTag(PlatformListItemViewTestTags.CHEVRON_ICON, useUnmergedTree = true)
             .assertCountEquals(2)
         composeTestRule
-            .onAllNodesWithTag(PlatformListItemViewTestTags.ADD_BUTTON)
+            .onAllNodesWithTag(AddStatusIndicatorTestTags.ADD_ICON, useUnmergedTree = true)
             .assertCountEquals(0)
     }
 

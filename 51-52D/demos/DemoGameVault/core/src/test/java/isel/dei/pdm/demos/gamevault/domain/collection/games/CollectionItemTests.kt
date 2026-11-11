@@ -32,7 +32,7 @@ class CollectionItemTests {
         // Arrange
         val entry = CollectionEntry(
             game = game,
-            platform = platform,
+            platforms = setOf(platform),
             playStatus = PlayStatus(PlayTime(42, 10), State.PLAYING, listOf(Accomplishment(march)))
         )
 
@@ -46,7 +46,7 @@ class CollectionItemTests {
             releaseYear = 2022,
             coverUri = URI.create("content://vault/covers/7.jpg"),
             thumbnailUri = URI.create("content://vault/thumbnails/7.jpg"),
-            platformAbbreviation = NonBlankString("PS5"),
+            platformAbbreviations = listOf(NonBlankString("PS5")),
             state = State.PLAYING,
             timeSpent = PlayTime(42, 10),
             isFinished = true,
@@ -61,7 +61,7 @@ class CollectionItemTests {
         // Arrange
         val entry = CollectionEntry(
             game = game,
-            platform = platform,
+            platforms = setOf(platform),
             playStatus = PlayStatus(PlayTime(80, 0), State.PLAYING, platinum = Accomplishment(march)),
             sessionStartTime = Instant.parse("2026-11-08T20:00:00Z")
         )
@@ -77,11 +77,21 @@ class CollectionItemTests {
 
     @Test
     fun `toItem of a game without release date nor images has them absent`() {
-        val item = CollectionEntry(Game(1L, "Hades II"), platform).toItem()
+        val item = CollectionEntry(Game(1L, "Hades II"), setOf(platform)).toItem()
 
         assertNull(item.releaseYear)
         assertNull(item.coverUri)
         assertNull(item.thumbnailUri)
+    }
+
+    @Test
+    fun `toItem lists the abbreviations of the platforms in the order they were added`() {
+        // Arrange
+        val switch = Platform(2L, "Switch", "Nintendo Switch")
+        val entry = CollectionEntry(game, setOf(switch)).addPlatform(platform)
+
+        // Act & Assert
+        assertEquals(listOf(NonBlankString("Switch"), NonBlankString("PS5")), entry.toItem().platformAbbreviations)
     }
 
     // CollectionQuery

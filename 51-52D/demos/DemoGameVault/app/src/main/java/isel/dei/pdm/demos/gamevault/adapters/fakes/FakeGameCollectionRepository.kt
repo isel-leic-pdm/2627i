@@ -67,8 +67,8 @@ class FakeGameCollectionRepository(
 
     // Adding games
 
-    override suspend fun findSameGame(game: NewGame): Game? =
-        collection.value.values.firstOrNull { game isSameGameAs it.entry.game }?.entry?.game
+    override suspend fun findSameEntry(game: NewGame): CollectionEntry? =
+        collection.value.values.firstOrNull { game isSameGameAs it.entry.game }?.entry
 
     override suspend fun add(
         game: NewGame,
@@ -78,7 +78,12 @@ class FakeGameCollectionRepository(
     ): AddGameResult {
         val existing = collection.value.values.firstOrNull { game isSameGameAs it.entry.game }
         if (existing != null) {
-            return AddGameResult.AlreadyInCollection(existing.entry.game)
+            val entry = existing.entry
+            if (entry.isOwnedOn(platform)) {
+                return AddGameResult.AlreadyOwnedOnPlatform(entry.game)
+            }
+            collection.value += entry.game.id to existing.copy(entry = entry.addPlatform(platform))
+            return AddGameResult.PlatformAdded(entry.game)
         }
         val added = Game(
             id = nextId++,
@@ -88,7 +93,7 @@ class FakeGameCollectionRepository(
             thumbnailUri = game.thumbnailUri,
             source = game.source
         )
-        val entry = CollectionEntry(game = added, platform = platform, playStatus = playStatus)
+        val entry = CollectionEntry(game = added, platforms = setOf(platform), playStatus = playStatus)
         collection.value += added.id to StoredGame(entry, details)
         return AddGameResult.Added(added.id)
     }
@@ -192,7 +197,7 @@ class FakeGameCollectionRepository(
 private fun CollectionEntry.meets(query: CollectionQuery): Boolean =
     (query.state == null || playStatus.state == query.state) &&
         (!query.platinumOnly || playStatus.platinum != null) &&
-        (query.platformId == null || platform.id == query.platformId) &&
+        (query.platformId == null || platforms.any { it.id == query.platformId }) &&
         (query.nameContains?.let { game.name.value.contains(it.value, ignoreCase = true) } ?: true) &&
         (query.initial == null || game.name.value.initial() == query.initial)
 

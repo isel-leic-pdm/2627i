@@ -95,11 +95,11 @@ class PlatformListItemViewTest {
     // Trailing indicators
 
     @Test
-    fun platform_list_item_displays_add_button_when_addable() {
+    fun platform_list_item_displays_add_icon_when_addable() {
         setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.ADDABLE))
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemViewTestTags.ADD_BUTTON)
+            .onNodeWithTag(AddStatusIndicatorTestTags.ADD_ICON, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 
@@ -108,7 +108,7 @@ class PlatformListItemViewTest {
         setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.ADDING))
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemViewTestTags.ADDING_INDICATOR)
+            .onNodeWithTag(AddStatusIndicatorTestTags.ADDING_INDICATOR)
             .assertIsDisplayed()
     }
 
@@ -117,7 +117,7 @@ class PlatformListItemViewTest {
         setItemContent(samplePlatform.toListItemModel(PlatformListItemMode.ADDED))
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemViewTestTags.ADDED_ICON, useUnmergedTree = true)
+            .onNodeWithTag(AddStatusIndicatorTestTags.ADDED_ICON, useUnmergedTree = true)
             .assertIsDisplayed()
     }
 
@@ -148,7 +148,7 @@ class PlatformListItemViewTest {
     }
 
     @Test
-    fun clicking_add_button_triggers_onSelected() {
+    fun clicking_add_icon_triggers_onSelected() {
         var selected = false
         setItemContent(
             item = samplePlatform.toListItemModel(PlatformListItemMode.ADDABLE),
@@ -156,7 +156,7 @@ class PlatformListItemViewTest {
         )
 
         composeTestRule
-            .onNodeWithTag(PlatformListItemViewTestTags.ADD_BUTTON)
+            .onNodeWithTag(AddStatusIndicatorTestTags.ADD_ICON, useUnmergedTree = true)
             .performClick()
 
         assertTrue(selected)
