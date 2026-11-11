@@ -10,8 +10,8 @@ import io.ktor.client.engine.okhttp.OkHttp
 import isel.dei.pdm.demos.gamevault.adapters.datastore.DataStoreCredentialsRepository
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeCredentialsRepository
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeGameCollectionRepository
-import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeGameSearchService
 import isel.dei.pdm.demos.gamevault.adapters.igdb.IgdbApi
+import isel.dei.pdm.demos.gamevault.adapters.igdb.IgdbGameSearchService
 import isel.dei.pdm.demos.gamevault.adapters.igdb.IgdbPlatformSearchService
 import isel.dei.pdm.demos.gamevault.adapters.igdb.createIgdbHttpClient
 import isel.dei.pdm.demos.gamevault.adapters.room.GameVaultDatabase
@@ -74,8 +74,7 @@ class DemoGameVaultApplication : DependenciesContainer, Application() {
     }
 
     override val gameSearchService: GameSearchService by lazy {
-        // TODO: Replace with the IGDB based implementation, once it exists
-        FakeGameSearchService()
+        IgdbGameSearchService(api = igdbApi)
     }
 
     override val platformCollectionRepository: PlatformCollectionRepository by lazy {
