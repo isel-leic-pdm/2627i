@@ -2,6 +2,7 @@ package isel.dei.pdm.demos.gamevault.search.platforms
 
 import androidx.lifecycle.SavedStateHandle
 import isel.dei.pdm.demos.gamevault.MainDispatcherRule
+import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeImageStore
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.PersistenceException
 import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
@@ -61,6 +62,7 @@ class SearchForPlatformViewModelTest {
 
     private val searchService = ControlledPlatformSearchService()
     private val repository = ControlledPlatformCollectionRepository()
+    private val imageStore = FakeImageStore()
 
     /**
      * Collects the states published by the view model until the test ends, as the UI does. The
@@ -80,7 +82,7 @@ class SearchForPlatformViewModelTest {
         savedStateHandle: SavedStateHandle = SavedStateHandle(),
         collectionRepo: PlatformCollectionRepository = repository
     ): SearchForPlatformViewModel {
-        val viewModel = SearchForPlatformViewModel(searchService, collectionRepo, savedStateHandle)
+        val viewModel = SearchForPlatformViewModel(searchService, collectionRepo, imageStore, savedStateHandle)
         collectStates(viewModel)
         return viewModel
     }
@@ -167,7 +169,7 @@ class SearchForPlatformViewModelTest {
     @Test
     fun collection_is_only_observed_while_the_state_is_collected() = runTest {
         // Arrange
-        val viewModel = SearchForPlatformViewModel(searchService, repository, SavedStateHandle())
+        val viewModel = SearchForPlatformViewModel(searchService, repository, imageStore, SavedStateHandle())
         assertEquals(0, repository.observers)
 
         // Act & Assert - The UI starts collecting
@@ -184,7 +186,7 @@ class SearchForPlatformViewModelTest {
     @Test
     fun collection_observation_survives_short_interruptions() = runTest {
         // Arrange
-        val viewModel = SearchForPlatformViewModel(searchService, repository, SavedStateHandle())
+        val viewModel = SearchForPlatformViewModel(searchService, repository, imageStore, SavedStateHandle())
         val collector = collectStates(viewModel)
 
         // Act - The UI stops collecting and resumes shortly after (e.g. rotation)
@@ -550,8 +552,24 @@ class SearchForPlatformViewModelTest {
         assertEquals(PS5_PRO.name, added.name)
         assertEquals(PS5_PRO.abbreviation, added.abbreviation)
         assertEquals(PS5_PRO.version, added.version)
-        assertEquals(PS5_PRO.logoUri, added.logoUri)
         assertEquals(SourceReference(IGDB, NonBlankString("5")), added.source)
+        // The logo is a local copy
+        assertEquals(imageStore.copies[PS5_PRO.logoUri], added.logoUri)
+    }
+
+    @Test
+    fun addition_keeps_the_remote_logo_if_it_cannot_be_copied() = runTest {
+        // Arrange - e.g. without connectivity
+        imageStore.storeFails = true
+        val viewModel = createViewModelWithPs5Results()
+        viewModel.onAddPlatform(PS5_PRO)
+
+        // Act
+        repository.completeAdd()
+
+        // Assert - The platform is added anyway
+        assertEquals(AddStatus.ADDED, viewModel.statusOf(PS5_PRO))
+        assertEquals(PS5_PRO.logoUri, repository.platforms.first().single().logoUri)
     }
 
     @Test

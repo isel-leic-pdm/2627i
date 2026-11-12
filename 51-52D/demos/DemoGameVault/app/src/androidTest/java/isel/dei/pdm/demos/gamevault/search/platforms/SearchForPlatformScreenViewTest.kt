@@ -26,7 +26,7 @@ import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenView
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenViewTestTags.SEARCH_INDICATOR_TAG
 import isel.dei.pdm.demos.gamevault.ui.common.AddStatus
 import isel.dei.pdm.demos.gamevault.ui.common.AddStatusIndicatorTestTags
-import isel.dei.pdm.demos.gamevault.ui.common.ImageLoader
+import isel.dei.pdm.demos.gamevault.images.ImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.SearchBoxTestTags
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme

@@ -1,6 +1,7 @@
 package isel.dei.pdm.demos.gamevault.adapters.igdb
 
 import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.MockEngineConfig
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.toByteArray
 import io.ktor.client.request.HttpRequestData
@@ -18,7 +19,10 @@ import isel.dei.pdm.demos.gamevault.domain.search.ServiceUnavailableException
 import isel.dei.pdm.demos.gamevault.domain.search.UnauthenticatedException
 import isel.dei.pdm.demos.gamevault.domain.search.UnexpectedServiceException
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -44,6 +48,15 @@ class IgdbPlatformSearchServiceTest {
 
     private val networkError: Reply = { throw IOException("Simulated network error") }
 
+    /**
+     * A reply that only arrives after the request timeout elapsed (see [scriptedEngine]'s
+     * dispatcher, which makes it elapse in virtual time).
+     */
+    private val tooSlowReply: Reply = {
+        delay(REQUEST_TIMEOUT_MILLIS + 1_000)
+        respond("[]", HttpStatusCode.OK, jsonHeaders)
+    }
+
     private val emptyResult: Reply = json("[]")
 
     /**
@@ -56,17 +69,27 @@ class IgdbPlatformSearchServiceTest {
     /**
      * Creates an engine that replies to the requests to IGDB and to Twitch with the given replies,
      * in order. Unexpected requests (i.e. once the replies are exhausted) fail the test.
+     * @param dispatcher The engine's dispatcher, if not the default one. Timeouts are measured on
+     * it, so a test dispatcher makes them elapse in virtual time, instead of real time.
      */
-    private fun scriptedEngine(igdb: List<Reply>, twitch: List<Reply> = emptyList()): MockEngine {
+    private fun scriptedEngine(
+        igdb: List<Reply>,
+        twitch: List<Reply> = emptyList(),
+        dispatcher: CoroutineDispatcher? = null
+    ): MockEngine {
         val igdbReplies = ArrayDeque(igdb)
         val twitchReplies = ArrayDeque(twitch)
-        return MockEngine { request ->
-            val isIgdb = request.url.host == IGDB_HOST
-            (if (isIgdb) igdbRequests else twitchRequests).add(request)
-            val replies = if (isIgdb) igdbReplies else twitchReplies
-            val reply = replies.removeFirstOrNull() ?: error("Unexpected request to ${request.url}")
-            reply(request)
+        val config = MockEngineConfig().apply {
+            dispatcher?.let { this.dispatcher = it }
+            addHandler { request ->
+                val isIgdb = request.url.host == IGDB_HOST
+                (if (isIgdb) igdbRequests else twitchRequests).add(request)
+                val replies = if (isIgdb) igdbReplies else twitchReplies
+                val reply = replies.removeFirstOrNull() ?: error("Unexpected request to ${request.url}")
+                reply(request)
+            }
         }
+        return MockEngine(config)
     }
 
     private fun newSut(
@@ -351,6 +374,36 @@ class IgdbPlatformSearchServiceTest {
     fun persistent_network_error_is_reported_as_no_connectivity_after_retries() = runTest {
         // Arrange
         val engine = scriptedEngine(igdb = List(MAX_RETRIES + 1) { networkError })
+        val sut = newSut(engine)
+
+        // Act & Assert
+        assertFailsWith<NoConnectivityException> { sut.search(query) }
+        assertEquals(MAX_RETRIES + 1, igdbRequests.size)
+    }
+
+    @Test
+    fun request_that_times_out_is_retried() = runTest {
+        // Arrange
+        val engine = scriptedEngine(
+            igdb = listOf(tooSlowReply, emptyResult),
+            dispatcher = StandardTestDispatcher(testScheduler)
+        )
+        val sut = newSut(engine)
+
+        // Act
+        sut.search(query)
+
+        // Assert - The timeout is a transient error, like any other network error
+        assertEquals(2, igdbRequests.size)
+    }
+
+    @Test
+    fun persistent_timeout_is_reported_as_no_connectivity_after_retries() = runTest {
+        // Arrange
+        val engine = scriptedEngine(
+            igdb = List(MAX_RETRIES + 1) { tooSlowReply },
+            dispatcher = StandardTestDispatcher(testScheduler)
+        )
         val sut = newSut(engine)
 
         // Act & Assert

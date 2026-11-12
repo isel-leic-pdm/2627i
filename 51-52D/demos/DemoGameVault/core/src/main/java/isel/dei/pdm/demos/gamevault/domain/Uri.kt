@@ -21,6 +21,12 @@ data class Uri(val value: String) {
         require(URI_SYNTAX.matches(value)) { "Not a URI: $value" }
     }
 
+    /**
+     * The URI's scheme (e.g. https), in lower case, as schemes are case insensitive.
+     */
+    val scheme: String
+        get() = value.substringBefore(':').lowercase()
+
     override fun toString(): String = value
 }
 

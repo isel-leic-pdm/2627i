@@ -5,8 +5,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.runtime.CompositionLocalProvider
 import isel.dei.pdm.demos.gamevault.DependenciesContainer
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformActivity
+import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 
 /**
@@ -30,12 +32,14 @@ class PlatformCollectionActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            DemoGameVaultTheme {
-                PlatformCollectionScreen(
-                    viewModel = viewModel,
-                    onAddPlatform = { SearchForPlatformActivity.navigate(this) },
-                    onBack = { finish() }
-                )
+            CompositionLocalProvider(LocalImageLoader provides dependencies.imageLoader) {
+                DemoGameVaultTheme {
+                    PlatformCollectionScreen(
+                        viewModel = viewModel,
+                        onAddPlatform = { SearchForPlatformActivity.navigate(this) },
+                        onBack = { finish() }
+                    )
+                }
             }
         }
     }

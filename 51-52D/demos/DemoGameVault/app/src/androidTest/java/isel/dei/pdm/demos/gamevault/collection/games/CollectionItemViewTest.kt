@@ -19,7 +19,7 @@ import isel.dei.pdm.demos.gamevault.domain.Year
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionItem
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayTime
-import isel.dei.pdm.demos.gamevault.ui.common.ImageLoader
+import isel.dei.pdm.demos.gamevault.images.ImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
 import org.junit.Assert.assertTrue
 import org.junit.Rule

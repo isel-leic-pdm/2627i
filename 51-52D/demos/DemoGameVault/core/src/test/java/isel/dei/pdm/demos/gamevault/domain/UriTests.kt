@@ -22,6 +22,14 @@ class UriTests {
     }
 
     @Test
+    fun `scheme is the part before the colon, in lower case`() {
+        assertEquals("https", Uri("https://example.com/ps5.png").scheme)
+        assertEquals("https", Uri("HTTPS://example.com/ps5.png").scheme)
+        assertEquals("vault-image", Uri("vault-image://abc").scheme)
+        assertEquals("urn", Uri("urn:isbn:0451450523").scheme)
+    }
+
+    @Test
     fun `Uri is displayed as its value`() {
         assertEquals("https://example.com/ps5.png", Uri("https://example.com/ps5.png").toString())
     }

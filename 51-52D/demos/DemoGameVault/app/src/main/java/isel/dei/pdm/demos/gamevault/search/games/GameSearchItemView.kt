@@ -25,7 +25,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import isel.dei.pdm.demos.gamevault.R
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
@@ -71,7 +70,7 @@ fun GameSearchItemView(
             modifier = Modifier.padding(8.dp)
         ) {
             AsyncImage(
-                uri = game.thumbnailUri?.toString()?.toUri(),
+                uri = game.thumbnailUri,
                 contentDescription = game.name.value,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

@@ -18,6 +18,8 @@ import isel.dei.pdm.demos.gamevault.domain.search.SearchString
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformSearchService
 import isel.dei.pdm.demos.gamevault.domain.search.toSearchStringOrNull
+import isel.dei.pdm.demos.gamevault.images.ImageStore
+import isel.dei.pdm.demos.gamevault.images.storeOrKeep
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenState.Error
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenState.Results
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenState.Search
@@ -48,6 +50,8 @@ import kotlin.time.Duration.Companion.seconds
  *
  * @param searchService The service used to search for platforms.
  * @param collectionRepo The repository used to store the user's collection of platforms.
+ * @param imageStore The store where the logos of the added platforms are copied to, so that they
+ * do not depend on the network.
  * @param savedStateHandle The handle used to preserve the search query.
  * @param searchIndicatorDelay How long a search must take before the loading indicator is
  * displayed, so that it does not flash on screen when the search is almost instantaneous.
@@ -55,6 +59,7 @@ import kotlin.time.Duration.Companion.seconds
 class SearchForPlatformViewModel(
     private val searchService: PlatformSearchService,
     private val collectionRepo: PlatformCollectionRepository,
+    private val imageStore: ImageStore,
     private val savedStateHandle: SavedStateHandle,
     private val searchIndicatorDelay: Duration = DEFAULT_SEARCH_INDICATOR_DELAY
 ) : ViewModel() {
@@ -186,7 +191,9 @@ class SearchForPlatformViewModel(
         _additions.update { it + (platform to AddStatus.ADDING) }
         viewModelScope.launch {
             val outcome = try {
-                collectionRepo.add(platform.toNewPlatform())
+                // The remote logo is kept if it cannot be copied (e.g. without connectivity)
+                val logoUri = imageStore.storeOrKeep(platform.logoUri)
+                collectionRepo.add(platform.toNewPlatform().copy(logoUri = logoUri))
                 _additions.update { it + (platform to AddStatus.ADDED) }
                 AddPlatformOutcome.Added(platform)
             } catch (e: PersistenceException) {
@@ -262,11 +269,17 @@ class SearchForPlatformViewModel(
          */
         fun factory(
             searchService: PlatformSearchService,
-            repository: PlatformCollectionRepository
+            repository: PlatformCollectionRepository,
+            imageStore: ImageStore
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
-                    SearchForPlatformViewModel(searchService, repository, createSavedStateHandle())
+                    SearchForPlatformViewModel(
+                        searchService,
+                        repository,
+                        imageStore,
+                        createSavedStateHandle()
+                    )
                 }
             }
     }

@@ -5,6 +5,7 @@ import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.HttpResponseData
 
 /**
- * A scripted reply to a request, used by the tests of the IGDB services to script a MockEngine.
+ * A scripted reply to a request, used by the tests of the HTTP clients (e.g. the IGDB services,
+ * or the image source) to script a MockEngine.
  */
 internal typealias Reply = suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData

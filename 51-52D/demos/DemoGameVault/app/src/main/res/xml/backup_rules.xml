@@ -7,4 +7,8 @@
 <full-backup-content>
     <!-- The client's secrets must not leave the device -->
     <exclude domain="file" path="datastore/credentials.preferences_pb"/>
+    <!-- The copies of the images can be obtained again from their sources, and may exceed the
+         backup's quota (in which case nothing would be backed up). Up to API 30, the same rules
+         apply to transfers between devices, so the copies are not transferred either. -->
+    <exclude domain="file" path="images/"/>
 </full-backup-content>

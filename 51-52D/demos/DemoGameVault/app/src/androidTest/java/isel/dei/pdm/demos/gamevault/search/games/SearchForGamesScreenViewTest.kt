@@ -38,7 +38,7 @@ import isel.dei.pdm.demos.gamevault.search.games.SearchForGamesScreenViewTestTag
 import isel.dei.pdm.demos.gamevault.search.games.SearchForGamesScreenViewTestTags.GAME_LIST_TAG
 import isel.dei.pdm.demos.gamevault.search.games.SearchForGamesScreenViewTestTags.PLATFORM_FILTER_TAG
 import isel.dei.pdm.demos.gamevault.search.games.SearchForGamesScreenViewTestTags.SEARCH_INDICATOR_TAG
-import isel.dei.pdm.demos.gamevault.ui.common.ImageLoader
+import isel.dei.pdm.demos.gamevault.images.ImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.SearchBoxTestTags
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme

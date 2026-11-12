@@ -3,6 +3,7 @@ package isel.dei.pdm.demos.gamevault.search.games
 import androidx.lifecycle.SavedStateHandle
 import isel.dei.pdm.demos.gamevault.MainDispatcherRule
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeGameCollectionRepository
+import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeImageStore
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.PersistenceException
 import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
@@ -70,7 +71,13 @@ class SearchForGamesViewModelTest {
         val GAME_PC = gamePlatform(6L, "PC (Microsoft Windows)", "PC")
         val GAME_SWITCH = gamePlatform(130L, "Nintendo Switch", "Switch")
 
-        val ELDEN_RING = GameInfo(1L, "Elden Ring", platforms = listOf(GAME_PS5, GAME_PC))
+        val ELDEN_RING = GameInfo(
+            id = 1L,
+            name = "Elden Ring",
+            coverUri = "https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg",
+            thumbnailUri = "https://images.igdb.com/igdb/image/upload/t_cover_small/co4jni.jpg",
+            platforms = listOf(GAME_PS5, GAME_PC)
+        )
         val HADES = GameInfo(2L, "Hades", platforms = listOf(GAME_PC, GAME_SWITCH))
         val DEMONS_SOULS = GameInfo(3L, "Demon's Souls", platforms = listOf(GAME_PS3))
 
@@ -91,6 +98,7 @@ class SearchForGamesViewModelTest {
         listOf(PS5, PS5_PRO, PC, SWITCH).forEach { preload(it) }
     }
     private val gameRepo = ControlledGameCollectionRepository()
+    private val imageStore = FakeImageStore()
 
     /**
      * Collects the states published by the view model until the test ends, as the UI does. The
@@ -112,7 +120,7 @@ class SearchForGamesViewModelTest {
         gameRepository: GameCollectionRepository = gameRepo
     ): SearchForGamesViewModel {
         val viewModel = SearchForGamesViewModel(
-            searchService, gameRepository, platformRepository, savedStateHandle
+            searchService, gameRepository, platformRepository, imageStore, savedStateHandle
         )
         collectStates(viewModel)
         return viewModel
@@ -166,7 +174,7 @@ class SearchForGamesViewModelTest {
     @Test
     fun viewmodel_is_loading_until_the_platforms_are_read() = runTest {
         // Arrange
-        val viewModel = SearchForGamesViewModel(searchService, gameRepo, platformRepo, SavedStateHandle())
+        val viewModel = SearchForGamesViewModel(searchService, gameRepo, platformRepo, imageStore, SavedStateHandle())
         assertEquals(SearchForGamesScreenState.Loading, viewModel.state.value)
 
         // Act
@@ -251,7 +259,7 @@ class SearchForGamesViewModelTest {
     @Test
     fun platforms_are_only_observed_while_the_state_is_collected() = runTest {
         // Arrange
-        val viewModel = SearchForGamesViewModel(searchService, gameRepo, platformRepo, SavedStateHandle())
+        val viewModel = SearchForGamesViewModel(searchService, gameRepo, platformRepo, imageStore, SavedStateHandle())
         assertEquals(0, platformRepo.observers)
 
         // Act & Assert - The UI starts collecting
@@ -443,7 +451,7 @@ class SearchForGamesViewModelTest {
     @Test
     fun search_completes_while_the_ui_is_away_and_is_not_repeated_when_it_comes_back() = runTest {
         // Arrange
-        val viewModel = SearchForGamesViewModel(searchService, gameRepo, platformRepo, SavedStateHandle())
+        val viewModel = SearchForGamesViewModel(searchService, gameRepo, platformRepo, imageStore, SavedStateHandle())
         val collector = collectStates(viewModel)
         viewModel.onSearchQueryChange(ELDEN_QUERY)
 
@@ -609,6 +617,39 @@ class SearchForGamesViewModelTest {
         assertEquals(setOf(PC), entry?.platforms)
         assertEquals(igdb("1"), entry?.game?.source)
         assertIs<AddGameResult.Added>(gameRepo.results.single())
+    }
+
+    @Test
+    fun addition_stores_local_copies_of_the_cover_and_thumbnail() = runTest {
+        // Arrange
+        val viewModel = createViewModelWithResults()
+        viewModel.onAddGame(ELDEN_RING, PC)
+
+        // Act
+        gameRepo.completeAdd()
+
+        // Assert
+        val game = gameRepo.findSameEntry(NewGame("Elden Ring"))?.game
+        assertEquals(imageStore.copies[ELDEN_RING.coverUri], game?.coverUri)
+        assertEquals(imageStore.copies[ELDEN_RING.thumbnailUri], game?.thumbnailUri)
+        assertEquals(2, imageStore.copies.size)
+    }
+
+    @Test
+    fun addition_keeps_the_remote_images_if_they_cannot_be_copied() = runTest {
+        // Arrange - e.g. without connectivity
+        imageStore.storeFails = true
+        val viewModel = createViewModelWithResults()
+        viewModel.onAddGame(ELDEN_RING, PC)
+
+        // Act
+        gameRepo.completeAdd()
+
+        // Assert - The game is added anyway
+        assertEquals(AddStatus.ADDED, viewModel.statusOf(ELDEN_RING, PC))
+        val game = gameRepo.findSameEntry(NewGame("Elden Ring"))?.game
+        assertEquals(ELDEN_RING.coverUri, game?.coverUri)
+        assertEquals(ELDEN_RING.thumbnailUri, game?.thumbnailUri)
     }
 
     @Test

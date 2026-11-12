@@ -1,6 +1,5 @@
 package isel.dei.pdm.demos.gamevault.ui.common
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -25,8 +24,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
-import androidx.core.net.toUri
 import isel.dei.pdm.demos.gamevault.R
+import isel.dei.pdm.demos.gamevault.domain.Uri
+import isel.dei.pdm.demos.gamevault.images.ImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.AsyncImageTestTags.ASYNC_IMAGE
 import isel.dei.pdm.demos.gamevault.ui.common.AsyncImageTestTags.ERROR
 import isel.dei.pdm.demos.gamevault.ui.common.AsyncImageTestTags.LOADING
@@ -94,11 +94,6 @@ fun AsyncImage(
 }
 
 /**
- * Type alias for a function that loads an image from a URI.
- */
-typealias ImageLoader = suspend (Uri) -> Result<ImageBitmap>
-
-/**
  * Represents the state of an asynchronous image load.
  */
 sealed class AsyncImageState {
@@ -139,7 +134,7 @@ class AsyncImagePreviews {
 
         DemoGameVaultTheme {
             AsyncImage(
-                uri = "http://example.com/image.jpg".toUri(),
+                uri = Uri("http://example.com/image.jpg"),
                 contentDescription = null,
                 modifier = Modifier.size(100.dp),
                 loader = loadingLoader
@@ -160,7 +155,7 @@ class AsyncImagePreviews {
 
         DemoGameVaultTheme {
             AsyncImage(
-                uri = "http://example.com/image.jpg".toUri(),
+                uri = Uri("http://example.com/image.jpg"),
                 contentDescription = null,
                 modifier = Modifier.size(100.dp),
                 loader = successLoader
@@ -178,7 +173,7 @@ class AsyncImagePreviews {
 
         DemoGameVaultTheme {
             AsyncImage(
-                uri = "http://example.com/image.jpg".toUri(),
+                uri = Uri("http://example.com/image.jpg"),
                 contentDescription = null,
                 modifier = Modifier.size(100.dp),
                 loader = errorLoader

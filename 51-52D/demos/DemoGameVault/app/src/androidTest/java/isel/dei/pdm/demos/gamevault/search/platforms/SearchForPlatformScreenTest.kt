@@ -18,6 +18,7 @@ import androidx.core.graphics.createBitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.test.platform.app.InstrumentationRegistry
 import isel.dei.pdm.demos.gamevault.R
+import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeImageStore
 import isel.dei.pdm.demos.gamevault.ui.common.AddStatusIndicatorTestTags
 import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
@@ -34,7 +35,7 @@ import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenTest
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformScreenTestTags.SCREEN_TAG
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformViewModel.Companion.QUERY_KEY
 import isel.dei.pdm.demos.gamevault.ui.common.ErrorViewOverlayTestTags
-import isel.dei.pdm.demos.gamevault.ui.common.ImageLoader
+import isel.dei.pdm.demos.gamevault.images.ImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.SearchBoxTestTags
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
@@ -111,7 +112,7 @@ class SearchForPlatformScreenTest {
             // Created on the main thread, as the view model expects
             val viewModel = remember {
                 val savedState = initialQuery?.let { mapOf(QUERY_KEY to it.value) } ?: emptyMap()
-                SearchForPlatformViewModel(searchService, repository, SavedStateHandle(savedState))
+                SearchForPlatformViewModel(searchService, repository, FakeImageStore(), SavedStateHandle(savedState))
             }
             CompositionLocalProvider(LocalImageLoader provides successLoader) {
                 DemoGameVaultTheme {

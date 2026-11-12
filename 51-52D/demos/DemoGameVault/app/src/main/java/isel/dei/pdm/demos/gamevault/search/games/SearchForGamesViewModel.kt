@@ -23,6 +23,8 @@ import isel.dei.pdm.demos.gamevault.domain.search.games.GameSearchService
 import isel.dei.pdm.demos.gamevault.domain.search.games.releasedFor
 import isel.dei.pdm.demos.gamevault.domain.search.games.toSearchCriterion
 import isel.dei.pdm.demos.gamevault.domain.search.toSearchStringOrNull
+import isel.dei.pdm.demos.gamevault.images.ImageStore
+import isel.dei.pdm.demos.gamevault.images.storeOrKeep
 import isel.dei.pdm.demos.gamevault.search.games.SearchForGamesScreenState.Error
 import isel.dei.pdm.demos.gamevault.search.games.SearchForGamesScreenState.Loading
 import isel.dei.pdm.demos.gamevault.search.games.SearchForGamesScreenState.NoPlatforms
@@ -79,6 +81,8 @@ import kotlin.time.Duration.Companion.seconds
  * @param gameRepo The repository used to store the user's collection of games.
  * @param platformRepo The repository of the user's collection of platforms, which games are
  * searched for (and added on).
+ * @param imageStore The store where the cover and thumbnail of the added games are copied to, so
+ * that they do not depend on the network.
  * @param savedStateHandle The handle used to preserve the search query and filters.
  * @param searchIndicatorDelay How long a search must take before the loading indicator is
  * displayed, so that it does not flash on screen when the search is almost instantaneous.
@@ -88,6 +92,7 @@ class SearchForGamesViewModel(
     private val searchService: GameSearchService,
     private val gameRepo: GameCollectionRepository,
     platformRepo: PlatformCollectionRepository,
+    private val imageStore: ImageStore,
     private val savedStateHandle: SavedStateHandle,
     private val searchIndicatorDelay: Duration = DEFAULT_SEARCH_INDICATOR_DELAY
 ) : ViewModel() {
@@ -348,7 +353,7 @@ class SearchForGamesViewModel(
             val outcome = try {
                 // Whatever the result (added, platform added to the existing entry, or already
                 // owned on the platform), the game ends up owned on the platform
-                gameRepo.add(game.toNewGame(), platform)
+                gameRepo.add(game.toNewGame().withLocalImages(), platform)
                 _additions.update { it + (key to AddStatus.ADDED) }
                 AddGameOutcome.Added(game, platform)
             } catch (e: PersistenceException) {
@@ -359,6 +364,18 @@ class SearchForGamesViewModel(
                 _addOutcomes.update { it + outcome }
         }
     }
+
+    /**
+     * This game, with local copies of its images instead of the remote ones. Images that cannot
+     * be copied (e.g. without connectivity) are kept remote. If the game is already in the
+     * collection, the copies already exist, as they are identified by their source, so they are
+     * not downloaded again.
+     */
+    private suspend fun NewGame.withLocalImages(): NewGame =
+        copy(
+            coverUri = imageStore.storeOrKeep(coverUri),
+            thumbnailUri = imageStore.storeOrKeep(thumbnailUri)
+        )
 
     /**
      * Implementation of the state transition that results from the current add outcome having
@@ -516,7 +533,8 @@ class SearchForGamesViewModel(
         fun factory(
             searchService: GameSearchService,
             gameRepository: GameCollectionRepository,
-            platformRepository: PlatformCollectionRepository
+            platformRepository: PlatformCollectionRepository,
+            imageStore: ImageStore
         ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
@@ -524,6 +542,7 @@ class SearchForGamesViewModel(
                         searchService,
                         gameRepository,
                         platformRepository,
+                        imageStore,
                         createSavedStateHandle()
                     )
                 }

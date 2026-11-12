@@ -5,7 +5,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.runtime.CompositionLocalProvider
 import isel.dei.pdm.demos.gamevault.DependenciesContainer
+import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 
 /**
@@ -23,18 +25,21 @@ class SearchForPlatformActivity : ComponentActivity() {
     private val viewModel: SearchForPlatformViewModel by viewModels {
         SearchForPlatformViewModel.factory(
             searchService = dependencies.platformSearchService,
-            repository = dependencies.platformCollectionRepository
+            repository = dependencies.platformCollectionRepository,
+            imageStore = dependencies.imageStore
         )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            DemoGameVaultTheme {
-                SearchForPlatformScreen(
-                    viewModel = viewModel,
-                    onBack = { finish() }
-                )
+            CompositionLocalProvider(LocalImageLoader provides dependencies.imageLoader) {
+                DemoGameVaultTheme {
+                    SearchForPlatformScreen(
+                        viewModel = viewModel,
+                        onBack = { finish() }
+                    )
+                }
             }
         }
     }

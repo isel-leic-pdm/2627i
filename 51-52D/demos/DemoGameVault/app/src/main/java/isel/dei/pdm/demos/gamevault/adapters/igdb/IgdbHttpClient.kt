@@ -17,6 +17,7 @@ import isel.dei.pdm.demos.gamevault.domain.search.CredentialsRepository
 import isel.dei.pdm.demos.gamevault.domain.search.Secrets
 import isel.dei.pdm.demos.gamevault.domain.search.ServiceUnavailableException
 import isel.dei.pdm.demos.gamevault.domain.search.UnexpectedServiceException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.SerialName
@@ -40,6 +41,17 @@ internal val igdbJson = Json { ignoreUnknownKeys = true }
  * The maximum number of retries of a request that failed with a transient error.
  */
 internal const val MAX_RETRIES = 3
+
+/**
+ * How long establishing a connection may take, in each attempt, before it is considered failed.
+ */
+internal const val CONNECT_TIMEOUT_MILLIS = 10_000L
+
+/**
+ * How long a request may take, in each attempt, from sending it to receiving the whole response,
+ * before it is considered failed.
+ */
+internal const val REQUEST_TIMEOUT_MILLIS = 15_000L
 
 /**
  * Creates the HTTP client used to access IGDB. It is meant to be shared by all IGDB services, so
@@ -74,15 +86,15 @@ fun createIgdbHttpClient(
         retryIf(maxRetries = MAX_RETRIES) { _, response ->
             response.status.value in 500..599 || response.status == HttpStatusCode.TooManyRequests
         }
-        retryOnExceptionIf(maxRetries = MAX_RETRIES) { _, cause -> cause is IOException }
+        retryOnExceptionIf(maxRetries = MAX_RETRIES) { _, cause -> cause.isNetworkError() }
         exponentialDelay(baseDelayMs = 500, maxDelayMs = 4_000, randomizationMs = 250)
         delay(retryDelay)
     }
 
     // Installed after HttpRequestRetry, so that each attempt has its own timeout
     install(HttpTimeout) {
-        connectTimeoutMillis = 10_000
-        requestTimeoutMillis = 15_000
+        connectTimeoutMillis = CONNECT_TIMEOUT_MILLIS
+        requestTimeoutMillis = REQUEST_TIMEOUT_MILLIS
     }
 
     // Finally, we install the authentication plugin, that automatically refreshes de AT
@@ -146,6 +158,21 @@ private suspend fun RefreshTokensParams.requestAccessToken(secrets: Secrets): St
         // 400 (invalid client id) and 403 (invalid client secret)
         else -> null
     }
+}
+
+/**
+ * Whether this exception, thrown while sending a request, is a network error (including
+ * timeouts), which is transient. The [HttpTimeout] plugin reports a timeout by cancelling the
+ * request, so the timeout reaches the [HttpRequestRetry] plugin as the cause of a
+ * [CancellationException], which is unwrapped. Other cancellations (e.g. the user leaving the
+ * screen) are not network errors.
+ */
+private fun Throwable.isNetworkError(): Boolean {
+    var exception: Throwable = this
+    while (exception is CancellationException) {
+        exception = exception.cause ?: return false
+    }
+    return exception is IOException
 }
 
 /**

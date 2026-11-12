@@ -7,6 +7,10 @@
     <!-- The client's secrets must not leave the device -->
     <cloud-backup>
         <exclude domain="file" path="datastore/credentials.preferences_pb"/>
+        <!-- The copies of the images can be obtained again from their sources, and may exceed the
+             cloud backup's quota (in which case nothing would be backed up). Transfers between
+             devices have no quota, so the copies are kept in them. -->
+        <exclude domain="file" path="images/"/>
     </cloud-backup>
     <device-transfer>
         <exclude domain="file" path="datastore/credentials.preferences_pb"/>

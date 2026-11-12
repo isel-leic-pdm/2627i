@@ -12,6 +12,7 @@ import androidx.compose.ui.test.performClick
 import androidx.core.graphics.createBitmap
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
+import isel.dei.pdm.demos.gamevault.images.ImageLoader
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test

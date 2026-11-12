@@ -25,7 +25,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import isel.dei.pdm.demos.gamevault.R
 import isel.dei.pdm.demos.gamevault.domain.collection.games.Accomplishment
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionEntry
@@ -70,7 +69,7 @@ fun CollectionItemView(
             modifier = Modifier.padding(8.dp)
         ) {
             AsyncImage(
-                uri = item.thumbnailUri?.toString()?.toUri(),
+                uri = item.thumbnailUri,
                 contentDescription = item.name.value,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

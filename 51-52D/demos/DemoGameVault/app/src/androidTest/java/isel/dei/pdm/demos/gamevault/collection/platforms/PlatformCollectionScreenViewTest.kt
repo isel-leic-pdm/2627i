@@ -19,7 +19,7 @@ import isel.dei.pdm.demos.gamevault.collection.platforms.PlatformCollectionScree
 import isel.dei.pdm.demos.gamevault.collection.platforms.PlatformCollectionScreenViewTestTags.PLATFORM_LIST_TAG
 import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
-import isel.dei.pdm.demos.gamevault.ui.common.ImageLoader
+import isel.dei.pdm.demos.gamevault.images.ImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.AddStatusIndicatorTestTags
 import isel.dei.pdm.demos.gamevault.ui.common.PlatformListItemViewTestTags

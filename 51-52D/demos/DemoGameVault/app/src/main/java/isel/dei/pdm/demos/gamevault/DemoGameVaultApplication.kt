@@ -14,14 +14,21 @@ import isel.dei.pdm.demos.gamevault.adapters.igdb.IgdbApi
 import isel.dei.pdm.demos.gamevault.adapters.igdb.IgdbGameSearchService
 import isel.dei.pdm.demos.gamevault.adapters.igdb.IgdbPlatformSearchService
 import isel.dei.pdm.demos.gamevault.adapters.igdb.createIgdbHttpClient
+import isel.dei.pdm.demos.gamevault.adapters.images.FileImageStore
+import isel.dei.pdm.demos.gamevault.adapters.images.HttpImageSource
+import isel.dei.pdm.demos.gamevault.adapters.images.SchemeImageSource
+import isel.dei.pdm.demos.gamevault.adapters.images.cachingImageLoader
+import isel.dei.pdm.demos.gamevault.adapters.images.createImageHttpClient
 import isel.dei.pdm.demos.gamevault.adapters.room.GameVaultDatabase
 import isel.dei.pdm.demos.gamevault.adapters.room.RoomPlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.collection.games.GameCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
-import isel.dei.pdm.demos.gamevault.home.HomeScreenSampleData
 import isel.dei.pdm.demos.gamevault.domain.search.CredentialsRepository
 import isel.dei.pdm.demos.gamevault.domain.search.games.GameSearchService
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformSearchService
+import isel.dei.pdm.demos.gamevault.home.HomeScreenSampleData
+import isel.dei.pdm.demos.gamevault.images.ImageLoader
+import java.io.File
 
 /**
  * The dependencies container to be used in production.
@@ -60,6 +67,42 @@ class DemoGameVaultApplication : DependenciesContainer, Application() {
 
     private val igdbApi: IgdbApi by lazy {
         IgdbApi(client = igdbHttpClient, credentials = credentialsRepository)
+    }
+
+    /**
+     * The HTTP client used to download images, with a disk cache in the app's cache directory,
+     * which the system may clear when storage is low (see [createImageHttpClient]).
+     */
+    private val imageHttpClient: HttpClient by lazy {
+        createImageHttpClient(cacheDirectory = File(cacheDir, "images"))
+    }
+
+    private val httpImageSource: HttpImageSource by lazy {
+        HttpImageSource(imageHttpClient)
+    }
+
+    /**
+     * The store of the local copies of the collection's images, in the app's internal storage.
+     *
+     * IMPORTANT: The directory (images/) is excluded from cloud backups in res/xml/backup_rules.xml
+     * and res/xml/data_extraction_rules.xml, as the copies can be obtained again from their
+     * sources, and may exceed Auto Backup's quota (25 MB), in which case nothing would be backed
+     * up. If the name changes, those files MUST be updated accordingly.
+     */
+    override val imageStore: FileImageStore by lazy {
+        FileImageStore(directory = File(filesDir, "images"), source = httpImageSource)
+    }
+
+    override val imageLoader: ImageLoader by lazy {
+        cachingImageLoader(
+            source = SchemeImageSource(
+                mapOf(
+                    "http" to httpImageSource,
+                    "https" to httpImageSource,
+                    FileImageStore.SCHEME to imageStore
+                )
+            )
+        )
     }
 
     override val credentialsRepository: CredentialsRepository by lazy {

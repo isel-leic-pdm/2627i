@@ -8,7 +8,8 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
-import androidx.core.net.toUri
+import isel.dei.pdm.demos.gamevault.domain.Uri
+import isel.dei.pdm.demos.gamevault.images.ImageLoader
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 import kotlinx.coroutines.delay
 import org.junit.Rule
@@ -30,7 +31,7 @@ class AsyncImageTest {
         composeTestRule.setContent {
             DemoGameVaultTheme {
                 AsyncImage(
-                    uri = "http://example.com/image.jpg".toUri(),
+                    uri = Uri("http://example.com/image.jpg"),
                     contentDescription = "Loading image",
                     modifier = Modifier.size(100.dp),
                     loader = loadingLoader,
@@ -55,7 +56,7 @@ class AsyncImageTest {
         composeTestRule.setContent {
             DemoGameVaultTheme {
                 AsyncImage(
-                    uri = "http://example.com/image.jpg".toUri(),
+                    uri = Uri("http://example.com/image.jpg"),
                     contentDescription = "Success image",
                     modifier = Modifier.size(100.dp),
                     loader = successLoader,
@@ -77,7 +78,7 @@ class AsyncImageTest {
         composeTestRule.setContent {
             DemoGameVaultTheme {
                 AsyncImage(
-                    uri = "http://example.com/image.jpg".toUri(),
+                    uri = Uri("http://example.com/image.jpg"),
                     contentDescription = "Error image",
                     modifier = Modifier.size(100.dp),
                     loader = errorLoader,
@@ -117,7 +118,7 @@ class AsyncImageTest {
         composeTestRule.setContent {
             DemoGameVaultTheme {
                 AsyncImage(
-                    uri = "http://example.com/image.jpg".toUri(),
+                    uri = Uri("http://example.com/image.jpg"),
                     contentDescription = "Error image",
                     modifier = Modifier.size(100.dp),
                 )

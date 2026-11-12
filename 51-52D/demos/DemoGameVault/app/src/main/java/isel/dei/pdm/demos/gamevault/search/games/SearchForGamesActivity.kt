@@ -5,8 +5,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.runtime.CompositionLocalProvider
 import isel.dei.pdm.demos.gamevault.DependenciesContainer
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformActivity
+import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 
 /**
@@ -25,21 +27,24 @@ class SearchForGamesActivity : ComponentActivity() {
         SearchForGamesViewModel.factory(
             searchService = dependencies.gameSearchService,
             gameRepository = dependencies.gameCollectionRepository,
-            platformRepository = dependencies.platformCollectionRepository
+            platformRepository = dependencies.platformCollectionRepository,
+            imageStore = dependencies.imageStore
         )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            DemoGameVaultTheme {
-                SearchForGamesScreen(
-                    viewModel = viewModel,
-                    // Once the user comes back, the platforms are read again, as the screen
-                    // observes them again
-                    onAddPlatform = { SearchForPlatformActivity.navigate(this) },
-                    onBack = { finish() }
-                )
+            CompositionLocalProvider(LocalImageLoader provides dependencies.imageLoader) {
+                DemoGameVaultTheme {
+                    SearchForGamesScreen(
+                        viewModel = viewModel,
+                        // Once the user comes back, the platforms are read again, as the screen
+                        // observes them again
+                        onAddPlatform = { SearchForPlatformActivity.navigate(this) },
+                        onBack = { finish() }
+                    )
+                }
             }
         }
     }

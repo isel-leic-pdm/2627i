@@ -14,7 +14,7 @@ import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.domain.search.games.GameInfo
 import isel.dei.pdm.demos.gamevault.ui.common.AddStatus
 import isel.dei.pdm.demos.gamevault.ui.common.AddStatusIndicatorTestTags
-import isel.dei.pdm.demos.gamevault.ui.common.ImageLoader
+import isel.dei.pdm.demos.gamevault.images.ImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
 import org.junit.Assert.assertTrue
 import org.junit.Rule
