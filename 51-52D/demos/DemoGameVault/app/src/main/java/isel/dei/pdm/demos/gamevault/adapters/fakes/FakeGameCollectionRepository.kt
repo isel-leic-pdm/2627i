@@ -90,8 +90,7 @@ class FakeGameCollectionRepository(
             name = game.name,
             releaseDate = game.releaseDate,
             coverUri = game.coverUri,
-            thumbnailUri = game.thumbnailUri,
-            source = game.source
+            thumbnailUri = game.thumbnailUri
         )
         val entry = CollectionEntry(game = added, platforms = setOf(platform), playStatus = playStatus)
         collection.value += added.id to StoredGame(entry, details)
@@ -197,7 +196,7 @@ class FakeGameCollectionRepository(
 private fun CollectionEntry.meets(query: CollectionQuery): Boolean =
     (query.state == null || playStatus.state == query.state) &&
         (!query.platinumOnly || playStatus.platinum != null) &&
-        (query.platformId == null || platforms.any { it.id == query.platformId }) &&
+        (query.platform?.let { isOwnedOn(it) } ?: true) &&
         (query.nameContains?.let { game.name.value.contains(it.value, ignoreCase = true) } ?: true) &&
         (query.initial == null || game.name.value.initial() == query.initial)
 

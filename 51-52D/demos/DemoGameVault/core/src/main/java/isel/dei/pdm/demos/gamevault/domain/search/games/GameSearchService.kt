@@ -8,8 +8,8 @@ import isel.dei.pdm.demos.gamevault.domain.search.SearchString
  *
  * The app uses a single search provider (currently IGDB), and implementations are specific to it.
  * Using another provider means replacing the implementation, not supporting several providers at
- * once. Therefore, the platforms of the user's collection that were obtained from a search
- * service are assumed to have been obtained from this provider (see [toSearchCriterion]).
+ * once. The vault does not keep the provider's identifiers, so the platforms of the user's
+ * collection are described to the service by their names (see [PlatformCriterion]).
  *
  * All operations report failures uniformly, by throwing a [SearchServiceException].
  * Implementations must translate the errors of the underlying technology (e.g. network or HTTP

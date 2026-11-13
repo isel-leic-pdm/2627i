@@ -93,6 +93,23 @@ class PlayStatusTests {
         assertFalse(Accomplishment(march).isIn(Year(2025)))
     }
 
+    @Test
+    fun `undated Accomplishment is in no year`() {
+        assertFalse(Accomplishment(null).isIn(thisYear))
+    }
+
+    @Test
+    fun `Accomplishments are ordered chronologically with the undated ones first`() {
+        val accomplishments = listOf(
+            Accomplishment(october), Accomplishment(null), Accomplishment(march)
+        )
+
+        assertEquals(
+            listOf(Accomplishment(null), Accomplishment(march), Accomplishment(october)),
+            accomplishments.sortedWith(Accomplishment.chronologically)
+        )
+    }
+
     // PlayStatus construction
 
     @Test
@@ -279,6 +296,15 @@ class PlayStatusTests {
     }
 
     @Test
+    fun `addRun without date registers an undated run and sets the state to FINISHED`() {
+        val updated = PlayStatus(PlayTime(30, 0), State.BACKLOG).addRun(null)
+
+        assertEquals(State.FINISHED, updated.state)
+        assertEquals(listOf(Accomplishment(null)), updated.completedRuns)
+        assertTrue(updated.isFinished)
+    }
+
+    @Test
     fun `addRun on later runs appends it and keeps the state`() {
         // Arrange
         val status = PlayStatus(PlayTime(60, 0), State.PLAYING, listOf(Accomplishment(march)))
@@ -329,6 +355,14 @@ class PlayStatusTests {
     }
 
     @Test
+    fun `addPlatinum without date registers an undated platinum`() {
+        val updated = PlayStatus(PlayTime(80, 0), State.PLAYING).addPlatinum(null)
+
+        assertEquals(Accomplishment(null), updated.platinum)
+        assertFalse(updated.obtainedPlatinumIn(thisYear))
+    }
+
+    @Test
     fun `addPlatinum is rejected in the NONE state`() {
         assertFailsWith<IllegalArgumentException> {
             PlayStatus().addPlatinum(october)
@@ -337,7 +371,7 @@ class PlayStatusTests {
 
     // Yearly accomplishments
 
-    private fun withRuns(vararg dates: LocalDate) =
+    private fun withRuns(vararg dates: LocalDate?) =
         PlayStatus(PlayTime(50, 0), State.FINISHED, dates.map { Accomplishment(it) })
 
     @Test
@@ -362,6 +396,38 @@ class PlayStatusTests {
 
         assertTrue(status.wasFirstFinishedIn(thisYear))
         assertTrue(status.wasReplayedIn(thisYear))
+    }
+
+    @Test
+    fun `the first finish is the earliest run, whatever the order the runs were registered in`() {
+        val status = withRuns(march, lastYear)
+
+        assertFalse(status.wasFirstFinishedIn(thisYear))
+        assertTrue(status.wasReplayedIn(thisYear))
+    }
+
+    @Test
+    fun `game finished twice on the same date was first finished and replayed`() {
+        val status = withRuns(march, march)
+
+        assertTrue(status.wasFirstFinishedIn(thisYear))
+        assertTrue(status.wasReplayedIn(thisYear))
+    }
+
+    @Test
+    fun `game with an undated run was first finished in no year and its dated runs are replays`() {
+        val status = withRuns(march, null)
+
+        assertFalse(status.wasFirstFinishedIn(thisYear))
+        assertTrue(status.wasReplayedIn(thisYear))
+    }
+
+    @Test
+    fun `game with undated runs only was neither first finished nor replayed in any year`() {
+        val status = withRuns(null, null)
+
+        assertFalse(status.wasFirstFinishedIn(thisYear))
+        assertFalse(status.wasReplayedIn(thisYear))
     }
 
     @Test

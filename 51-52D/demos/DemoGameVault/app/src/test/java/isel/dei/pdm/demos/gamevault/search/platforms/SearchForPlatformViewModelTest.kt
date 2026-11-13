@@ -3,11 +3,8 @@ package isel.dei.pdm.demos.gamevault.search.platforms
 import androidx.lifecycle.SavedStateHandle
 import isel.dei.pdm.demos.gamevault.MainDispatcherRule
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeImageStore
-import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.PersistenceException
 import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
-import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
-import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference.Provider.IGDB
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.NewPlatform
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
@@ -555,7 +552,6 @@ class SearchForPlatformViewModelTest {
         assertEquals(PS5_PRO.name, added.name)
         assertEquals(PS5_PRO.abbreviation, added.abbreviation)
         assertEquals(PS5_PRO.version, added.version)
-        assertEquals(SourceReference(IGDB, NonBlankString("5")), added.source)
         // The logo is a local copy
         assertEquals(imageStore.copies[PS5_PRO.logoUri], added.logoUri)
     }
@@ -814,8 +810,7 @@ class ControlledPlatformCollectionRepository(
                 name = platform.name,
                 logoUri = platform.logoUri,
                 ownedSince = platform.ownedSince,
-                version = platform.version,
-                source = platform.source
+                version = platform.version
             )
         }
         return id

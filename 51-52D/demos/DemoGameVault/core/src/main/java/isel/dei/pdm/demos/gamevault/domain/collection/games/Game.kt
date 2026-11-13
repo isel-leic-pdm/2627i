@@ -1,13 +1,14 @@
 package isel.dei.pdm.demos.gamevault.domain.collection.games
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
-import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
 import isel.dei.pdm.demos.gamevault.domain.Uri
 import kotlinx.datetime.LocalDate
 
 /**
- * Represents a game in the user's vault, independently of how it was obtained (from a search
- * service or inserted manually).
+ * Represents a game in the user's vault. The vault is authoritative: the game is identified by
+ * its [id] alone, and its information is the vault's, however it was first obtained (copied from
+ * a search service, as a convenience, or inserted manually). The vault does not keep track of
+ * where the information came from.
  *
  * @property id The unique identifier of the game, as assigned by the repository.
  * @property name The game's name.
@@ -15,15 +16,13 @@ import kotlinx.datetime.LocalDate
  * @property coverUri The URI of the game's cover image, if available. Typically refers to a local
  * copy of the image, but any URI supported by the app's image loader is valid.
  * @property thumbnailUri The URI of the game's thumbnail image, if available.
- * @property source The source from which the game was obtained, or null if inserted manually.
  */
 data class Game(
     val id: Long,
     val name: NonBlankString,
     val releaseDate: LocalDate? = null,
     val coverUri: Uri? = null,
-    val thumbnailUri: Uri? = null,
-    val source: SourceReference? = null
+    val thumbnailUri: Uri? = null
 ) {
     /**
      * Convenience constructor that accepts strings for the name, cover and thumbnail URIs.
@@ -36,22 +35,20 @@ data class Game(
         name: String,
         releaseDate: LocalDate? = null,
         coverUri: String? = null,
-        thumbnailUri: String? = null,
-        source: SourceReference? = null
+        thumbnailUri: String? = null
     ) : this(
         id = id,
         name = NonBlankString(name),
         releaseDate = releaseDate,
         coverUri = coverUri?.let { Uri(it) },
-        thumbnailUri = thumbnailUri?.let { Uri(it) },
-        source = source
+        thumbnailUri = thumbnailUri?.let { Uri(it) }
     )
 
     /**
      * Checks whether this game and [other] are the same game. See [isSameGame] for the rules.
      */
     infix fun isSameGameAs(other: Game): Boolean =
-        isSameGame(name, releaseDate, source, other.name, other.releaseDate, other.source)
+        isSameGame(name, releaseDate, other.name, other.releaseDate)
 }
 
 /**
@@ -61,14 +58,12 @@ data class Game(
  * @property releaseDate The game's release date, if known.
  * @property coverUri The URI of the game's cover image, if available.
  * @property thumbnailUri The URI of the game's thumbnail image, if available.
- * @property source The source from which the game was obtained, or null if inserted manually.
  */
 data class NewGame(
     val name: NonBlankString,
     val releaseDate: LocalDate? = null,
     val coverUri: Uri? = null,
-    val thumbnailUri: Uri? = null,
-    val source: SourceReference? = null
+    val thumbnailUri: Uri? = null
 ) {
     /**
      * Convenience constructor that accepts strings for the name, cover and thumbnail URIs.
@@ -80,14 +75,12 @@ data class NewGame(
         name: String,
         releaseDate: LocalDate? = null,
         coverUri: String? = null,
-        thumbnailUri: String? = null,
-        source: SourceReference? = null
+        thumbnailUri: String? = null
     ) : this(
         name = NonBlankString(name),
         releaseDate = releaseDate,
         coverUri = coverUri?.let { Uri(it) },
-        thumbnailUri = thumbnailUri?.let { Uri(it) },
-        source = source
+        thumbnailUri = thumbnailUri?.let { Uri(it) }
     )
 
     /**
@@ -95,24 +88,21 @@ data class NewGame(
      * the rules.
      */
     infix fun isSameGameAs(game: Game): Boolean =
-        isSameGame(name, releaseDate, source, game.name, game.releaseDate, game.source)
+        isSameGame(name, releaseDate, game.name, game.releaseDate)
 }
 
 /**
- * Determines whether two games are the same game, used to detect duplicates in the vault:
- * - If both games come from the same provider, they are the same game if they have the same
- * external identifier, regardless of their names (which the user may have edited).
- * - Otherwise, they are the same game if their names are equal, ignoring case, punctuation and
- * whitespace differences, and their release years are equal, if known for both. The release year
- * distinguishes games that share their name (e.g. God of War, from 2005 and 2018).
+ * Determines whether two games are the same game, used to prevent the user from adding duplicates
+ * to the vault by accident: they are the same game if their names are equal, ignoring case,
+ * punctuation and whitespace differences, and their release years are equal, if known for both.
+ * The release year distinguishes games that share their name (e.g. God of War, from 2005 and
+ * 2018). It is a safeguard, not an identity: duplicates that slip through (e.g. games named
+ * differently) are to be consolidated by the user.
  */
 private fun isSameGame(
-    name: NonBlankString, releaseDate: LocalDate?, source: SourceReference?,
-    otherName: NonBlankString, otherReleaseDate: LocalDate?, otherSource: SourceReference?
+    name: NonBlankString, releaseDate: LocalDate?,
+    otherName: NonBlankString, otherReleaseDate: LocalDate?
 ): Boolean {
-    if (source != null && otherSource != null && source.provider == otherSource.provider) {
-        return source.externalId == otherSource.externalId
-    }
     val sameName = name.normalized() == otherName.normalized()
     val sameYear = releaseDate == null || otherReleaseDate == null ||
             releaseDate.year == otherReleaseDate.year

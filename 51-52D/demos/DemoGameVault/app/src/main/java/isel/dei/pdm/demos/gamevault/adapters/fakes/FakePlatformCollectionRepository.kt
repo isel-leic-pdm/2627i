@@ -25,8 +25,7 @@ class FakePlatformCollectionRepository : PlatformCollectionRepository {
             name = platform.name,
             logoUri = platform.logoUri,
             ownedSince = platform.ownedSince,
-            version = platform.version,
-            source = platform.source
+            version = platform.version
         )
         _platforms.emit(_platforms.value + created)
         return newId

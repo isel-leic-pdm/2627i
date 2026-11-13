@@ -14,8 +14,8 @@ import isel.dei.pdm.demos.gamevault.domain.Year
  * @property releaseYear The game's release year, if known. Distinguishes games with the same name.
  * @property coverUri The URI of the game's cover image, if available.
  * @property thumbnailUri The URI of the game's thumbnail image, if available.
- * @property platformAbbreviations The abbreviations of the platforms the game is owned on, in the
- * order the platforms were added. There is at least one. Versions are not included, as games are
+ * @property platformAbbreviations The abbreviations of the platforms the game is owned on, in no
+ * particular order. There is at least one. Versions are not included, as games are
  * oblivious of them (see [CollectionEntry.platforms]).
  * @property state The game's play state.
  * @property timeSpent The total time spent playing the game.

@@ -1,6 +1,7 @@
 package isel.dei.pdm.demos.gamevault.domain.collection.games
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 
 /**
  * The criteria used to browse the collection. The set of criteria is fixed and they are all
@@ -10,8 +11,10 @@ import isel.dei.pdm.demos.gamevault.domain.NonBlankString
  *
  * @property state Only entries in this play state, or any state if null.
  * @property platinumOnly Only entries whose platinum was obtained.
- * @property platformId Only entries owned on the platform with this identifier (among others, as
- * games may be owned on several platforms), or any platform if null.
+ * @property platform Only entries owned on this platform, regardless of its version (see
+ * [CollectionEntry.isOwnedOn]), among others, as games may be owned on several platforms. Any
+ * platform if null. For example, filtering by the PS5 includes the games registered as owned on
+ * the PS5 Slim.
  * @property nameContains Only entries whose game's name contains this text, ignoring case, or any
  * name if null.
  * @property initial Only entries whose game's name is listed under this initial, for alphabetical
@@ -23,7 +26,7 @@ import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 data class CollectionQuery(
     val state: PlayStatus.State? = null,
     val platinumOnly: Boolean = false,
-    val platformId: Long? = null,
+    val platform: Platform? = null,
     val nameContains: NonBlankString? = null,
     val initial: Char? = null
 ) {

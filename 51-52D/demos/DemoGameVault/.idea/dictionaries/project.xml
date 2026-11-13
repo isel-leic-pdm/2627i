@@ -3,6 +3,9 @@
     <words>
       <w>IGDB</w>
       <w>Igdb</w>
+      <w>NOCASE</w>
+      <w>gamevault</w>
+      <w>isel</w>
     </words>
   </dictionary>
 </component>

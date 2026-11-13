@@ -7,9 +7,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.PersistenceException
-import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.NewPlatform
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
@@ -310,13 +308,13 @@ private fun PlatformInfo.matches(platform: Platform): Boolean =
 
 /**
  * Converts this platform, as provided by the search service, to a platform to be added to the
- * user's collection, keeping a reference to its source.
+ * user's collection. Its information is copied into the vault, which does not keep track of where
+ * it came from.
  */
 private fun PlatformInfo.toNewPlatform(): NewPlatform =
     NewPlatform(
         abbreviation = abbreviation,
         name = name,
         logoUri = logoUri,
-        version = version,
-        source = SourceReference(SourceReference.Provider.IGDB, NonBlankString(id.toString()))
+        version = version
     )

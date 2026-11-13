@@ -9,7 +9,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import isel.dei.pdm.demos.gamevault.adapters.datastore.DataStoreCredentialsRepository
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeCredentialsRepository
-import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeGameCollectionRepository
 import isel.dei.pdm.demos.gamevault.adapters.igdb.IgdbApi
 import isel.dei.pdm.demos.gamevault.adapters.igdb.IgdbGameSearchService
 import isel.dei.pdm.demos.gamevault.adapters.igdb.IgdbPlatformSearchService
@@ -20,13 +19,13 @@ import isel.dei.pdm.demos.gamevault.adapters.images.SchemeImageSource
 import isel.dei.pdm.demos.gamevault.adapters.images.cachingImageLoader
 import isel.dei.pdm.demos.gamevault.adapters.images.createImageHttpClient
 import isel.dei.pdm.demos.gamevault.adapters.room.GameVaultDatabase
+import isel.dei.pdm.demos.gamevault.adapters.room.RoomGameCollectionRepository
 import isel.dei.pdm.demos.gamevault.adapters.room.RoomPlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.collection.games.GameCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.search.CredentialsRepository
 import isel.dei.pdm.demos.gamevault.domain.search.games.GameSearchService
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformSearchService
-import isel.dei.pdm.demos.gamevault.home.HomeScreenSampleData
 import isel.dei.pdm.demos.gamevault.images.ImageLoader
 import java.io.File
 
@@ -125,9 +124,6 @@ class DemoGameVaultApplication : DependenciesContainer, Application() {
     }
 
     override val gameCollectionRepository: GameCollectionRepository by lazy {
-        // TODO: Replace with the Room based implementation, once it exists. Meanwhile, the fake
-        //  (which is confined to the main thread) is seeded with sample data, so that the home
-        //  screen has something to display
-        FakeGameCollectionRepository(initialEntries = HomeScreenSampleData.entries)
+        RoomGameCollectionRepository(database = database)
     }
 }

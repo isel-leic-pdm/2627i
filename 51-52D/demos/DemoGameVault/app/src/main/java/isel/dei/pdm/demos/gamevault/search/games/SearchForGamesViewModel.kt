@@ -7,9 +7,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.PersistenceException
-import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionEntry
 import isel.dei.pdm.demos.gamevault.domain.collection.games.GameCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.collection.games.NewGame
@@ -552,14 +550,13 @@ class SearchForGamesViewModel(
 
 /**
  * Converts this game, as provided by the search service, to a game to be added to the user's
- * collection, keeping a reference to its source (the app's single search provider, see
- * [GameSearchService]).
+ * collection. Its information is copied into the vault, which does not keep track of where it
+ * came from.
  */
 private fun GameInfo.toNewGame(): NewGame =
     NewGame(
         name = name,
         releaseDate = releaseDate,
         coverUri = coverUri,
-        thumbnailUri = thumbnailUri,
-        source = SourceReference(SourceReference.Provider.IGDB, NonBlankString(id.toString()))
+        thumbnailUri = thumbnailUri
     )

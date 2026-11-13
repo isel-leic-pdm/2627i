@@ -1,7 +1,6 @@
 package isel.dei.pdm.demos.gamevault.domain.collection.platforms
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
-import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
 import isel.dei.pdm.demos.gamevault.domain.Uri
 import isel.dei.pdm.demos.gamevault.domain.Year
 import kotlin.test.Test
@@ -12,34 +11,19 @@ import kotlin.test.assertTrue
 
 class PlatformTests {
 
-    private val igdbSource = SourceReference(SourceReference.Provider.IGDB, NonBlankString("167"))
-
     // Platforms as far as games are concerned
 
     @Test
-    fun `versions of a platform obtained from the provider are the same game platform`() {
-        val ps5 = Platform(1L, "PS5", "PlayStation 5", source = igdbSource)
-        val slim = Platform(2L, "PS5", "PlayStation 5 Slim", version = "Slim", source = igdbSource)
+    fun `versions of a platform are the same game platform`() {
+        val ps5 = Platform(1L, "PS5", "PlayStation 5")
+        val slim = Platform(2L, "PS5", "PlayStation 5", version = "Slim")
 
         assertTrue(ps5.isSameGamePlatformAs(slim))
         assertTrue(slim.isSameGamePlatformAs(ps5))
     }
 
     @Test
-    fun `platforms obtained from the provider are told apart by its identifiers, not by names`() {
-        // Arrange - Even if they share the abbreviation
-        val ps5 = Platform(1L, "PS", "PlayStation 5", source = igdbSource)
-        val ps4 = Platform(
-            2L, "PS", "PlayStation 4",
-            source = SourceReference(SourceReference.Provider.IGDB, NonBlankString("48"))
-        )
-
-        // Act & Assert
-        assertFalse(ps5.isSameGamePlatformAs(ps4))
-    }
-
-    @Test
-    fun `platforms inserted manually are the same game platform if they share the name or abbreviation`() {
+    fun `platforms are the same game platform if they share the name or abbreviation, ignoring case`() {
         val ps5 = Platform(1L, "PS5", "PlayStation 5")
 
         assertTrue(ps5.isSameGamePlatformAs(Platform(2L, "PS5", "Sony PS5", version = "Slim")))
@@ -48,19 +32,11 @@ class PlatformTests {
     }
 
     @Test
-    fun `platforms from a provider and inserted manually are compared by name or abbreviation`() {
-        val ps5 = Platform(1L, "PS5", "PlayStation 5", source = igdbSource)
-
-        assertTrue(ps5.isSameGamePlatformAs(Platform(2L, "PS5", "My PS5")))
-        assertFalse(ps5.isSameGamePlatformAs(Platform(3L, "NSW", "Nintendo Switch")))
-    }
-
-    @Test
     fun `distinctGamePlatforms keeps the first version of each platform, in order`() {
         // Arrange
-        val pro = Platform(1L, "PS5", "PlayStation 5", version = "Pro", source = igdbSource)
+        val pro = Platform(1L, "PS5", "PlayStation 5", version = "Pro")
         val switch = Platform(2L, "NSW", "Nintendo Switch")
-        val ps5 = Platform(3L, "PS5", "PlayStation 5", source = igdbSource)
+        val ps5 = Platform(3L, "PS5", "PlayStation 5")
         val oled = Platform(4L, "NSW", "Nintendo Switch", version = "OLED")
 
         // Act & Assert
@@ -78,12 +54,10 @@ class PlatformTests {
             name = "PlayStation 5",
             logoUri = "https://example.com/ps5.png",
             ownedSince = 2020,
-            version = "Digital Edition",
-            source = igdbSource
+            version = "Digital Edition"
         )
 
         // Assert
-        assertEquals(igdbSource, platform.source)
         assertEquals(1L, platform.id)
         assertEquals(NonBlankString("PS5"), platform.abbreviation)
         assertEquals(NonBlankString("PlayStation 5"), platform.name)
@@ -130,12 +104,10 @@ class PlatformTests {
             name = "Nintendo Switch",
             logoUri = "https://example.com/switch.png",
             ownedSince = 2021,
-            version = "OLED",
-            source = igdbSource
+            version = "OLED"
         )
 
         // Assert
-        assertEquals(igdbSource, newPlatform.source)
         assertEquals(NonBlankString("NSW"), newPlatform.abbreviation)
         assertEquals(NonBlankString("Nintendo Switch"), newPlatform.name)
         assertEquals(Uri("https://example.com/switch.png"), newPlatform.logoUri)

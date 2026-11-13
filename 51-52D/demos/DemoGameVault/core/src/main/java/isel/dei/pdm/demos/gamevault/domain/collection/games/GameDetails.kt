@@ -9,8 +9,8 @@ import isel.dei.pdm.demos.gamevault.domain.NonBlankString
  *
  * The details belong to the game, not to its collection entries: a game owned on several
  * platforms has a single set of details. They are either copied from the search service when the
- * game is added (and may then be refreshed through the game's [Game.source]), or inserted by the
- * user. Either way, the user may edit them.
+ * game is added, as a convenience, or inserted by the user. Either way, they are the vault's, and
+ * the user may edit them.
  *
  * @property game The game these details refer to.
  * @property description A summary or description of the game, if available.

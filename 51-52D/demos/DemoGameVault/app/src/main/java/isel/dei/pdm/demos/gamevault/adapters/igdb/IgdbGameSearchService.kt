@@ -20,9 +20,8 @@ import kotlin.time.Instant
 /**
  * A [GameSearchService] that searches for games in IGDB.
  *
- * Platforms identified by their IGDB identifiers are matched by identifier. Platforms matched by
- * name are matched against the name, abbreviation and alternative name of IGDB's platforms,
- * exactly but ignoring case (see [PlatformCriterion.ByName]).
+ * Platforms are matched by name, against the name, abbreviation and alternative name of IGDB's
+ * platforms, exactly but ignoring case (see [PlatformCriterion]).
  *
  * @param api The API used to execute the queries.
  */
@@ -34,8 +33,7 @@ class IgdbGameSearchService(private val api: IgdbApi) : GameSearchService {
         category: GameInfo.Category?
     ): List<GameInfo> {
         require(platforms.isNotEmpty()) { "There must be at least one platform" }
-        // None of the platforms can be matched (e.g. identifiers that are not IGDB's)
-        val query = gamesQuery(name, platforms, category) ?: return emptyList()
+        val query = gamesQuery(name, platforms, category)
         return decode(api.query(endpoint = "games", query = query))
             .mapNotNull { it.toGameInfo() }
     }
@@ -87,15 +85,16 @@ private val GAME_TYPES = mapOf(
  * @param name The text to search for.
  * @param platforms The platforms the games must be released for.
  * @param category The category of the games, or null for any category.
- * @return the payload to be sent in IGDB requests, following the syntax of the Apicalypse idiom,
- * or null if none of the platforms can be matched (i.e. the search would have no results).
+ * @return the payload to be sent in IGDB requests, following the syntax of the Apicalypse idiom.
+ * @throws IllegalArgumentException If [platforms] is empty.
  */
 internal fun gamesQuery(
     name: SearchString,
     platforms: List<PlatformCriterion>,
     category: GameInfo.Category?
-): String? {
-    val platformsCondition = platformsCondition(platforms) ?: return null
+): String {
+    require(platforms.isNotEmpty()) { "There must be at least one platform" }
+    val platformsCondition = platformsCondition(platforms)
     val text = name.value.trim().escapeForApicalypse()
     val categoryCondition = category?.let { " & game_type = ${GAME_TYPES.getValue(it)}" }.orEmpty()
     return """
@@ -117,26 +116,20 @@ internal fun gameDetailsQuery(gameId: Long): String =
     """.trimIndent()
 
 /**
- * The Apicalypse condition that matches the games released for any of the given platforms, or
- * null if none of them can be matched. Identifiers that are not IGDB's (i.e. not numbers) cannot
- * be matched, and are left out, so that they cannot change the query.
+ * The Apicalypse condition that matches the games released for any of the given platforms: those
+ * with a platform whose name, abbreviation or alternative name is equal, ignoring case, to the
+ * name or abbreviation of one of the given platforms.
  */
-private fun platformsCondition(platforms: List<PlatformCriterion>): String? {
-    val ids = platforms.filterIsInstance<PlatformCriterion.ById>()
-        .mapNotNull { it.externalId.value.toLongOrNull() }
-        .distinct()
-    val names = platforms.filterIsInstance<PlatformCriterion.ByName>()
+private fun platformsCondition(platforms: List<PlatformCriterion>): String =
+    platforms
         .flatMap { listOf(it.name.value, it.abbreviation.value) }
         .map { it.trim().escapeForApicalypse() }
         .distinct()
-    val conditions =
-        listOfNotNull(ids.takeIf { it.isNotEmpty() }?.let { "platforms = (${it.joinToString(",")})" }) +
-            names.flatMap { platformName ->
-                listOf("name", "abbreviation", "alternative_name")
-                    .map { field -> """platforms.$field ~ "$platformName"""" }
-            }
-    return conditions.takeIf { it.isNotEmpty() }?.joinToString(" | ")
-}
+        .flatMap { platformName ->
+            listOf("name", "abbreviation", "alternative_name")
+                .map { field -> """platforms.$field ~ "$platformName"""" }
+        }
+        .joinToString(" | ")
 
 /**
  * Escapes the characters that have a special meaning inside Apicalypse strings, so that the

@@ -35,14 +35,12 @@ class IgdbGameSearchServiceTest {
 
     private companion object {
         val NAME = SearchString("Elden")
-        val PS5 = byId("167")
-        val PC = byId("6")
-        val SWITCH = byName("Nintendo Switch", "NSW")
+        val PS5 = criterion("PlayStation 5", "PS5")
+        val PC = criterion("PC (Microsoft Windows)", "PC")
+        val SWITCH = criterion("Nintendo Switch", "NSW")
 
-        fun byId(id: String) = PlatformCriterion.ById(NonBlankString(id))
-
-        fun byName(name: String, abbreviation: String) =
-            PlatformCriterion.ByName(NonBlankString(name), NonBlankString(abbreviation))
+        fun criterion(name: String, abbreviation: String) =
+            PlatformCriterion(NonBlankString(name), NonBlankString(abbreviation))
 
         fun image(size: String, id: String) = "https://images.igdb.com/igdb/image/upload/t_$size/$id.jpg"
     }
@@ -96,7 +94,7 @@ class IgdbGameSearchServiceTest {
     @Test
     fun query_searches_games_whose_name_contains_the_text() {
         // Act
-        val query = gamesQuery(SearchString(" Elden "), listOf(PS5), null)!!
+        val query = gamesQuery(SearchString(" Elden "), listOf(PS5), null)
 
         // Assert
         assertTrue(query.contains("""where name ~ *"Elden"* & ("""))
@@ -106,20 +104,25 @@ class IgdbGameSearchServiceTest {
     @Test
     fun query_escapes_the_search_text() {
         // Act
-        val query = gamesQuery(SearchString("""a"b\c"""), listOf(PS5), null)!!
+        val query = gamesQuery(SearchString("""a"b\c"""), listOf(PS5), null)
 
         // Assert
         assertTrue(query.contains("""name ~ *"a\"b\\c"*"""))
     }
 
     @Test
-    fun query_matches_platforms_by_id_and_by_name() {
-        // Act
-        val query = gamesQuery(NAME, listOf(PS5, SWITCH, PC, PS5), null)!!
+    fun query_matches_platforms_by_name_and_abbreviation() {
+        // Act - Repeated platforms (e.g. versions of the same platform) are included once
+        val query = gamesQuery(NAME, listOf(PS5, SWITCH, PS5), null)
 
         // Assert - Each name is matched exactly, ignoring case, against all names of IGDB's platforms
         val expectedCondition = listOf(
-            "platforms = (167,6)",
+            """platforms.name ~ "PlayStation 5"""",
+            """platforms.abbreviation ~ "PlayStation 5"""",
+            """platforms.alternative_name ~ "PlayStation 5"""",
+            """platforms.name ~ "PS5"""",
+            """platforms.abbreviation ~ "PS5"""",
+            """platforms.alternative_name ~ "PS5"""",
             """platforms.name ~ "Nintendo Switch"""",
             """platforms.abbreviation ~ "Nintendo Switch"""",
             """platforms.alternative_name ~ "Nintendo Switch"""",
@@ -133,20 +136,10 @@ class IgdbGameSearchServiceTest {
     @Test
     fun query_escapes_the_platform_names() {
         // Act
-        val query = gamesQuery(NAME, listOf(byName("""My "PC"""", "PC")), null)!!
+        val query = gamesQuery(NAME, listOf(criterion("""My "PC"""", "PC")), null)
 
         // Assert
         assertTrue(query.contains("""platforms.name ~ "My \"PC\"""""))
-    }
-
-    @Test
-    fun query_leaves_out_identifiers_that_are_not_igdb_ones() {
-        // Act - An identifier that would change the query if included
-        val query = gamesQuery(NAME, listOf(byId("6) | id > (0"), PS5), null)!!
-
-        // Assert
-        assertTrue(query.contains("platforms = (167)"))
-        assertFalse(query.contains("id > (0"))
     }
 
     @Test
@@ -162,22 +155,9 @@ class IgdbGameSearchServiceTest {
         // Fails if a new category is added without being mapped here
         assertEquals(GameInfo.Category.entries.toSet(), expectedTypes.keys)
         expectedTypes.forEach { (category, type) ->
-            assertTrue(gamesQuery(NAME, listOf(PS5), category)!!.contains(") & game_type = $type;"))
+            assertTrue(gamesQuery(NAME, listOf(PS5), category).contains(") & game_type = $type;"))
         }
-        assertFalse(gamesQuery(NAME, listOf(PS5), null)!!.contains("game_type ="))
-    }
-
-    @Test
-    fun search_for_platforms_that_cannot_be_matched_sends_no_request() = runTest {
-        // Arrange
-        val sut = newSut()
-
-        // Act
-        val games = sut.searchGames(NAME, listOf(byId("not-a-number")), category = null)
-
-        // Assert
-        assertEquals(emptyList<GameInfo>(), games)
-        assertTrue(requests.isEmpty())
+        assertFalse(gamesQuery(NAME, listOf(PS5), null).contains("game_type ="))
     }
 
     @Test

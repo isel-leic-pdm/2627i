@@ -1,8 +1,6 @@
 package isel.dei.pdm.demos.gamevault.domain.collection.games
 
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
-import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
-import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference.Provider.IGDB
 import isel.dei.pdm.demos.gamevault.domain.Uri
 import kotlinx.datetime.LocalDate
 import kotlin.test.Test
@@ -14,8 +12,6 @@ import kotlin.test.assertTrue
 
 class GameTests {
 
-    private fun igdb(id: String) = SourceReference(IGDB, NonBlankString(id))
-
     // Game
 
     @Test
@@ -26,8 +22,7 @@ class GameTests {
             name = "Elden Ring",
             releaseDate = LocalDate(2022, 2, 25),
             coverUri = "content://vault/covers/1.jpg",
-            thumbnailUri = "https://example.com/thumb.jpg",
-            source = igdb("119133")
+            thumbnailUri = "https://example.com/thumb.jpg"
         )
 
         // Assert
@@ -36,7 +31,6 @@ class GameTests {
         assertEquals(LocalDate(2022, 2, 25), game.releaseDate)
         assertEquals(Uri("content://vault/covers/1.jpg"), game.coverUri)
         assertEquals(Uri("https://example.com/thumb.jpg"), game.thumbnailUri)
-        assertEquals(igdb("119133"), game.source)
     }
 
     @Test
@@ -68,8 +62,7 @@ class GameTests {
         val newGame = NewGame(
             name = "Hades II",
             releaseDate = LocalDate(2025, 9, 25),
-            coverUri = "content://vault/covers/2.jpg",
-            source = igdb("277143")
+            coverUri = "content://vault/covers/2.jpg"
         )
 
         // Assert
@@ -77,7 +70,6 @@ class GameTests {
         assertEquals(LocalDate(2025, 9, 25), newGame.releaseDate)
         assertEquals(Uri("content://vault/covers/2.jpg"), newGame.coverUri)
         assertNull(newGame.thumbnailUri)
-        assertEquals(igdb("277143"), newGame.source)
     }
 
     @Test
@@ -91,15 +83,6 @@ class GameTests {
     fun `NewGame secondary constructor throws IllegalArgumentException when coverUri is invalid`() {
         assertFailsWith<IllegalArgumentException> {
             NewGame(name = "Hades II", coverUri = " invalid_uri ")
-        }
-    }
-
-    // SourceReference
-
-    @Test
-    fun `SourceReference cannot be created with a blank externalId`() {
-        assertFailsWith<IllegalArgumentException> {
-            igdb("   ")
         }
     }
 
@@ -144,24 +127,6 @@ class GameTests {
         val sequel = Game(2L, "Hades II")
 
         assertFalse(game isSameGameAs sequel)
-    }
-
-    @Test
-    fun `games from the same provider are compared by their external identifiers only`() {
-        val game = Game(1L, "Elden Ring", source = igdb("119133"))
-        val renamed = Game(2L, "My favourite game", source = igdb("119133"))
-        val homonym = Game(3L, "Elden Ring", source = igdb("999999"))
-
-        assertTrue(game isSameGameAs renamed)
-        assertFalse(game isSameGameAs homonym)
-    }
-
-    @Test
-    fun `games are compared by name and release year when only one has a source`() {
-        val fromIgdb = Game(1L, "Elden Ring", source = igdb("119133"))
-        val manual = Game(2L, "Elden Ring")
-
-        assertTrue(fromIgdb isSameGameAs manual)
     }
 
     @Test

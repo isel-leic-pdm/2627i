@@ -16,10 +16,10 @@ import kotlin.time.Duration.Companion.milliseconds
  * A fake implementation of the [GameSearchService] interface.
  * We use it to have fine control over the service behavior while developing the app.
  *
- * Platforms are identified by their IGDB identifiers (e.g. 167 for the PlayStation 5), so that
- * the platforms added to the collection through the actual platform search service are matched
- * by identifier. Platforms matched by name are recognized by their name, abbreviation, or one of
- * their alternative names, ignoring case (see [PlatformCriterion.matches]).
+ * Platforms are described as IGDB does (e.g. PlayStation 5, or PS5), so that the platforms added
+ * to the collection through the actual platform search service are matched as they would be by
+ * the actual game search service: by their name, abbreviation, or one of their alternative names,
+ * ignoring case (see [PlatformCriterion.matches]).
  *
  * The catalogue includes games with similar names (e.g. a game and its remake), which is what the
  * search results must help telling apart.

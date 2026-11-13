@@ -80,8 +80,7 @@ class ScriptedPlatformCollectionRepository(
                 name = platform.name,
                 logoUri = platform.logoUri,
                 ownedSince = platform.ownedSince,
-                version = platform.version,
-                source = platform.source
+                version = platform.version
             )
         }
         return id

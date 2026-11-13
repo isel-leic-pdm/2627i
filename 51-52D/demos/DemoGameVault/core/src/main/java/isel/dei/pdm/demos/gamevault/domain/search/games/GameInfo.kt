@@ -70,7 +70,7 @@ data class GameInfo(
  * @property abbreviation The platform's abbreviation (e.g. PS5), if available.
  * @property alternativeNames Other names the platform is known by (e.g. NSW, for the Nintendo
  * Switch). Together with the name and abbreviation, they are used to recognize platforms matched
- * by name (see [PlatformCriterion.ByName]).
+ * by name (see [PlatformCriterion]).
  */
 data class GamePlatform(
     val id: Long,

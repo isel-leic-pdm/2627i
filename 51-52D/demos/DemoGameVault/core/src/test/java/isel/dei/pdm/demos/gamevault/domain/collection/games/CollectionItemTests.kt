@@ -86,13 +86,16 @@ class CollectionItemTests {
     }
 
     @Test
-    fun `toItem lists the abbreviations of the platforms in the order they were added`() {
+    fun `toItem lists the abbreviations of all the platforms the game is owned on`() {
         // Arrange
         val switch = Platform(2L, "Switch", "Nintendo Switch")
         val entry = CollectionEntry(game, setOf(switch)).addPlatform(platform)
 
-        // Act & Assert
-        assertEquals(listOf(NonBlankString("Switch"), NonBlankString("PS5")), entry.toItem().platformAbbreviations)
+        // Act & Assert - In no particular order
+        assertEquals(
+            setOf(NonBlankString("Switch"), NonBlankString("PS5")),
+            entry.toItem().platformAbbreviations.toSet()
+        )
     }
 
     // CollectionQuery
@@ -105,7 +108,7 @@ class CollectionItemTests {
         // Assert
         assertNull(query.state)
         assertFalse(query.platinumOnly)
-        assertNull(query.platformId)
+        assertNull(query.platform)
         assertNull(query.nameContains)
         assertNull(query.initial)
     }

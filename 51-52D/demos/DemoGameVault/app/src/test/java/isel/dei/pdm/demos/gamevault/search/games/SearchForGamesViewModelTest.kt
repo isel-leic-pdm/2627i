@@ -7,8 +7,6 @@ import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeImageStore
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.PersistenceException
 import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
-import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
-import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference.Provider.IGDB
 import isel.dei.pdm.demos.gamevault.domain.collection.games.AddGameResult
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionEntry
 import isel.dei.pdm.demos.gamevault.domain.collection.games.Game
@@ -59,13 +57,10 @@ class SearchForGamesViewModelTest {
         val ELDEN_QUERY = SearchString("Elden")
         val HADES_QUERY = SearchString("Hades")
 
-        fun igdb(id: String) = SourceReference(IGDB, NonBlankString(id))
-
-        // The platforms of the user's collection: the PS5 in two versions, and a Switch
-        // inserted manually (so it has no source)
-        val PS5 = Platform(1L, "PS5", "PlayStation 5", source = igdb("167"))
-        val PS5_PRO = Platform(2L, "PS5", "PlayStation 5", version = "Pro", source = igdb("167"))
-        val PC = Platform(3L, "PC", "PC (Microsoft Windows)", source = igdb("6"))
+        // The platforms of the user's collection: the PS5 in two versions, a PC and a Switch
+        val PS5 = Platform(1L, "PS5", "PlayStation 5")
+        val PS5_PRO = Platform(2L, "PS5", "PlayStation 5", version = "Pro")
+        val PC = Platform(3L, "PC", "PC (Microsoft Windows)")
         val SWITCH = Platform(4L, "NSW", "Nintendo Switch")
 
         // The platforms games are released for, as provided by the search service
@@ -87,10 +82,12 @@ class SearchForGamesViewModelTest {
         fun gamePlatform(id: Long, name: String, abbreviation: String) =
             GamePlatform(id, NonBlankString(name), NonBlankString(abbreviation))
 
-        fun byId(id: String) = PlatformCriterion.ById(NonBlankString(id))
+        fun criterion(name: String, abbreviation: String) =
+            PlatformCriterion(NonBlankString(name), NonBlankString(abbreviation))
 
-        fun byName(name: String, abbreviation: String) =
-            PlatformCriterion.ByName(NonBlankString(name), NonBlankString(abbreviation))
+        val PS5_CRITERION = criterion("PlayStation 5", "PS5")
+        val PC_CRITERION = criterion("PC (Microsoft Windows)", "PC")
+        val SWITCH_CRITERION = criterion("Nintendo Switch", "NSW")
     }
 
     @get:Rule
@@ -286,12 +283,12 @@ class SearchForGamesViewModelTest {
         // Act
         viewModel.onSearchQueryChange(ELDEN_QUERY)
 
-        // Assert - By id if obtained from the provider, by name if inserted manually
+        // Assert - By name and abbreviation, one criterion per platform, versions not included
         assertEquals(SearchForGamesScreenState.Search(ELDEN_QUERY, filters()), viewModel.state.value)
         assertEquals(
             ControlledGameSearchService.Request(
                 ELDEN_QUERY,
-                listOf(byId("167"), byId("6"), byName("Nintendo Switch", "NSW")),
+                listOf(PS5_CRITERION, PC_CRITERION, SWITCH_CRITERION),
                 category = null
             ),
             searchService.requests.single()
@@ -310,7 +307,7 @@ class SearchForGamesViewModelTest {
 
         // Assert
         assertEquals(
-            ControlledGameSearchService.Request(ELDEN_QUERY, listOf(byId("6")), GameInfo.Category.REMAKE),
+            ControlledGameSearchService.Request(ELDEN_QUERY, listOf(PC_CRITERION), GameInfo.Category.REMAKE),
             searchService.requests.single()
         )
     }
@@ -348,7 +345,7 @@ class SearchForGamesViewModelTest {
             viewModel.state.value
         )
         assertEquals(
-            ControlledGameSearchService.Request(ELDEN_QUERY, listOf(byId("6")), GameInfo.Category.REMAKE),
+            ControlledGameSearchService.Request(ELDEN_QUERY, listOf(PC_CRITERION), GameInfo.Category.REMAKE),
             searchService.requests.single()
         )
     }
@@ -394,7 +391,7 @@ class SearchForGamesViewModelTest {
         searchService.complete(ELDEN_QUERY, listOf(ELDEN_RING, HADES, DEMONS_SOULS))
 
         // Assert - Once per platform, regardless of versions, and none for Demon's Souls, which
-        // was released for none of them. The Switch inserted manually is recognized by its name.
+        // was released for none of them. All platforms are recognized by their names.
         assertEquals(
             listOf(ELDEN_RING to PS5, ELDEN_RING to PC, HADES to PC, HADES to SWITCH),
             viewModel.items().map { it.game to it.platform }
@@ -516,7 +513,7 @@ class SearchForGamesViewModelTest {
 
         // Assert
         assertEquals(SearchForGamesScreenState.Search(ELDEN_QUERY, filters(PS5)), viewModel.state.value)
-        assertEquals(listOf(byId("167")), searchService.requests.last().platforms)
+        assertEquals(listOf(PS5_CRITERION), searchService.requests.last().platforms)
     }
 
     @Test
@@ -559,7 +556,7 @@ class SearchForGamesViewModelTest {
         // Arrange - Owned on the PS5 Pro, which counts as the PS5, as games ignore versions
         val repository = ControlledGameCollectionRepository(
             FakeGameCollectionRepository(
-                listOf(CollectionEntry(Game(10L, "Elden Ring", source = igdb("1")), setOf(PS5_PRO)))
+                listOf(CollectionEntry(Game(10L, "Elden Ring"), setOf(PS5_PRO)))
             )
         )
 
@@ -577,7 +574,7 @@ class SearchForGamesViewModelTest {
         // Arrange
         val repository = ControlledGameCollectionRepository(
             FakeGameCollectionRepository(
-                listOf(CollectionEntry(Game(10L, "Elden Ring", source = igdb("1")), setOf(PS5)))
+                listOf(CollectionEntry(Game(10L, "Elden Ring"), setOf(PS5)))
             ),
             findError = UnrecoverablePersistenceException()
         )
@@ -618,7 +615,6 @@ class SearchForGamesViewModelTest {
         assertNull(viewModel.addOutcome.value)
         val entry = gameRepo.findSameEntry(NewGame("Elden Ring"))
         assertEquals(setOf(PC), entry?.platforms)
-        assertEquals(igdb("1"), entry?.game?.source)
         assertIs<AddGameResult.Added>(gameRepo.results.single())
     }
 
@@ -660,7 +656,7 @@ class SearchForGamesViewModelTest {
         // Arrange
         val repository = ControlledGameCollectionRepository(
             FakeGameCollectionRepository(
-                listOf(CollectionEntry(Game(10L, "Elden Ring", source = igdb("1")), setOf(PS5)))
+                listOf(CollectionEntry(Game(10L, "Elden Ring"), setOf(PS5)))
             )
         )
         val viewModel = createViewModelWithResults(gameRepository = repository)
@@ -761,7 +757,7 @@ class SearchForGamesViewModelTest {
         // Arrange
         val repository = ControlledGameCollectionRepository(
             FakeGameCollectionRepository(
-                listOf(CollectionEntry(Game(10L, "Elden Ring", source = igdb("1")), setOf(PC)))
+                listOf(CollectionEntry(Game(10L, "Elden Ring"), setOf(PC)))
             )
         )
         val viewModel = createViewModelWithResults(gameRepository = repository)

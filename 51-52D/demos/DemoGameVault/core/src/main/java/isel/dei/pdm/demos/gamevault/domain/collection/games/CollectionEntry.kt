@@ -26,7 +26,7 @@ import kotlin.time.Instant
  * may also be added directly (e.g. if the user forgot to start a session).
  *
  * @property game The catalog game entry.
- * @property platforms The platforms the game is owned on, in the order they were added. There is
+ * @property platforms The platforms the game is owned on, in no particular order. There is
  * at least one, and no two of them are versions of the same platform (see [isOwnedOn]). Each one
  * is the version of the collection through which the game was registered as owned on the
  * platform, which is merely a reference: its version is irrelevant.
@@ -90,20 +90,20 @@ data class CollectionEntry(
 
     /**
      * Adds a completed run to the play status. See [PlayStatus.addRun].
-     * @param completedOn The date the run was completed.
+     * @param completedOn The date the run was completed, or null if unknown.
      * @return A new [CollectionEntry] with the updated status.
      * @throws IllegalArgumentException If this is the first completed run and a session is
      * active (it must be ended first, as the game becomes FINISHED).
      */
-    fun addRun(completedOn: LocalDate): CollectionEntry =
+    fun addRun(completedOn: LocalDate?): CollectionEntry =
         copy(playStatus = playStatus.addRun(completedOn))
 
     /**
      * Registers the platinum in the play status. See [PlayStatus.addPlatinum].
-     * @param obtainedOn The date the platinum was obtained.
+     * @param obtainedOn The date the platinum was obtained, or null if unknown.
      * @return A new [CollectionEntry] with the updated status.
      */
-    fun addPlatinum(obtainedOn: LocalDate): CollectionEntry =
+    fun addPlatinum(obtainedOn: LocalDate?): CollectionEntry =
         copy(playStatus = playStatus.addPlatinum(obtainedOn))
 
     /**

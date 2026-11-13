@@ -3,7 +3,6 @@ package isel.dei.pdm.demos.gamevault.domain.collection.platforms
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.Uri
 import isel.dei.pdm.demos.gamevault.domain.Year
-import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
 
 /**
  * Represents a platform in the user's collection.
@@ -15,15 +14,16 @@ import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
  * involved (e.g. the platforms a game is owned on, or searching games for a platform), versions
  * are therefore not distinguished (see [isSameGamePlatformAs]).
  *
+ * The vault is authoritative: the platform is identified by its [id] alone, and its information
+ * is the vault's, however it was first obtained (copied from a search service, as a convenience,
+ * or inserted manually).
+ *
  * @property id The unique identifier of the platform, as assigned by the repository
  * @property abbreviation The platform's abbreviation (e.g. PS5, XBOX).
  * @property name The platform's full name (e.g. PlayStation 5).
  * @property logoUri The URI of the platform's logo, if available.
  * @property ownedSince The year the platform was acquired, if available.
  * @property version The platform's version (e.g. Pro, Digital Edition), if available.
- * @property source The source from which the platform was obtained, or null if inserted manually.
- * Note that it does not identify the platform: different versions of a platform may share the
- * same source reference (e.g. IGDB uses the same identifier for PlayStation 5 and its Pro version).
  */
 data class Platform(
     val id: Long,
@@ -31,8 +31,7 @@ data class Platform(
     val name: NonBlankString,
     val logoUri: Uri? = null,
     val ownedSince: Year? = null,
-    val version: NonBlankString? = null,
-    val source: SourceReference? = null
+    val version: NonBlankString? = null
 ) {
     /**
      * Convenience constructor that accepts instrinsic types (String and int).
@@ -45,33 +44,25 @@ data class Platform(
         name: String,
         logoUri: String? = null,
         ownedSince: Int? = null,
-        version: String? = null,
-        source: SourceReference? = null
+        version: String? = null
     ) : this(
         id = id,
         abbreviation = NonBlankString(abbreviation),
         name = NonBlankString(name),
         logoUri = logoUri?.let { Uri(it) },
         ownedSince = ownedSince?.let { Year(it) },
-        version = version?.let { NonBlankString(it) },
-        source = source
+        version = version?.let { NonBlankString(it) }
     )
 
     /**
      * Checks whether this platform and [other] are the same platform as far as games are
      * concerned, i.e. regardless of their versions (e.g. PlayStation 5 and PlayStation 5 Slim):
-     * - If both were obtained from the same provider, they are the same if the provider identifies
-     * them the same way (providers use the same identifier for all versions of a platform).
-     * - Otherwise, they are the same if they have the same name or the same abbreviation,
-     * ignoring case.
+     * they are the same if they have the same name or the same abbreviation, ignoring case. The
+     * version is kept apart from the name, so it does not take part in the comparison.
      */
     fun isSameGamePlatformAs(other: Platform): Boolean =
-        if (source != null && other.source != null && source.provider == other.source.provider) {
-            source.externalId == other.source.externalId
-        } else {
-            name.value.equals(other.name.value, ignoreCase = true) ||
-                abbreviation.value.equals(other.abbreviation.value, ignoreCase = true)
-        }
+        name.value.equals(other.name.value, ignoreCase = true) ||
+            abbreviation.value.equals(other.abbreviation.value, ignoreCase = true)
 }
 
 /**
@@ -92,15 +83,13 @@ fun List<Platform>.distinctGamePlatforms(): List<Platform> =
  * @property logoUri The URI of the platform's logo, if available.
  * @property ownedSince The year the platform was acquired, if available.
  * @property version The platform's version (e.g. Pro, Digital Edition), if available.
- * @property source The source from which the platform was obtained, or null if inserted manually.
  */
 data class NewPlatform(
     val abbreviation: NonBlankString,
     val name: NonBlankString,
     val logoUri: Uri? = null,
     val ownedSince: Year? = null,
-    val version: NonBlankString? = null,
-    val source: SourceReference? = null
+    val version: NonBlankString? = null
 ) {
     /**
      * Convenience constructor that accepts instrinsic types (String and int).
@@ -112,14 +101,12 @@ data class NewPlatform(
         name: String,
         logoUri: String? = null,
         ownedSince: Int? = null,
-        version: String? = null,
-        source: SourceReference? = null
+        version: String? = null
     ) : this(
         abbreviation = NonBlankString(abbreviation),
         name = NonBlankString(name),
         logoUri = logoUri?.let { Uri(it) },
         ownedSince = ownedSince?.let { Year(it) },
-        version = version?.let { NonBlankString(it) },
-        source = source
+        version = version?.let { NonBlankString(it) }
     )
 }

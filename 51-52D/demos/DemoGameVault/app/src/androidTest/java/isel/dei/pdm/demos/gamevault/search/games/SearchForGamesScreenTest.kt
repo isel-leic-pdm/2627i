@@ -25,7 +25,6 @@ import isel.dei.pdm.demos.gamevault.R
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeImageStore
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
-import isel.dei.pdm.demos.gamevault.domain.collection.SourceReference
 import isel.dei.pdm.demos.gamevault.domain.collection.games.GameCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
@@ -63,8 +62,8 @@ class SearchForGamesScreenTest {
     private companion object {
         val QUERY = SearchString("Elden Ring")
 
-        val PS5 = Platform(1L, "PS5", "PlayStation 5", source = igdb("167"))
-        val PC = Platform(2L, "PC", "PC (Microsoft Windows)", source = igdb("6"))
+        val PS5 = Platform(1L, "PS5", "PlayStation 5")
+        val PC = Platform(2L, "PC", "PC (Microsoft Windows)")
 
         val ELDEN_RING = GameInfo(
             id = 1L,
@@ -86,8 +85,6 @@ class SearchForGamesScreenTest {
          * How long to wait for asynchronous work driven by the real clock (e.g. the view model).
          */
         const val WAIT_TIMEOUT_MS = 5_000L
-
-        fun igdb(id: String) = SourceReference(SourceReference.Provider.IGDB, NonBlankString(id))
 
         fun gamePlatform(id: Long, name: String, abbreviation: String) =
             GamePlatform(id, NonBlankString(name), NonBlankString(abbreviation))

@@ -34,14 +34,29 @@ fun Duration.toPlayTime(): PlayTime = PlayTime(
 /**
  * Represents something the user accomplished in a game, such as completing a run or obtaining
  * the platinum.
- * @property achievedOn The date of the accomplishment. When registered while playing, it is the
- * current date; otherwise, it is provided by the user.
+ *
+ * Accomplishments may be registered after the fact (e.g. the runs completed before the user
+ * adopted the app), when their date may no longer be known. Undated accomplishments are assumed
+ * to have happened before any dated one, as they typically predate the app: they count as
+ * accomplishments, but they are in no year.
+ *
+ * @property achievedOn The date of the accomplishment, or null if unknown. When registered while
+ * playing, it is the current date; otherwise, it is provided by the user, if known.
  */
-data class Accomplishment(val achievedOn: LocalDate) {
+data class Accomplishment(val achievedOn: LocalDate?) {
     /**
-     * Whether the accomplishment happened in the given [year].
+     * Whether the accomplishment happened in the given [year]. Undated accomplishments are in no
+     * year.
      */
-    fun isIn(year: Year): Boolean = achievedOn in year
+    fun isIn(year: Year): Boolean = achievedOn != null && achievedOn in year
+
+    companion object {
+        /**
+         * Orders accomplishments chronologically, the undated ones first (see [Accomplishment]).
+         */
+        val chronologically: Comparator<Accomplishment> =
+            compareBy(nullsFirst()) { it.achievedOn }
+    }
 }
 
 /**
@@ -53,8 +68,9 @@ data class Accomplishment(val achievedOn: LocalDate) {
  *
  * @property timeSpent The total time spent playing the game.
  * @property state The current state of the game in the user's collection.
- * @property completedRuns The runs completed by the user, in the order they were registered. If
- * the user is playing the game and there are no completed runs, they are in their first run.
+ * @property completedRuns The runs completed by the user, in no particular order (runs may be
+ * registered after the fact, e.g. when importing a collection). If the user is playing the game
+ * and there are no completed runs, they are in their first run.
  * @property platinum The platinum, if obtained: all the game's achievements (e.g. trophies) were
  * obtained. Not to be confused with completing 100% of the game, which is game specific (e.g.
  * visiting all areas or getting all collectibles) and may or may not be expressed in achievements.
@@ -110,22 +126,24 @@ data class PlayStatus(
     val isFinished: Boolean
         get() = completedRuns.isNotEmpty()
 
-    // Yearly accomplishments. The first completed run is the first one registered.
+    // Yearly accomplishments. The first completed run is the earliest one, whatever the order the
+    // runs were registered in. Undated runs are the earliest (see Accomplishment): if there is
+    // one, the game was first finished in no known year, and all the dated runs are replays.
 
     /**
      * Whether the game was finished for the first time in the given [year], i.e. its first
-     * completed run is from that year.
+     * completed run (the earliest one) is from that year.
      */
     fun wasFirstFinishedIn(year: Year): Boolean =
-        completedRuns.firstOrNull()?.isIn(year) == true
+        completedRuns.minWithOrNull(Accomplishment.chronologically)?.isIn(year) == true
 
     /**
-     * Whether the game was replayed in the given [year], i.e. a run other than the first one was
-     * completed in that year. A game finished for the first time and replayed in the same year
-     * counts as both.
+     * Whether the game was replayed in the given [year], i.e. a run other than the first one (the
+     * earliest one) was completed in that year. A game finished for the first time and replayed
+     * in the same year counts as both, as does a game finished twice on the same date.
      */
     fun wasReplayedIn(year: Year): Boolean =
-        completedRuns.drop(1).any { it.isIn(year) }
+        completedRuns.sortedWith(Accomplishment.chronologically).drop(1).any { it.isIn(year) }
 
     /**
      * Whether the platinum was obtained in the given [year].
@@ -157,10 +175,11 @@ data class PlayStatus(
     /**
      * Adds a completed run, finished on the given date.
      * If this is the first completed run, the state is set to FINISHED.
-     * @param completedOn The date the run was completed.
+     * @param completedOn The date the run was completed, or null if unknown (e.g. a run
+     * registered after the fact).
      * @return A new [PlayStatus] with the added run.
      */
-    fun addRun(completedOn: LocalDate): PlayStatus {
+    fun addRun(completedOn: LocalDate?): PlayStatus {
         val nextState = if (completedRuns.isEmpty()) State.FINISHED else state
         return copy(completedRuns = completedRuns + Accomplishment(completedOn), state = nextState)
     }
@@ -168,10 +187,10 @@ data class PlayStatus(
     /**
      * Registers the platinum, obtained on the given date. If the platinum was already registered,
      * its date is replaced (e.g. to correct it). The state is not changed.
-     * @param obtainedOn The date the platinum was obtained.
+     * @param obtainedOn The date the platinum was obtained, or null if unknown.
      * @return A new [PlayStatus] with the platinum.
      * @throws IllegalArgumentException If the game is in the NONE state.
      */
-    fun addPlatinum(obtainedOn: LocalDate): PlayStatus =
+    fun addPlatinum(obtainedOn: LocalDate?): PlayStatus =
         copy(platinum = Accomplishment(obtainedOn))
 }
