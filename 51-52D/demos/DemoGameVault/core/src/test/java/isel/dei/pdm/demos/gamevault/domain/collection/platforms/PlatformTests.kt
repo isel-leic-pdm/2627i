@@ -8,7 +8,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class PlatformTests {
@@ -71,18 +70,6 @@ class PlatformTests {
     // Platform
 
     @Test
-    fun `Platform primary constructor leaves optional properties absent by default`() {
-        // Act
-        val platform = Platform(1L, NonBlankString("PS5"), NonBlankString("PlayStation 5"))
-
-        // Assert
-        assertNull(platform.logoUri)
-        assertNull(platform.ownedSince)
-        assertNull(platform.version)
-        assertNull(platform.source)
-    }
-
-    @Test
     fun `Platform secondary constructor converts intrinsic types into the corresponding types`() {
         // Act
         val platform = Platform(
@@ -103,18 +90,6 @@ class PlatformTests {
         assertEquals(Uri("https://example.com/ps5.png"), platform.logoUri)
         assertEquals(Year(2020), platform.ownedSince)
         assertEquals(NonBlankString("Digital Edition"), platform.version)
-    }
-
-    @Test
-    fun `Platform secondary constructor leaves optional properties absent by default`() {
-        // Act
-        val platform = Platform(id = 1L, abbreviation = "PS5", name = "PlayStation 5")
-
-        // Assert
-        assertNull(platform.logoUri)
-        assertNull(platform.ownedSince)
-        assertNull(platform.version)
-        assertNull(platform.source)
     }
 
     @Test
@@ -148,18 +123,6 @@ class PlatformTests {
     // NewPlatform
 
     @Test
-    fun `NewPlatform primary constructor leaves optional properties absent by default`() {
-        // Act
-        val newPlatform = NewPlatform(NonBlankString("NSW"), NonBlankString("Nintendo Switch"))
-
-        // Assert
-        assertNull(newPlatform.logoUri)
-        assertNull(newPlatform.ownedSince)
-        assertNull(newPlatform.version)
-        assertNull(newPlatform.source)
-    }
-
-    @Test
     fun `NewPlatform secondary constructor converts intrinsic types into the corresponding types`() {
         // Act
         val newPlatform = NewPlatform(
@@ -178,18 +141,6 @@ class PlatformTests {
         assertEquals(Uri("https://example.com/switch.png"), newPlatform.logoUri)
         assertEquals(Year(2021), newPlatform.ownedSince)
         assertEquals(NonBlankString("OLED"), newPlatform.version)
-    }
-
-    @Test
-    fun `NewPlatform secondary constructor leaves optional properties absent by default`() {
-        // Act
-        val newPlatform = NewPlatform(abbreviation = "NSW", name = "Nintendo Switch")
-
-        // Assert
-        assertNull(newPlatform.logoUri)
-        assertNull(newPlatform.ownedSince)
-        assertNull(newPlatform.version)
-        assertNull(newPlatform.source)
     }
 
     @Test

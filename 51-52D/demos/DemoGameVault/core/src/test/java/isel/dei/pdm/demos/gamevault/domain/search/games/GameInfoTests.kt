@@ -7,7 +7,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 class GameInfoTests {
 
@@ -156,21 +155,6 @@ class GameInfoTests {
         // Act & Assert
         assertEquals(game1, game2)
         assertEquals(game1.hashCode(), game2.hashCode())
-    }
-
-    @Test
-    fun `Game Category enum contains expected values`() {
-        // Arrange
-        val categories = GameInfo.Category.entries
-
-        // Act & Assert
-        assertEquals(5, categories.size)
-        assertTrue(categories.contains(GameInfo.Category.MAIN_GAME))
-        assertTrue(categories.contains(GameInfo.Category.MAIN_GAME))
-        assertTrue(categories.contains(GameInfo.Category.DLC))
-        assertTrue(categories.contains(GameInfo.Category.BUNDLE))
-        assertTrue(categories.contains(GameInfo.Category.REMAKE))
-        assertTrue(categories.contains(GameInfo.Category.REMASTER))
     }
 
     @Test

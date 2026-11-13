@@ -12,6 +12,10 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+jacoco {
+    toolVersion = libs.versions.jacoco.get()
+}
+
 tasks.withType<KotlinCompile>().configureEach {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)

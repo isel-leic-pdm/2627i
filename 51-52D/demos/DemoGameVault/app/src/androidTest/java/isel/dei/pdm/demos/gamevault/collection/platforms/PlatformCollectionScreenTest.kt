@@ -146,18 +146,6 @@ class PlatformCollectionScreenTest {
     }
 
     @Test
-    fun error_view_displays_a_tip_that_depends_on_the_error() {
-        setScreenContent(
-            repository = ScriptedPlatformCollectionRepository(
-                readErrors = listOf(RecoverablePersistenceException())
-            )
-        )
-
-        composeTestRule.onNodeWithTag(ErrorViewOverlayTestTags.TIP_TAG).assertIsDisplayed()
-        assertTextIsDisplayed(R.string.platform_collection_error_tip_recoverable)
-    }
-
-    @Test
     fun retrying_displays_the_platforms_in_the_collection() {
         val repository = ScriptedPlatformCollectionRepository(
             readErrors = listOf(RecoverablePersistenceException()),

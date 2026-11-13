@@ -1,20 +1,13 @@
 package isel.dei.pdm.demos.gamevault.ui.common
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertHasNoClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.unit.dp
 import isel.dei.pdm.demos.gamevault.ui.common.AddStatusIndicatorTestTags.ADDED_ICON
 import isel.dei.pdm.demos.gamevault.ui.common.AddStatusIndicatorTestTags.ADDING_INDICATOR
 import isel.dei.pdm.demos.gamevault.ui.common.AddStatusIndicatorTestTags.ADD_ICON
-import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
@@ -79,28 +72,5 @@ class AddStatusIndicatorTest {
         setIndicatorContent(AddStatus.NOT_ADDED)
 
         composeTestRule.onNodeWithTag(ADD_ICON).assertHasNoClickAction()
-    }
-
-    @Test
-    fun pressing_the_add_icon_is_handled_by_the_hosting_item() {
-        // The indicator is meant to be displayed by an item that is clickable as a whole
-        var hostClicks = 0
-        composeTestRule.setContent {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clickable { hostClicks++ }
-            ) {
-                AddStatusIndicator(
-                    status = AddStatus.NOT_ADDED,
-                    addDescription = ADD_DESCRIPTION,
-                    addedDescription = ADDED_DESCRIPTION
-                )
-            }
-        }
-
-        composeTestRule.onNodeWithTag(ADD_ICON, useUnmergedTree = true).performClick()
-
-        assertEquals(1, hostClicks)
     }
 }

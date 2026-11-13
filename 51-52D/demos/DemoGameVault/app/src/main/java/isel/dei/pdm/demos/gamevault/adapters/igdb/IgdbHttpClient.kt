@@ -4,6 +4,9 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.api.ClientPlugin
+import io.ktor.client.plugins.api.Send
+import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.RefreshTokensParams
@@ -54,6 +57,18 @@ internal const val CONNECT_TIMEOUT_MILLIS = 10_000L
 internal const val REQUEST_TIMEOUT_MILLIS = 15_000L
 
 /**
+ * The maximum number of requests sent to IGDB in any period of [RATE_LIMIT_WINDOW]. IGDB allows 4
+ * requests per second: the window is a bit longer, as a safety margin, because IGDB counts the
+ * requests when they arrive, and network delays may bring them closer together.
+ */
+internal const val MAX_REQUESTS_PER_WINDOW = 4
+
+/**
+ * The period in which at most [MAX_REQUESTS_PER_WINDOW] requests are sent to IGDB.
+ */
+internal val RATE_LIMIT_WINDOW = 1_100.milliseconds
+
+/**
  * Creates the HTTP client used to access IGDB. It is meant to be shared by all IGDB services, so
  * that they also share the access token.
  *
@@ -65,18 +80,26 @@ internal const val REQUEST_TIMEOUT_MILLIS = 15_000L
  * IGDB rejects it (401), or none is stored, a new one is obtained from Twitch using the stored
  * secrets, saved in the repository, and the request is repeated. Concurrent rejections trigger a
  * single renewal.
+ * - Throttling ([RequestThrottle]): requests to IGDB are delayed, as needed, so that IGDB's rate
+ * limit is not exceeded, instead of being rejected (429). The limit on the number of open
+ * requests (8) is not enforced here: OkHttp's engine already allows at most 5 per host (see
+ * okhttp3.Dispatcher.maxRequestsPerHost).
  *
  * The order in which the plugins are installed matters: the first one wraps the following ones.
- * Retries wrap token renewal, so each attempt uses the most recent access token.
+ * Retries wrap token renewal, so each attempt uses the most recent access token. Throttling is
+ * the innermost one, so that every request actually sent is counted, including the retries and
+ * the requests repeated after a token renewal.
  *
  * @param engine The HTTP engine (e.g. OkHttp in production, MockEngine in tests).
  * @param credentials The repository where the secrets and the access token are stored.
  * @param retryDelay The function used to wait between retries. Meant to be replaced in tests.
+ * @param throttle The throttle of the requests to IGDB. Meant to be replaced in tests.
  */
 fun createIgdbHttpClient(
     engine: HttpClientEngine,
     credentials: CredentialsRepository,
-    retryDelay: suspend (millis: Long) -> Unit = { delay(it.milliseconds) }
+    retryDelay: suspend (millis: Long) -> Unit = { delay(it.milliseconds) },
+    throttle: RequestThrottle = RequestThrottle(MAX_REQUESTS_PER_WINDOW, RATE_LIMIT_WINDOW)
 ): HttpClient = HttpClient(engine) {
     // Responses are not turned into exceptions: their status is translated by IgdbApi
     expectSuccess = false
@@ -131,7 +154,23 @@ fun createIgdbHttpClient(
             }
         }
     }
+
+    // Installed last, so that it wraps the sending of every request, including the repeated ones
+    install(throttling(throttle))
 }
+
+/**
+ * Creates the plugin that throttles the requests to IGDB with the given [throttle]. Requests to
+ * other hosts (e.g. Twitch's token endpoint) are not subject to IGDB's rate limit.
+ */
+private fun throttling(throttle: RequestThrottle): ClientPlugin<Unit> =
+    createClientPlugin("IgdbThrottling") {
+        on(Send) { request ->
+            if (request.url.host == IGDB_HOST)
+                throttle.acquire()
+            proceed(request)
+        }
+    }
 
 /**
  * Requests a new access token from Twitch, using the client credentials flow.

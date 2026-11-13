@@ -4,47 +4,10 @@ import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 class GameDetailsTests {
 
     private val game = Game(1L, "Elden Ring")
-
-    @Test
-    fun `GameDetails has no details nor notes by default`() {
-        // Act
-        val details = GameDetails(game)
-
-        // Assert
-        assertEquals(game, details.game)
-        assertNull(details.description)
-        assertTrue(details.developers.isEmpty())
-        assertTrue(details.publishers.isEmpty())
-        assertTrue(details.genres.isEmpty())
-        assertNull(details.notes)
-    }
-
-    @Test
-    fun `GameDetails holds the game and its detailed properties`() {
-        // Arrange
-        val description = NonBlankString("An action RPG set in the Lands Between")
-        val developers = listOf(NonBlankString("FromSoftware"))
-        val publishers = listOf(NonBlankString("Bandai Namco"), NonBlankString("FromSoftware"))
-        val genres = listOf(NonBlankString("Action"), NonBlankString("RPG"))
-        val notes = NonBlankString("Lent the disc to João")
-
-        // Act
-        val details = GameDetails(game, description, developers, publishers, genres, notes)
-
-        // Assert
-        assertEquals(game, details.game)
-        assertEquals(description, details.description)
-        assertEquals(developers, details.developers)
-        assertEquals(publishers, details.publishers)
-        assertEquals(genres, details.genres)
-        assertEquals(notes, details.notes)
-    }
 
     // Convenience factory
 

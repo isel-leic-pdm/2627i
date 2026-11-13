@@ -21,6 +21,7 @@ import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformViewModel.
 import isel.dei.pdm.demos.gamevault.ui.common.AddStatus
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -30,11 +31,13 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -667,12 +670,17 @@ class SearchForPlatformViewModelTest {
 
     @Test
     fun adding_platform_that_is_being_added_has_no_effect() = runTest {
-        // Arrange
+        // Arrange - From now on, the view model's coroutines only run when the scheduler runs them,
+        // so the published state does not yet reflect the first request when the second one
+        // arrives (e.g. a double tap). The main dispatcher is restored by mainDispatcherRule
         val viewModel = createViewModelWithPs5Results()
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         viewModel.onAddPlatform(PS5_PRO)
+        assertEquals(AddStatus.NOT_ADDED, viewModel.statusOf(PS5_PRO))
 
         // Act
         viewModel.onAddPlatform(PS5_PRO)
+        runCurrent()
 
         // Assert
         assertEquals(1, repository.pendingAdds)

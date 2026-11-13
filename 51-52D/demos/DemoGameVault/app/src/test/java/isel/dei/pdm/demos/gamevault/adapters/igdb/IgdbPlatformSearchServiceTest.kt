@@ -20,16 +20,20 @@ import isel.dei.pdm.demos.gamevault.domain.search.UnauthenticatedException
 import isel.dei.pdm.demos.gamevault.domain.search.UnexpectedServiceException
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformInfo
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.IOException
 import kotlin.test.assertFailsWith
+import kotlin.time.Duration.Companion.seconds
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class IgdbPlatformSearchServiceTest {
 
     private val secrets = Secrets(clientId = "client-id", clientSecret = "client-secret")
@@ -67,15 +71,23 @@ class IgdbPlatformSearchServiceTest {
     private val twitchRequests = mutableListOf<HttpRequestData>()
 
     /**
+     * When the requests to IGDB and to Twitch were sent, according to [scriptedEngine]'s clock.
+     */
+    private val igdbRequestTimes = mutableListOf<Long>()
+    private val twitchRequestTimes = mutableListOf<Long>()
+
+    /**
      * Creates an engine that replies to the requests to IGDB and to Twitch with the given replies,
      * in order. Unexpected requests (i.e. once the replies are exhausted) fail the test.
      * @param dispatcher The engine's dispatcher, if not the default one. Timeouts are measured on
      * it, so a test dispatcher makes them elapse in virtual time, instead of real time.
+     * @param clock The clock used to record when the requests are sent (e.g. the virtual time).
      */
     private fun scriptedEngine(
         igdb: List<Reply>,
         twitch: List<Reply> = emptyList(),
-        dispatcher: CoroutineDispatcher? = null
+        dispatcher: CoroutineDispatcher? = null,
+        clock: () -> Long = { 0L }
     ): MockEngine {
         val igdbReplies = ArrayDeque(igdb)
         val twitchReplies = ArrayDeque(twitch)
@@ -84,6 +96,7 @@ class IgdbPlatformSearchServiceTest {
             addHandler { request ->
                 val isIgdb = request.url.host == IGDB_HOST
                 (if (isIgdb) igdbRequests else twitchRequests).add(request)
+                (if (isIgdb) igdbRequestTimes else twitchRequestTimes).add(clock())
                 val replies = if (isIgdb) igdbReplies else twitchReplies
                 val reply = replies.removeFirstOrNull() ?: error("Unexpected request to ${request.url}")
                 reply(request)
@@ -94,9 +107,10 @@ class IgdbPlatformSearchServiceTest {
 
     private fun newSut(
         engine: MockEngine,
-        credentials: CredentialsRepository = FakeCredentialsRepository(secrets, "stored-token")
+        credentials: CredentialsRepository = FakeCredentialsRepository(secrets, "stored-token"),
+        throttle: RequestThrottle = RequestThrottle(MAX_REQUESTS_PER_WINDOW, RATE_LIMIT_WINDOW)
     ): IgdbPlatformSearchService {
-        val client = createIgdbHttpClient(engine, credentials, retryDelay = { })
+        val client = createIgdbHttpClient(engine, credentials, retryDelay = { }, throttle)
         return IgdbPlatformSearchService(IgdbApi(client, credentials))
     }
 
@@ -420,5 +434,57 @@ class IgdbPlatformSearchServiceTest {
         // Act & Assert
         assertFailsWith<UnexpectedServiceException> { sut.search(query) }
         assertEquals(1, igdbRequests.size)
+    }
+
+    // Throttling (in virtual time)
+
+    @Test
+    fun requests_beyond_the_rate_limit_wait() = runTest {
+        // Arrange
+        val engine = scriptedEngine(igdb = List(3) { emptyResult }, clock = { currentTime })
+        val throttle = RequestThrottle(maxRequests = 2, 1.seconds, testScheduler.timeSource)
+        val sut = newSut(engine, throttle = throttle)
+
+        // Act
+        repeat(3) { sut.search(query) }
+
+        // Assert
+        assertEquals(listOf(0L, 0L, 1_000L), igdbRequestTimes)
+    }
+
+    @Test
+    fun retries_are_throttled() = runTest {
+        // Arrange
+        val engine = scriptedEngine(
+            igdb = listOf(status(HttpStatusCode.ServiceUnavailable), emptyResult),
+            clock = { currentTime }
+        )
+        val throttle = RequestThrottle(maxRequests = 1, 1.seconds, testScheduler.timeSource)
+        val sut = newSut(engine, throttle = throttle)
+
+        // Act
+        sut.search(query)
+
+        // Assert
+        assertEquals(listOf(0L, 1_000L), igdbRequestTimes)
+    }
+
+    @Test
+    fun requests_repeated_after_token_renewal_are_throttled_but_token_requests_are_not() = runTest {
+        // Arrange
+        val engine = scriptedEngine(
+            igdb = listOf(status(HttpStatusCode.Unauthorized), emptyResult),
+            twitch = listOf(token("new-token")),
+            clock = { currentTime }
+        )
+        val throttle = RequestThrottle(maxRequests = 1, 1.seconds, testScheduler.timeSource)
+        val sut = newSut(engine, throttle = throttle)
+
+        // Act
+        sut.search(query)
+
+        // Assert - Twitch is not subject to IGDB's rate limit
+        assertEquals(listOf(0L), twitchRequestTimes)
+        assertEquals(listOf(0L, 1_000L), igdbRequestTimes)
     }
 }

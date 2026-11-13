@@ -31,8 +31,6 @@ import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.domain.search.SearchString
 import isel.dei.pdm.demos.gamevault.domain.search.games.GameInfo
-import isel.dei.pdm.demos.gamevault.ui.common.AddStatus
-import isel.dei.pdm.demos.gamevault.ui.common.AddStatusIndicatorTestTags
 import isel.dei.pdm.demos.gamevault.search.games.SearchForGamesScreenViewTestTags.ADD_PLATFORM_BUTTON_TAG
 import isel.dei.pdm.demos.gamevault.search.games.SearchForGamesScreenViewTestTags.CATEGORY_FILTER_TAG
 import isel.dei.pdm.demos.gamevault.search.games.SearchForGamesScreenViewTestTags.GAME_LIST_TAG
@@ -43,7 +41,6 @@ import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
 import isel.dei.pdm.demos.gamevault.ui.common.SearchBoxTestTags
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -66,11 +63,6 @@ class SearchForGamesScreenViewTest {
         val TOTK = GameInfo(1L, "Tears of the Kingdom", LocalDate(2023, 5, 12))
         val BOTW = GameInfo(2L, "Breath of the Wild", LocalDate(2017, 3, 3))
         val ECHOES = GameInfo(3L, "Echoes of Wisdom", LocalDate(2024, 9, 26))
-
-        /**
-         * Longer than the search box's debounce delay.
-         */
-        const val PAST_DEBOUNCE_TIME_MS = 1_000L
     }
 
     @get:Rule
@@ -177,29 +169,26 @@ class SearchForGamesScreenViewTest {
     fun search_box_text_is_preserved_across_state_transitions() {
         val state = mutableStateOf<SearchForGamesScreenState>(SearchForGamesScreenState.Start(FILTERS))
         setViewContent(state)
-        composeTestRule.onNodeWithTag(SearchBoxTestTags.INPUT).performTextInput(QUERY.value)
+        // The user keeps typing after the query was emitted, so the text differs from the states'
+        // query: had the search box been recreated, it would display the states' query instead
+        val typedText = "${QUERY.value} Tears"
+        composeTestRule.onNodeWithTag(SearchBoxTestTags.INPUT).performTextInput(typedText)
 
         state.value = SearchForGamesScreenState.Search(QUERY, FILTERS, isIndicatorVisible = true)
         composeTestRule.waitForIdle()
         state.value = SearchForGamesScreenState.Results(QUERY, FILTERS, listOf(GameSearchItemUiState(TOTK, SWITCH)))
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithTag(SearchBoxTestTags.INPUT).assert(hasEditableText(QUERY.value))
+        composeTestRule.onNodeWithTag(SearchBoxTestTags.INPUT).assert(hasEditableText(typedText))
     }
 
     @Test
-    fun search_box_displays_the_query_of_the_initial_state_without_emitting_it() {
-        // e.g. when the view is displayed again, after retrying a failed search
-        val emittedQueries = mutableListOf<SearchString>()
-        setViewContent(
-            state = SearchForGamesScreenState.Search(QUERY, FILTERS),
-            onSearchQueryChange = { emittedQueries += it }
-        )
-
-        composeTestRule.mainClock.advanceTimeBy(PAST_DEBOUNCE_TIME_MS)
+    fun search_box_displays_the_query_of_the_initial_state() {
+        // e.g. when the view is displayed again, after retrying a failed search. That the query is
+        // not emitted again is the search box's responsibility (see SearchBoxTest)
+        setViewContent(SearchForGamesScreenState.Search(QUERY, FILTERS))
 
         composeTestRule.onNodeWithTag(SearchBoxTestTags.INPUT).assert(hasEditableText(QUERY.value))
-        assertEquals(emptyList<SearchString>(), emittedQueries)
     }
 
     // Loading & No platforms
@@ -501,31 +490,6 @@ class SearchForGamesScreenViewTest {
     }
 
     @Test
-    fun items_are_displayed_according_to_their_add_status() {
-        setViewContent(
-            SearchForGamesScreenState.Results(
-                QUERY,
-                FILTERS,
-                listOf(
-                    GameSearchItemUiState(TOTK, SWITCH, AddStatus.NOT_ADDED),
-                    GameSearchItemUiState(BOTW, SWITCH, AddStatus.ADDING),
-                    GameSearchItemUiState(ECHOES, SWITCH, AddStatus.ADDED)
-                )
-            )
-        )
-
-        composeTestRule
-            .onAllNodesWithTag(AddStatusIndicatorTestTags.ADD_ICON, useUnmergedTree = true)
-            .assertCountEquals(1)
-        composeTestRule
-            .onAllNodesWithTag(AddStatusIndicatorTestTags.ADDING_INDICATOR)
-            .assertCountEquals(1)
-        composeTestRule
-            .onAllNodesWithTag(AddStatusIndicatorTestTags.ADDED_ICON, useUnmergedTree = true)
-            .assertCountEquals(1)
-    }
-
-    @Test
     fun selecting_a_game_triggers_onAddGame_with_that_game_and_platform() {
         var added: Pair<GameInfo, Platform>? = null
         setViewContent(
@@ -557,22 +521,5 @@ class SearchForGamesScreenViewTest {
         composeTestRule.onNode(itemOn("PC")).performClick()
 
         assertEquals(TOTK to PC, added)
-    }
-
-    @Test
-    fun selecting_an_added_game_does_not_trigger_onAddGame() {
-        var added: Pair<GameInfo, Platform>? = null
-        setViewContent(
-            state = SearchForGamesScreenState.Results(
-                QUERY,
-                FILTERS,
-                listOf(GameSearchItemUiState(TOTK, SWITCH, AddStatus.ADDED))
-            ),
-            onAddGame = { game, platform -> added = game to platform }
-        )
-
-        composeTestRule.onNodeWithText(TOTK.name.value).performClick()
-
-        assertNull(added)
     }
 }

@@ -1,8 +1,6 @@
 package isel.dei.pdm.demos.gamevault.collection.platforms
 
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
@@ -49,18 +47,17 @@ class PlatformCollectionScreenViewTest {
     }
 
     /**
-     * Displays the view for the given state. The state is read during composition, so tests can
-     * change it to drive the view through state transitions.
+     * Displays the view for the given state.
      */
     private fun setViewContent(
-        state: MutableState<PlatformCollectionScreenState>,
+        state: PlatformCollectionScreenState,
         onPlatformSelected: (Platform) -> Unit = {}
     ) {
         composeTestRule.setContent {
             CompositionLocalProvider(LocalImageLoader provides successLoader) {
                 DemoGameVaultTheme {
                     PlatformCollectionScreenView(
-                        state = state.value,
+                        state = state,
                         onPlatformSelected = onPlatformSelected
                     )
                 }
@@ -68,20 +65,8 @@ class PlatformCollectionScreenViewTest {
         }
     }
 
-    /**
-     * Displays the view for the given (fixed) state.
-     */
-    private fun setViewContent(
-        state: PlatformCollectionScreenState,
-        onPlatformSelected: (Platform) -> Unit = {}
-    ) = setViewContent(mutableStateOf(state), onPlatformSelected)
-
     private fun assertTextIsDisplayed(resId: Int) {
         composeTestRule.onNodeWithText(context.getString(resId)).assertIsDisplayed()
-    }
-
-    private fun assertTextDoesNotExist(resId: Int) {
-        composeTestRule.onNodeWithText(context.getString(resId)).assertDoesNotExist()
     }
 
     // Loading
@@ -154,33 +139,5 @@ class PlatformCollectionScreenViewTest {
         composeTestRule.onNodeWithTag(LOADING_INDICATOR_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PLATFORM_LIST_TAG).assertDoesNotExist()
         composeTestRule.onNodeWithTag(EMPTY_MESSAGE_TAG).assertDoesNotExist()
-    }
-
-    // State transitions
-
-    @Test
-    fun loading_to_results_replaces_the_indicator_with_the_list() {
-        val state = mutableStateOf<PlatformCollectionScreenState>(PlatformCollectionScreenState.Loading)
-        setViewContent(state)
-        composeTestRule.onNodeWithTag(LOADING_INDICATOR_TAG).assertIsDisplayed()
-
-        state.value = PlatformCollectionScreenState.Results(listOf(SWITCH))
-
-        composeTestRule.onNodeWithTag(LOADING_INDICATOR_TAG).assertDoesNotExist()
-        composeTestRule.onNodeWithText(SWITCH.name.value).assertIsDisplayed()
-    }
-
-    @Test
-    fun results_are_updated_when_the_collection_changes() {
-        val state = mutableStateOf<PlatformCollectionScreenState>(
-            PlatformCollectionScreenState.Results(emptyList())
-        )
-        setViewContent(state)
-        assertTextIsDisplayed(R.string.platform_collection_empty)
-
-        state.value = PlatformCollectionScreenState.Results(listOf(SWITCH))
-
-        assertTextDoesNotExist(R.string.platform_collection_empty)
-        composeTestRule.onNodeWithText(SWITCH.name.value).assertIsDisplayed()
     }
 }

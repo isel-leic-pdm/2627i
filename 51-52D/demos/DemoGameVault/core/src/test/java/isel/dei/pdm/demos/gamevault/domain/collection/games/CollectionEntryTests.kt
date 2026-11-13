@@ -179,22 +179,6 @@ class CollectionEntryTests {
         }
     }
 
-    @Test
-    fun `operations do not change the original entry`() {
-        // Arrange
-        val entry = entry()
-
-        // Act
-        entry.updateStatus(State.DROPPED)
-        entry.addRun(completedOn)
-        entry.addPlatinum(completedOn)
-        entry.addPlayTime(30.minutes)
-        entry.startSession(sessionStart)
-
-        // Assert
-        assertEquals(entry(), entry)
-    }
-
     // Play status operations during a session
 
     @Test

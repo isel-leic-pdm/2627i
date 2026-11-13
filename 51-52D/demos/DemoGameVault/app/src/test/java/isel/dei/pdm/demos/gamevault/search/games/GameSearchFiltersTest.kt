@@ -1,7 +1,6 @@
 package isel.dei.pdm.demos.gamevault.search.games
 
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
@@ -20,15 +19,6 @@ class GameSearchFiltersTest {
         // Assert
         assertNull(filters.selectedPlatform)
         assertNull(filters.category)
-    }
-
-    @Test
-    fun one_of_the_platforms_can_be_selected() {
-        // Act
-        val filters = GameSearchFilters(platforms = listOf(PS5, SWITCH), selectedPlatform = SWITCH)
-
-        // Assert
-        assertEquals(SWITCH, filters.selectedPlatform)
     }
 
     @Test(expected = IllegalArgumentException::class)

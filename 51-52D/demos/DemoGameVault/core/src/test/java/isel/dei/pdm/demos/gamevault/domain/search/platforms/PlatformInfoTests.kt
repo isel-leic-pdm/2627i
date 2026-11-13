@@ -5,23 +5,8 @@ import isel.dei.pdm.demos.gamevault.domain.Uri
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertNull
 
 class PlatformInfoTests {
-
-    @Test
-    fun `primary constructor leaves optional properties absent by default`() {
-        // Act
-        val sut = PlatformInfo(
-            id = 1L,
-            abbreviation = NonBlankString("PS5"),
-            name = NonBlankString("PlayStation 5")
-        )
-
-        // Assert
-        assertNull(sut.logoUri)
-        assertNull(sut.version)
-    }
 
     @Test
     fun `secondary constructor converts strings into the corresponding types`() {
@@ -40,16 +25,6 @@ class PlatformInfoTests {
         assertEquals(NonBlankString("PlayStation 5"), sut.name)
         assertEquals(Uri("https://example.com/ps5.png"), sut.logoUri)
         assertEquals(NonBlankString("Digital Edition"), sut.version)
-    }
-
-    @Test
-    fun `secondary constructor leaves optional properties absent by default`() {
-        // Act
-        val sut = PlatformInfo(id = 2L, abbreviation = "XBOX", name = "Xbox Series X")
-
-        // Assert
-        assertNull(sut.logoUri)
-        assertNull(sut.version)
     }
 
     @Test

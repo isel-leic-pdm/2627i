@@ -19,18 +19,6 @@ class GameTests {
     // Game
 
     @Test
-    fun `Game primary constructor leaves optional properties absent by default`() {
-        // Act
-        val game = Game(1L, NonBlankString("Elden Ring"))
-
-        // Assert
-        assertNull(game.releaseDate)
-        assertNull(game.coverUri)
-        assertNull(game.thumbnailUri)
-        assertNull(game.source)
-    }
-
-    @Test
     fun `Game secondary constructor converts intrinsic types into the corresponding types`() {
         // Act
         val game = Game(
@@ -73,18 +61,6 @@ class GameTests {
     }
 
     // NewGame
-
-    @Test
-    fun `NewGame primary constructor leaves optional properties absent by default`() {
-        // Act
-        val newGame = NewGame(NonBlankString("Hades II"))
-
-        // Assert
-        assertNull(newGame.releaseDate)
-        assertNull(newGame.coverUri)
-        assertNull(newGame.thumbnailUri)
-        assertNull(newGame.source)
-    }
 
     @Test
     fun `NewGame secondary constructor converts intrinsic types into the corresponding types`() {

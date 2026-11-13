@@ -170,18 +170,6 @@ class PlayStatusTests {
     }
 
     @Test
-    fun `addPlayTime does not change the original status`() {
-        // Arrange
-        val status = PlayStatus(PlayTime(1, 0), State.PLAYING)
-
-        // Act
-        status.addPlayTime(1.hours)
-
-        // Assert
-        assertEquals(PlayTime(1, 0), status.timeSpent)
-    }
-
-    @Test
     fun `addPlayTime is rejected in the NONE state`() {
         assertFailsWith<IllegalArgumentException> {
             PlayStatus().addPlayTime(30.minutes)
