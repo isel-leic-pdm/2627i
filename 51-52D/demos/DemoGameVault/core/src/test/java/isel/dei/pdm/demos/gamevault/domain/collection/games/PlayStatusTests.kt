@@ -241,10 +241,20 @@ class PlayStatusTests {
     }
 
     @Test
-    fun `updateState to FINISHED without completed runs is rejected`() {
-        assertFailsWith<IllegalArgumentException> {
-            PlayStatus(PlayTime(20, 0), State.PLAYING).updateState(State.FINISHED)
-        }
+    fun `updateState to FINISHED without completed runs registers an undated run`() {
+        val updated = PlayStatus(PlayTime(20, 0), State.PLAYING).updateState(State.FINISHED)
+
+        assertEquals(State.FINISHED, updated.state)
+        assertEquals(listOf(Accomplishment(null)), updated.completedRuns)
+        assertTrue(updated.isFinished)
+    }
+
+    @Test
+    fun `updateState to FINISHED from the NONE state registers an undated run`() {
+        val updated = PlayStatus().updateState(State.FINISHED)
+
+        assertEquals(State.FINISHED, updated.state)
+        assertEquals(listOf(Accomplishment(null)), updated.completedRuns)
     }
 
     @Test
@@ -383,17 +393,40 @@ class PlayStatusTests {
     }
 
     @Test
-    fun `addPlatinum is rejected in the NONE state`() {
-        assertFailsWith<IllegalArgumentException> {
-            PlayStatus().addPlatinum(october)
-        }
+    fun `addPlatinum with completed runs adds no run`() {
+        val runs = listOf(Accomplishment(march))
+
+        val updated = PlayStatus(PlayTime(80, 0), State.PLAYING, runs).addPlatinum(october)
+
+        assertEquals(runs, updated.completedRuns)
+        assertEquals(State.PLAYING, updated.state)
     }
 
     @Test
-    fun `addPlatinum is rejected without completed runs`() {
-        assertFailsWith<IllegalArgumentException> {
-            PlayStatus(PlayTime(80, 0), State.PLAYING).addPlatinum(october)
-        }
+    fun `addPlatinum without completed runs also registers a run on the same date and finishes the game`() {
+        val updated = PlayStatus(PlayTime(80, 0), State.PLAYING).addPlatinum(october)
+
+        assertEquals(Accomplishment(october), updated.platinum)
+        assertEquals(listOf(Accomplishment(october)), updated.completedRuns)
+        assertEquals(State.FINISHED, updated.state)
+    }
+
+    @Test
+    fun `addPlatinum without date nor completed runs also registers an undated run`() {
+        val updated = PlayStatus(PlayTime(80, 0), State.PAUSED).addPlatinum(null)
+
+        assertEquals(Accomplishment(null), updated.platinum)
+        assertEquals(listOf(Accomplishment(null)), updated.completedRuns)
+        assertEquals(State.FINISHED, updated.state)
+    }
+
+    @Test
+    fun `addPlatinum in the NONE state finishes the game, as when registered after the fact`() {
+        val updated = PlayStatus().addPlatinum(null)
+
+        assertEquals(Accomplishment(null), updated.platinum)
+        assertEquals(listOf(Accomplishment(null)), updated.completedRuns)
+        assertEquals(State.FINISHED, updated.state)
     }
 
     // Yearly accomplishments

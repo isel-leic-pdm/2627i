@@ -184,16 +184,39 @@ class CollectionEntryTests {
 
     @Test
     fun `leaving the PLAYING state during a session is rejected`() {
-        assertFailsWith<IllegalArgumentException> {
-            entryInSession().updateStatus(State.PAUSED)
+        listOf(State.BACKLOG, State.PAUSED, State.DROPPED, State.FINISHED).forEach { state ->
+            assertFailsWith<IllegalStateException> {
+                entryInSession().updateStatus(state)
+            }
         }
     }
 
     @Test
+    fun `staying in the PLAYING state during a session keeps it active`() {
+        assertTrue(entryInSession().updateStatus(State.PLAYING).isSessionActive)
+    }
+
+    @Test
     fun `finishing the game for the first time during a session is rejected`() {
-        assertFailsWith<IllegalArgumentException> {
+        assertFailsWith<IllegalStateException> {
             entryInSession().addRun(completedOn)
         }
+    }
+
+    @Test
+    fun `adding the platinum without completed runs during a session is rejected`() {
+        // The implied run would finish the game for the first time
+        assertFailsWith<IllegalStateException> {
+            entryInSession().addPlatinum(completedOn)
+        }
+    }
+
+    @Test
+    fun `addPlatinum without completed runs finishes the entry`() {
+        val updated = entry().addPlatinum(completedOn)
+
+        assertEquals(listOf(Accomplishment(completedOn)), updated.playStatus.completedRuns)
+        assertEquals(State.FINISHED, updated.playStatus.state)
     }
 
     @Test

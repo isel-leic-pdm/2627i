@@ -170,14 +170,18 @@ data class PlayStatus(
 
     /**
      * Updates the state of the playing status, keeping its accomplishments.
-     * A game is finished for the first time by adding a run (see [addRun]), which registers the
-     * completion date. Hence, setting the state to FINISHED requires a completed run.
+     * A finished game has at least one completed run, so setting the state to FINISHED when
+     * there are none also registers an undated run (see [addRun]), as when the game is marked as
+     * finished after the fact. To register when the game was finished, add the run instead, which
+     * also sets the state to FINISHED.
      * @param newState The new state to set.
      * @return A new [PlayStatus] with the updated state.
-     * @throws IllegalArgumentException If the new state is FINISHED and there are no completed
-     * runs, or if the new state is NONE and there is time spent or accomplishments.
+     * @throws IllegalArgumentException If the new state is NONE and there is time spent or
+     * accomplishments.
      */
-    fun updateState(newState: State): PlayStatus = copy(state = newState)
+    fun updateState(newState: State): PlayStatus =
+        if (newState == State.FINISHED && !isFinished) addRun(completedOn = null)
+        else copy(state = newState)
 
     /**
      * Adds a completed run, finished on the given date.
@@ -193,14 +197,16 @@ data class PlayStatus(
 
     /**
      * Registers the platinum, obtained on the given date. If the platinum was already registered,
-     * its date is replaced (e.g. to correct it). The state is not changed.
-     * The platinum requires a completed run, which is registered on its own (see [addRun]), as
-     * each accomplishment is registered explicitly by the user.
-     * @param obtainedOn The date the platinum was obtained, or null if unknown.
+     * its date is replaced (e.g. to correct it).
+     * A game whose platinum was obtained is also finished, so if no run was completed yet, a run
+     * completed on the same date is also registered, which sets the state to FINISHED (see
+     * [addRun]). The run cannot have been completed after the platinum, so its date is the latest
+     * it can be; if the platinum is undated, so is the run. Otherwise, the state is not changed.
+     * @param obtainedOn The date the platinum was obtained, or null if unknown (e.g. registered
+     * after the fact).
      * @return A new [PlayStatus] with the platinum.
-     * @throws IllegalArgumentException If no run was completed yet (which includes the NONE
-     * state).
      */
     fun addPlatinum(obtainedOn: LocalDate?): PlayStatus =
-        copy(platinum = Accomplishment(obtainedOn))
+        (if (isFinished) this else addRun(completedOn = obtainedOn))
+            .copy(platinum = Accomplishment(obtainedOn))
 }

@@ -82,30 +82,52 @@ data class CollectionEntry(
      * Updates the state of the entry's play status. See [PlayStatus.updateState].
      * @param newState The new state to set.
      * @return A new [CollectionEntry] with the updated status.
-     * @throws IllegalArgumentException If the new state is not PLAYING and a session is active
-     * (it must be ended first), or if the new state does not meet the play status requirements.
+     * @throws IllegalStateException If the new state is not PLAYING and a session is active (it
+     * must be ended first).
+     * @throws IllegalArgumentException If the new state does not meet the play status
+     * requirements (see [PlayStatus.updateState]).
      */
-    fun updateStatus(newState: PlayStatus.State): CollectionEntry =
-        copy(playStatus = playStatus.updateState(newState))
+    fun updateStatus(newState: PlayStatus.State): CollectionEntry {
+        check(!isSessionActive || newState == PlayStatus.State.PLAYING) {
+            "The game cannot leave the PLAYING state while a play session is active"
+        }
+        return copy(playStatus = playStatus.updateState(newState))
+    }
 
     /**
      * Adds a completed run to the play status. See [PlayStatus.addRun].
      * @param completedOn The date the run was completed, or null if unknown.
      * @return A new [CollectionEntry] with the updated status.
-     * @throws IllegalArgumentException If this is the first completed run and a session is
-     * active (it must be ended first, as the game becomes FINISHED).
+     * @throws IllegalStateException If this is the first completed run and a session is active
+     * (it must be ended first, as the game becomes FINISHED).
      */
-    fun addRun(completedOn: LocalDate?): CollectionEntry =
-        copy(playStatus = playStatus.addRun(completedOn))
+    fun addRun(completedOn: LocalDate?): CollectionEntry {
+        checkNotFinishingDuringSession()
+        return copy(playStatus = playStatus.addRun(completedOn))
+    }
 
     /**
      * Registers the platinum in the play status. See [PlayStatus.addPlatinum].
      * @param obtainedOn The date the platinum was obtained, or null if unknown.
      * @return A new [CollectionEntry] with the updated status.
-     * @throws IllegalArgumentException If no run was completed yet.
+     * @throws IllegalStateException If no run was completed yet and a session is active, as the
+     * implied run would finish the game for the first time (see [addRun]).
      */
-    fun addPlatinum(obtainedOn: LocalDate?): CollectionEntry =
-        copy(playStatus = playStatus.addPlatinum(obtainedOn))
+    fun addPlatinum(obtainedOn: LocalDate?): CollectionEntry {
+        checkNotFinishingDuringSession()
+        return copy(playStatus = playStatus.addPlatinum(obtainedOn))
+    }
+
+    /**
+     * Checks that the game is not about to be finished for the first time while a session is
+     * active: the first completed run makes it FINISHED, so the session must be ended first.
+     * @throws IllegalStateException If no run was completed yet and a session is active.
+     */
+    private fun checkNotFinishingDuringSession() {
+        check(!isSessionActive || playStatus.isFinished) {
+            "The game cannot be finished for the first time while a play session is active"
+        }
+    }
 
     /**
      * Adds the given [duration] to the total time spent playing.
