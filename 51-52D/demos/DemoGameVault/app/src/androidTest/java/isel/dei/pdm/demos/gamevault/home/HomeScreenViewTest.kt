@@ -13,6 +13,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.platform.app.InstrumentationRegistry
 import isel.dei.pdm.demos.gamevault.R
+import isel.dei.pdm.demos.gamevault.collection.games.filters.CollectionFilter
 import isel.dei.pdm.demos.gamevault.domain.RecoverablePersistenceException
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.home.HomeScreenViewTestTags.COLLECTION_SECTION

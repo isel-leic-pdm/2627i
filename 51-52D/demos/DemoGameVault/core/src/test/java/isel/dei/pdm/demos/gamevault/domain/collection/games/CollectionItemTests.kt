@@ -9,7 +9,6 @@ import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Instant
@@ -63,7 +62,9 @@ class CollectionItemTests {
         val entry = CollectionEntry(
             game = game,
             platforms = setOf(platform),
-            playStatus = PlayStatus(PlayTime(80, 0), State.PLAYING, platinum = Accomplishment(march)),
+            playStatus = PlayStatus(
+                PlayTime(80, 0), State.PLAYING, listOf(Accomplishment(march)), Accomplishment(march)
+            ),
             sessionStartTime = Instant.parse("2026-11-08T20:00:00Z")
         )
 
@@ -71,7 +72,7 @@ class CollectionItemTests {
         val item = entry.toItem()
 
         // Assert
-        assertFalse(item.isFinished)
+        assertTrue(item.isFinished)
         assertTrue(item.hasPlatinum)
         assertTrue(item.isSessionActive)
     }
@@ -107,7 +108,7 @@ class CollectionItemTests {
 
         // Assert
         assertNull(query.state)
-        assertFalse(query.platinumOnly)
+        assertNull(query.completion)
         assertNull(query.platform)
         assertNull(query.nameContains)
         assertNull(query.initial)

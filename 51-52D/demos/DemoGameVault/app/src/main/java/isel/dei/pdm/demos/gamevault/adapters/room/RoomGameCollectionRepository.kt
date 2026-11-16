@@ -265,7 +265,7 @@ private fun GameCollectionDao.observeItems(
     limit: Int
 ): Flow<List<CollectionItemRow>> = observeItems(
     state = query.state?.name,
-    platinumOnly = query.platinumOnly,
+    completion = query.completion?.name,
     platformIds = platformIds,
     nameContains = query.nameContains?.value,
     initial = query.initial,

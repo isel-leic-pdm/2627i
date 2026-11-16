@@ -23,6 +23,7 @@ class CollectionEntryTests {
     private val addedAt = Instant.parse("2026-01-15T10:00:00Z")
     private val sessionStart = Instant.parse("2026-11-08T20:00:00Z")
     private val completedOn = LocalDate(2026, 11, 8)
+    private val firstRun = Accomplishment(LocalDate(2025, 1, 1))
 
     private fun entry(
         state: State = State.PLAYING,
@@ -150,7 +151,7 @@ class CollectionEntryTests {
 
     @Test
     fun `addPlatinum registers the platinum with the given date in the play status`() {
-        val updated = entry().addPlatinum(completedOn)
+        val updated = entry(completedRuns = listOf(firstRun)).addPlatinum(completedOn)
 
         assertEquals(Accomplishment(completedOn), updated.playStatus.platinum)
     }
@@ -164,7 +165,7 @@ class CollectionEntryTests {
 
     @Test
     fun `play status operations keep the remaining properties of the entry`() {
-        val entry = entry()
+        val entry = entry(completedRuns = listOf(firstRun))
 
         listOf(
             entry.updateStatus(State.PAUSED),
@@ -198,10 +199,7 @@ class CollectionEntryTests {
     @Test
     fun `completing a later run during a session keeps it active`() {
         // Arrange
-        val replaying = entry(
-            completedRuns = listOf(Accomplishment(LocalDate(2025, 1, 1))),
-            sessionStartTime = sessionStart
-        )
+        val replaying = entry(completedRuns = listOf(firstRun), sessionStartTime = sessionStart)
 
         // Act
         val updated = replaying.addRun(completedOn)
@@ -213,8 +211,10 @@ class CollectionEntryTests {
 
     @Test
     fun `adding play time and the platinum during a session keep it active`() {
+        val replaying = entry(completedRuns = listOf(firstRun), sessionStartTime = sessionStart)
+
         assertTrue(entryInSession().addPlayTime(10.minutes).isSessionActive)
-        assertTrue(entryInSession().addPlatinum(completedOn).isSessionActive)
+        assertTrue(replaying.addPlatinum(completedOn).isSessionActive)
     }
 
     // Starting sessions

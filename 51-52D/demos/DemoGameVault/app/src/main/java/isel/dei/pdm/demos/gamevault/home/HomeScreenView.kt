@@ -1,6 +1,5 @@
 package isel.dei.pdm.demos.gamevault.home
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,8 +29,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,11 +43,11 @@ import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayTime
 import isel.dei.pdm.demos.gamevault.domain.collection.games.toItem
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
-import isel.dei.pdm.demos.gamevault.collection.games.color
+import isel.dei.pdm.demos.gamevault.collection.games.filters.CollectionFilter
+import isel.dei.pdm.demos.gamevault.collection.games.filters.icon
+import isel.dei.pdm.demos.gamevault.collection.games.filters.iconColor
+import isel.dei.pdm.demos.gamevault.collection.games.filters.label
 import isel.dei.pdm.demos.gamevault.collection.games.icon
-import isel.dei.pdm.demos.gamevault.collection.games.PlatinumIcon
-import isel.dei.pdm.demos.gamevault.collection.games.labelResId
-import isel.dei.pdm.demos.gamevault.collection.games.platinumColor
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 import isel.dei.pdm.demos.gamevault.domain.Year
 import kotlinx.datetime.LocalDate
@@ -303,7 +300,7 @@ private fun CollectionFilterChip(
 ) {
     SuggestionChip(
         onClick = onSelected,
-        label = { Text(stringResource(filter.labelResId())) },
+        label = { Text(filter.label()) },
         icon = {
             // The label describes the filter, so the icon is decorative
             Icon(
@@ -385,39 +382,6 @@ private fun Stat(value: String, label: String) {
         )
     }
 }
-
-/**
- * The icon displayed for each filter.
- */
-private fun CollectionFilter.icon(): ImageVector =
-    when (this) {
-        is CollectionFilter.InState -> state.icon()
-        CollectionFilter.WithPlatinum -> PlatinumIcon
-    }
-
-/**
- * The color of the icon displayed for each filter. Colors are taken from the theme's color roles,
- * so that they adapt to the dynamic color scheme and to the dark theme: only the filters that are
- * meant to stand out are highlighted.
- */
-@Composable
-private fun CollectionFilter.iconColor(): Color =
-    when (this) {
-        is CollectionFilter.InState -> state.color()
-        CollectionFilter.WithPlatinum -> platinumColor()
-    }
-
-/**
- * The label displayed to the user for each filter.
- */
-@StringRes
-private fun CollectionFilter.labelResId(): Int =
-    when (this) {
-        is CollectionFilter.InState -> state.labelResId()
-        // TODO: The term used for platinum (e.g. Platinum, All achievements) is to become a user
-        //  preference, as it is platform specific
-        CollectionFilter.WithPlatinum -> R.string.accomplishment_platinum
-    }
 
 // Testing & preview utilities
 

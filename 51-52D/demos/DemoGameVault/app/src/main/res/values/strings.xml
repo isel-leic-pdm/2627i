@@ -110,6 +110,24 @@
     <string name="collection_item_play_time">%1$d h</string>
     <string name="collection_item_play_time_minutes">%1$d min</string>
 
+    <string name="collection_filters_description">Filters</string>
+    <!-- Announced by accessibility services for the badge with the number of active filters -->
+    <plurals name="collection_filters_active_description">
+        <item quantity="one">%1$d active</item>
+        <item quantity="other">%1$d active</item>
+    </plurals>
+    <string name="collection_filter_remove_description">Remove %1$s filter</string>
+    <!-- The option of a filter that stands for not filtering (e.g. any state) -->
+    <string name="collection_filter_any">Any</string>
+    <string name="collection_filters_title">Filters</string>
+    <string name="collection_filters_status_title">Status</string>
+    <string name="collection_filters_completion_title">Completion</string>
+
+    <!-- How far the user went in a game, whatever they are currently doing with it -->
+    <string name="completion_not_finished">Not finished</string>
+    <string name="completion_finished">Finished</string>
+    <string name="collection_filters_platform_title">Platform</string>
+
     <string name="image_placeholder">Image</string>
     <string name="image_not_available">Image not available</string>
 

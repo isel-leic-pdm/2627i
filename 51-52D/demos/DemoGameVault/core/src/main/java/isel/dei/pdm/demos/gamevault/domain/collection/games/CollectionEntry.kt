@@ -102,6 +102,7 @@ data class CollectionEntry(
      * Registers the platinum in the play status. See [PlayStatus.addPlatinum].
      * @param obtainedOn The date the platinum was obtained, or null if unknown.
      * @return A new [CollectionEntry] with the updated status.
+     * @throws IllegalArgumentException If no run was completed yet.
      */
     fun addPlatinum(obtainedOn: LocalDate?): CollectionEntry =
         copy(playStatus = playStatus.addPlatinum(obtainedOn))

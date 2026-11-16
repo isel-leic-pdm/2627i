@@ -13,6 +13,7 @@ import isel.dei.pdm.demos.gamevault.domain.collection.games.NewGame
 import isel.dei.pdm.demos.gamevault.domain.collection.games.NewGameDetails
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.domain.collection.games.StartSessionResult
+import isel.dei.pdm.demos.gamevault.domain.collection.games.meets
 import isel.dei.pdm.demos.gamevault.domain.collection.games.toItem
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import kotlinx.coroutines.flow.Flow
@@ -195,7 +196,7 @@ class FakeGameCollectionRepository(
  */
 private fun CollectionEntry.meets(query: CollectionQuery): Boolean =
     (query.state == null || playStatus.state == query.state) &&
-        (!query.platinumOnly || playStatus.platinum != null) &&
+        (query.completion?.let { playStatus.meets(it) } ?: true) &&
         (query.platform?.let { isOwnedOn(it) } ?: true) &&
         (query.nameContains?.let { game.name.value.contains(it.value, ignoreCase = true) } ?: true) &&
         (query.initial == null || game.name.value.initial() == query.initial)

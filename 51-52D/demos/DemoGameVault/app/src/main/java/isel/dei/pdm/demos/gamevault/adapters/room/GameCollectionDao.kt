@@ -74,7 +74,10 @@ abstract class GameCollectionDao {
      * those left at their "any" value are not applied (see
      * [isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionQuery]).
      * @param state Only games in this play state (its name), or any state if null.
-     * @param platinumOnly Only games whose platinum was obtained.
+     * @param completion Only games that reached this completion (its name), or any completion if
+     * null. Follows the domain rules (see
+     * [isel.dei.pdm.demos.gamevault.domain.collection.games.meets]): a game is finished if it
+     * has completed runs, whatever its state, and a game with the platinum is also finished.
      * @param anyPlatform Whether games owned on any platform are included, in which case
      * [platformIds] is ignored. Room cannot check whether a list parameter is null, hence the flag.
      * @param platformIds Only games owned on one of these platforms: the versions of the platform
@@ -98,7 +101,12 @@ abstract class GameCollectionDao {
                g.session_start_time IS NOT NULL AS is_session_active
         FROM games g
         WHERE (:state IS NULL OR g.state = :state)
-          AND (NOT :platinumOnly OR g.has_platinum)
+          AND (:completion IS NULL
+               OR (:completion = 'NOT_FINISHED'
+                   AND NOT EXISTS (SELECT 1 FROM completed_runs r WHERE r.game_id = g.id))
+               OR (:completion = 'FINISHED'
+                   AND EXISTS (SELECT 1 FROM completed_runs r WHERE r.game_id = g.id))
+               OR (:completion = 'PLATINUM' AND g.has_platinum))
           AND (:anyPlatform OR EXISTS (
                 SELECT 1 FROM game_platforms gp
                 WHERE gp.game_id = g.id AND gp.platform_id IN (:platformIds)))
@@ -112,7 +120,7 @@ abstract class GameCollectionDao {
     )
     protected abstract fun observeItemRows(
         state: String?,
-        platinumOnly: Boolean,
+        completion: String?,
         anyPlatform: Boolean,
         platformIds: List<Long>,
         nameContains: String?,
@@ -130,14 +138,14 @@ abstract class GameCollectionDao {
      */
     open fun observeItems(
         state: String?,
-        platinumOnly: Boolean,
+        completion: String?,
         platformIds: List<Long>?,
         nameContains: String?,
         initial: Char?,
         limit: Int
     ): Flow<List<CollectionItemRow>> = observeItemRows(
         state = state,
-        platinumOnly = platinumOnly,
+        completion = completion,
         anyPlatform = platformIds == null,
         platformIds = platformIds.orEmpty(),
         nameContains = nameContains?.escapeLikeWildcards(),

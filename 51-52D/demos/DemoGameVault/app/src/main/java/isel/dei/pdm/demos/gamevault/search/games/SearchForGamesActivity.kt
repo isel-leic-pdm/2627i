@@ -39,8 +39,6 @@ class SearchForGamesActivity : ComponentActivity() {
                 DemoGameVaultTheme {
                     SearchForGamesScreen(
                         viewModel = viewModel,
-                        // Once the user comes back, the platforms are read again, as the screen
-                        // observes them again
                         onAddPlatform = { SearchForPlatformActivity.navigate(this) },
                         onBack = { finish() }
                     )

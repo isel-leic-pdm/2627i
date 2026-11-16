@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import isel.dei.pdm.demos.gamevault.R
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeGameCollectionRepository
+import isel.dei.pdm.demos.gamevault.collection.games.filters.CollectionFilter
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionItem
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 

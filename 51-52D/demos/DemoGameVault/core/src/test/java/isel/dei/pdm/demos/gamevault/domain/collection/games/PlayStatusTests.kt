@@ -154,6 +154,24 @@ class PlayStatusTests {
     }
 
     @Test
+    fun `PlayStatus throws IllegalArgumentException when the platinum is obtained without completed runs`() {
+        listOf(State.BACKLOG, State.PLAYING, State.PAUSED, State.DROPPED).forEach { state ->
+            assertFailsWith<IllegalArgumentException> {
+                PlayStatus(PlayTime(80, 0), state, platinum = Accomplishment(march))
+            }
+        }
+    }
+
+    @Test
+    fun `PlayStatus with the platinum is finished`() {
+        val status = PlayStatus(
+            PlayTime(80, 0), State.PLAYING, listOf(Accomplishment(march)), Accomplishment(october)
+        )
+
+        assertTrue(status.isFinished)
+    }
+
+    @Test
     fun `PlayStatus keeps accomplishments in the remaining states`() {
         listOf(State.BACKLOG, State.PLAYING, State.PAUSED, State.DROPPED).forEach { state ->
             // Act
@@ -348,15 +366,17 @@ class PlayStatusTests {
 
     @Test
     fun `addPlatinum when already registered replaces its date`() {
-        val updated = PlayStatus(PlayTime(80, 0), State.PLAYING, platinum = Accomplishment(march))
-            .addPlatinum(october)
+        val updated = PlayStatus(
+            PlayTime(80, 0), State.PLAYING, listOf(Accomplishment(march)), Accomplishment(march)
+        ).addPlatinum(october)
 
         assertEquals(Accomplishment(october), updated.platinum)
     }
 
     @Test
     fun `addPlatinum without date registers an undated platinum`() {
-        val updated = PlayStatus(PlayTime(80, 0), State.PLAYING).addPlatinum(null)
+        val updated = PlayStatus(PlayTime(80, 0), State.PLAYING, listOf(Accomplishment(null)))
+            .addPlatinum(null)
 
         assertEquals(Accomplishment(null), updated.platinum)
         assertFalse(updated.obtainedPlatinumIn(thisYear))
@@ -366,6 +386,13 @@ class PlayStatusTests {
     fun `addPlatinum is rejected in the NONE state`() {
         assertFailsWith<IllegalArgumentException> {
             PlayStatus().addPlatinum(october)
+        }
+    }
+
+    @Test
+    fun `addPlatinum is rejected without completed runs`() {
+        assertFailsWith<IllegalArgumentException> {
+            PlayStatus(PlayTime(80, 0), State.PLAYING).addPlatinum(october)
         }
     }
 
@@ -440,7 +467,9 @@ class PlayStatusTests {
 
     @Test
     fun `platinum is obtained in the year of its date`() {
-        val status = PlayStatus(PlayTime(80, 0), State.PLAYING, platinum = Accomplishment(october))
+        val status = PlayStatus(
+            PlayTime(80, 0), State.PLAYING, listOf(Accomplishment(march)), Accomplishment(october)
+        )
 
         assertTrue(status.obtainedPlatinumIn(thisYear))
         assertFalse(status.obtainedPlatinumIn(Year(2025)))

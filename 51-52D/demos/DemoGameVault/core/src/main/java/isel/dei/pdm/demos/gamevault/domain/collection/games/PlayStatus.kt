@@ -65,6 +65,8 @@ data class Accomplishment(val achievedOn: LocalDate?) {
  *
  * Accomplishments are kept regardless of the state: a game that was finished, or whose platinum
  * was obtained, may be played again (i.e. be in the [State.PLAYING] state) without losing them.
+ * The state tells what the user is currently doing with the game, whereas the accomplishments
+ * tell how far they went in it (see [Completion]).
  *
  * @property timeSpent The total time spent playing the game.
  * @property state The current state of the game in the user's collection.
@@ -74,6 +76,8 @@ data class Accomplishment(val achievedOn: LocalDate?) {
  * @property platinum The platinum, if obtained: all the game's achievements (e.g. trophies) were
  * obtained. Not to be confused with completing 100% of the game, which is game specific (e.g.
  * visiting all areas or getting all collectibles) and may or may not be expressed in achievements.
+ * The platinum requires at least one completed run: a game whose platinum was obtained is also
+ * finished, whereas a finished game may not have the platinum.
  */
 data class PlayStatus(
     val timeSpent: PlayTime = PlayTime(),
@@ -117,6 +121,9 @@ data class PlayStatus(
         }
         require(!(state == State.FINISHED && completedRuns.isEmpty())) {
             "Games in the FINISHED state must have at least one completed run"
+        }
+        require(!(platinum != null && completedRuns.isEmpty())) {
+            "Games with the platinum must have at least one completed run"
         }
     }
 
@@ -187,9 +194,12 @@ data class PlayStatus(
     /**
      * Registers the platinum, obtained on the given date. If the platinum was already registered,
      * its date is replaced (e.g. to correct it). The state is not changed.
+     * The platinum requires a completed run, which is registered on its own (see [addRun]), as
+     * each accomplishment is registered explicitly by the user.
      * @param obtainedOn The date the platinum was obtained, or null if unknown.
      * @return A new [PlayStatus] with the platinum.
-     * @throws IllegalArgumentException If the game is in the NONE state.
+     * @throws IllegalArgumentException If no run was completed yet (which includes the NONE
+     * state).
      */
     fun addPlatinum(obtainedOn: LocalDate?): PlayStatus =
         copy(platinum = Accomplishment(obtainedOn))
