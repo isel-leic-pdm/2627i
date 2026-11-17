@@ -18,6 +18,7 @@ import isel.dei.pdm.demos.gamevault.collection.games.color
 import isel.dei.pdm.demos.gamevault.collection.games.icon
 import isel.dei.pdm.demos.gamevault.collection.games.labelResId
 import isel.dei.pdm.demos.gamevault.collection.games.platinumColor
+import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionQuery
 import isel.dei.pdm.demos.gamevault.domain.collection.games.Completion
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
@@ -62,6 +63,39 @@ sealed interface CollectionFilter {
             )
     }
 }
+
+/**
+ * The filters applied by this query, in the order they are presented: status, completion and
+ * platform, as in the filters sheet (see [FiltersSheetContent]). The search by name and the
+ * initial are not filters in this sense (see [CollectionFilter]).
+ */
+fun CollectionQuery.activeFilters(): List<CollectionFilter> =
+    listOfNotNull(
+        state?.let { CollectionFilter.InState(it) },
+        completion?.let { CollectionFilter.WithCompletion(it) },
+        platform?.let { CollectionFilter.OnPlatform(it) }
+    )
+
+/**
+ * The query that applies only this filter (e.g. to browse the collection from a shortcut).
+ */
+fun CollectionFilter.toQuery(): CollectionQuery =
+    when (this) {
+        is CollectionFilter.InState -> CollectionQuery(state = state)
+        is CollectionFilter.WithCompletion -> CollectionQuery(completion = completion)
+        is CollectionFilter.OnPlatform -> CollectionQuery(platform = platform)
+    }
+
+/**
+ * This query without the criterion of the given [filter], whatever its value: the rest of the
+ * query is kept as is.
+ */
+fun CollectionQuery.without(filter: CollectionFilter): CollectionQuery =
+    when (filter) {
+        is CollectionFilter.InState -> copy(state = null)
+        is CollectionFilter.WithCompletion -> copy(completion = null)
+        is CollectionFilter.OnPlatform -> copy(platform = null)
+    }
 
 /**
  * The icon displayed for each filter. Filters by play state or platinum use the icons of the

@@ -15,6 +15,7 @@ import isel.dei.pdm.demos.gamevault.domain.collection.games.NewGame
 import isel.dei.pdm.demos.gamevault.domain.collection.games.NewGameDetails
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.search.NoConnectivityException
 import isel.dei.pdm.demos.gamevault.domain.search.SearchString
 import isel.dei.pdm.demos.gamevault.domain.search.games.GameInfo
@@ -34,6 +35,10 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
@@ -271,6 +276,32 @@ class SearchForGamesViewModelTest {
         advanceTimeBy(STOP_TIMEOUT + 1.milliseconds)
         runCurrent()
         assertEquals(0, platformRepo.observers)
+    }
+
+    @Test
+    fun last_state_is_kept_while_observation_restarts() = runTest {
+        // Arrange - The screen displays results when the UI goes away (e.g. to the background)
+        // for longer than the stop timeout
+        val repository = PendingReadsPlatformCollectionRepository(platformRepo)
+        val viewModel = SearchForGamesViewModel(searchService, gameRepo, repository, imageStore, SavedStateHandle())
+        val collector = collectStates(viewModel)
+        viewModel.onSearchQueryChange(ELDEN_QUERY)
+        searchService.complete(ELDEN_QUERY, listOf(ELDEN_RING))
+        collector.cancel()
+        advanceTimeBy(STOP_TIMEOUT + 1.milliseconds)
+        runCurrent()
+
+        // Act - The UI comes back, and the platforms take a while to be read again (e.g. from a
+        // database)
+        repository.isReadPending = true
+        val published = mutableListOf<SearchForGamesScreenState>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.state.collect { published += it }
+        }
+
+        // Assert - The results are displayed throughout, without going through the loading state
+        assertTrue(published.none { it is SearchForGamesScreenState.Loading })
+        assertEquals(listOf(ELDEN_RING to PS5, ELDEN_RING to PC), viewModel.items().map { it.game to it.platform })
     }
 
     // Search
@@ -793,6 +824,26 @@ class SearchForGamesViewModelTest {
 
         // Assert
         assertEquals(0, gameRepo.pendingAdds)
+    }
+}
+
+/**
+ * A [PlatformCollectionRepository] implementation whose reads of the platforms can be left
+ * pending, as when they take a while (e.g. reading from a database). The remaining operations are
+ * those of the given [delegate].
+ */
+class PendingReadsPlatformCollectionRepository(
+    private val delegate: PlatformCollectionRepository
+) : PlatformCollectionRepository by delegate {
+
+    /**
+     * Whether subsequent reads of the platforms never produce them.
+     */
+    var isReadPending = false
+
+    override val platforms: Flow<List<Platform>> = flow {
+        if (isReadPending) awaitCancellation()
+        emitAll(delegate.platforms)
     }
 }
 

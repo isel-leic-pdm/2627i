@@ -21,11 +21,9 @@ import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
  * the PS5 Slim.
  * @property nameContains Only entries whose game's name contains this text, ignoring case, or any
  * name if null.
- * @property initial Only entries whose game's name is listed under this initial, for alphabetical
- * navigation: an upper case letter (A to Z), or [OTHER_INITIAL] for names starting with digits
- * or symbols. Any initial if null.
- * DRAFT: How names are listed under initials is still to be decided (e.g. whether accents are
- * ignored, such as in Ōkami, or leading articles, such as in The Legend of Zelda).
+ * @property initial Only entries whose game's name is listed under this initial (see
+ * [initialOf]), for alphabetical navigation: an upper case letter (A to Z), or [OTHER_INITIAL]
+ * for names starting with digits or symbols. Any initial if null.
  */
 data class CollectionQuery(
     val state: PlayStatus.State? = null,
@@ -45,5 +43,21 @@ data class CollectionQuery(
          * The initial under which the names starting with digits or symbols are listed.
          */
         const val OTHER_INITIAL = '#'
+
+        /**
+         * The initial under which the given game name is listed, for alphabetical navigation
+         * (e.g. the sections of a listing, or [initial]): its first letter, in upper case,
+         * ignoring leading whitespace, if it is a letter from A to Z; otherwise, [OTHER_INITIAL].
+         * Repositories that list under initials themselves (e.g. in a database query) must be
+         * consistent with it.
+         *
+         * DRAFT: Accents and leading articles are not taken into account yet (e.g. Ōkami is
+         * listed under [OTHER_INITIAL], and The Legend of Zelda under T), as the rules are
+         * still to be decided.
+         */
+        fun initialOf(name: NonBlankString): Char {
+            val first = name.value.trimStart().first().uppercaseChar()
+            return if (first in 'A'..'Z') first else OTHER_INITIAL
+        }
     }
 }

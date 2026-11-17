@@ -50,20 +50,29 @@ class HomeViewModel(
 ) : ViewModel() {
 
     /**
-     * The user's requests to retry loading the games being played.
+     * What causes a region's observation of the collection: the start of the observation, whether
+     * the first or a restart (e.g. when the app returns from the background), or the user retrying
+     * after an error.
      */
-    private val nowPlayingRetries = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private enum class Trigger { Start, Retry }
 
     /**
-     * The user's requests to retry computing the summary.
+     * The triggers of the observation of the games being played. Not replayed, so that restarting
+     * the observation is not taken for a retry.
      */
-    private val summaryRetries = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val nowPlayingTriggers = MutableSharedFlow<Trigger>(extraBufferCapacity = 1)
+
+    /**
+     * The triggers of the computation of the summary. Not replayed, so that restarting the
+     * observation is not taken for a retry.
+     */
+    private val summaryTriggers = MutableSharedFlow<Trigger>(extraBufferCapacity = 1)
 
     /**
      * The state of the "now playing" region of the screen.
      */
     val nowPlaying: StateFlow<NowPlayingState> = regionState(
-        retries = nowPlayingRetries,
+        triggers = nowPlayingTriggers,
         loading = NowPlayingState.Loading,
         observe = {
             collectionRepo
@@ -77,7 +86,7 @@ class HomeViewModel(
      * The state of the summary region of the screen.
      */
     val summary: StateFlow<SummaryState> = regionState(
-        retries = summaryRetries,
+        triggers = summaryTriggers,
         loading = SummaryState.Loading,
         observe = {
             collectionRepo.observeSummary(currentYear()).map { SummaryState.Loaded(it) }
@@ -93,7 +102,7 @@ class HomeViewModel(
      */
     fun onRetryNowPlaying() {
         if (nowPlaying.value is NowPlayingState.Error)
-            nowPlayingRetries.tryEmit(Unit)
+            nowPlayingTriggers.tryEmit(Trigger.Retry)
     }
 
     /**
@@ -104,30 +113,29 @@ class HomeViewModel(
      */
     fun onRetrySummary() {
         if (summary.value is SummaryState.Error)
-            summaryRetries.tryEmit(Unit)
+            summaryTriggers.tryEmit(Trigger.Retry)
     }
 
     /**
      * Publishes the state of a region of the screen, computed by the given observation of the
      * collection. The observation is started with the region in the [loading] state, and moves
-     * to the [error] state if the collection cannot be read, which ends it. Each retry request
+     * to the [error] state if the collection cannot be read, which ends it. Each retry trigger
      * restarts the observation, moving the region back to [loading].
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun <S> regionState(
-        retries: Flow<Unit>,
+        triggers: Flow<Trigger>,
         loading: S,
         observe: () -> Flow<S>,
         error: (PersistenceException) -> S
     ): StateFlow<S> =
-        retries
-            .map { true }
-            // The first observation is not a retry: the region is already in the loading state,
-            // or keeps its last state if observation is being restarted
-            .onStart { emit(false) }
-            .flatMapLatest { isRetry ->
+        triggers
+            .onStart { emit(Trigger.Start) }
+            .flatMapLatest { trigger ->
                 observe()
-                    .onStart { if (isRetry) emit(loading) }
+                    // On start, the region is already in the loading state, or keeps its last
+                    // state if observation is being restarted
+                    .onStart { if (trigger == Trigger.Retry) emit(loading) }
                     .catch { if (it is PersistenceException) emit(error(it)) else throw it }
             }
             .stateIn(

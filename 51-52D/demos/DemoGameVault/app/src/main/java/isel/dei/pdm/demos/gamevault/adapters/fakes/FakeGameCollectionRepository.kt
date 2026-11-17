@@ -199,17 +199,7 @@ private fun CollectionEntry.meets(query: CollectionQuery): Boolean =
         (query.completion?.let { playStatus.meets(it) } ?: true) &&
         (query.platform?.let { isOwnedOn(it) } ?: true) &&
         (query.nameContains?.let { game.name.value.contains(it.value, ignoreCase = true) } ?: true) &&
-        (query.initial == null || game.name.value.initial() == query.initial)
-
-/**
- * The initial under which this name is listed, for alphabetical navigation.
- * DRAFT: Accents and leading articles are not taken into account yet, as the rules are still to
- * be decided (see [CollectionQuery.initial]).
- */
-private fun String.initial(): Char {
-    val first = trimStart().first().uppercaseChar()
-    return if (first in 'A'..'Z') first else CollectionQuery.OTHER_INITIAL
-}
+        (query.initial == null || CollectionQuery.initialOf(game.name) == query.initial)
 
 /**
  * Computes the summary of the given play statuses, following the domain rules (see

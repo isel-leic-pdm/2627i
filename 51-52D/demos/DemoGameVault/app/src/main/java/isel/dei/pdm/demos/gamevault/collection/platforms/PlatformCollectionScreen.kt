@@ -25,6 +25,7 @@ import isel.dei.pdm.demos.gamevault.collection.platforms.PlatformCollectionScree
 import isel.dei.pdm.demos.gamevault.domain.PersistenceException
 import isel.dei.pdm.demos.gamevault.domain.RecoverablePersistenceException
 import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
+import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.ui.common.ErrorViewOverlay
 
 /**
@@ -33,6 +34,8 @@ import isel.dei.pdm.demos.gamevault.ui.common.ErrorViewOverlay
  *
  * @param viewModel The view model for the screen.
  * @param onAddPlatform The callback to be invoked when the user requests to add a platform.
+ * @param onPlatformSelected The callback to be invoked when the user selects a platform of the
+ * collection (e.g. to browse its games).
  * @param onBack The callback to be invoked when the back button is pressed.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,6 +43,7 @@ import isel.dei.pdm.demos.gamevault.ui.common.ErrorViewOverlay
 fun PlatformCollectionScreen(
     viewModel: PlatformCollectionViewModel,
     onAddPlatform: () -> Unit,
+    onPlatformSelected: (Platform) -> Unit,
     onBack: () -> Unit
 ) {
     val currentState = viewModel.state.collectAsStateWithLifecycle().value
@@ -91,8 +95,7 @@ fun PlatformCollectionScreen(
             )
             else -> PlatformCollectionScreenView(
                 state = currentState,
-                // TODO: Navigate to list of games of the platform, once the screen exists
-                onPlatformSelected = { },
+                onPlatformSelected = onPlatformSelected,
                 modifier = contentModifier
             )
         }

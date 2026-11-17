@@ -7,6 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.CompositionLocalProvider
 import isel.dei.pdm.demos.gamevault.DependenciesContainer
+import isel.dei.pdm.demos.gamevault.collection.games.GameCollectionActivity
+import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionQuery
 import isel.dei.pdm.demos.gamevault.search.platforms.SearchForPlatformActivity
 import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
@@ -37,6 +39,9 @@ class PlatformCollectionActivity : ComponentActivity() {
                     PlatformCollectionScreen(
                         viewModel = viewModel,
                         onAddPlatform = { SearchForPlatformActivity.navigate(this) },
+                        onPlatformSelected = {
+                            GameCollectionActivity.navigate(this, CollectionQuery(platform = it))
+                        },
                         onBack = { finish() }
                     )
                 }

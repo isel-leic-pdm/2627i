@@ -122,6 +122,24 @@ class CollectionItemTests {
     }
 
     @Test
+    fun `names are listed under their first letter in upper case`() {
+        listOf("Elden Ring" to 'E', "celeste" to 'C', "  Hades II" to 'H', "Zelda" to 'Z')
+            .forEach { (name, initial) ->
+                assertEquals(initial, CollectionQuery.initialOf(NonBlankString(name)))
+            }
+    }
+
+    @Test
+    fun `names not starting with a letter from A to Z are listed under the other initial`() {
+        listOf("1080° Snowboarding", "#DRIVE", "Ōkami", ".hack//G.U.").forEach { name ->
+            assertEquals(
+                CollectionQuery.OTHER_INITIAL,
+                CollectionQuery.initialOf(NonBlankString(name))
+            )
+        }
+    }
+
+    @Test
     fun `CollectionQuery throws IllegalArgumentException when the initial is invalid`() {
         listOf('a', '1', '?', 'Ō').forEach { initial ->
             assertFailsWith<IllegalArgumentException> {

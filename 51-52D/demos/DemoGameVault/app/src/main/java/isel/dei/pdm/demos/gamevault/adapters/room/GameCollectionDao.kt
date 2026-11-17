@@ -88,7 +88,8 @@ abstract class GameCollectionDao {
      * @param initial Only games whose name is listed under this initial: an upper case letter,
      * or '#' for names starting with digits or symbols (see
      * [isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionQuery.OTHER_INITIAL]), or
-     * any initial if null.
+     * any initial if null. Consistent with the domain rule (see
+     * [isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionQuery.Companion.initialOf]).
      * @param limit The maximum number of items. To find out whether more games meet the
      * criteria, ask for one more item than needed.
      */

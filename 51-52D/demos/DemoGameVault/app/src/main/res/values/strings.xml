@@ -110,6 +110,12 @@
     <string name="collection_item_play_time">%1$d h</string>
     <string name="collection_item_play_time_minutes">%1$d min</string>
 
+    <string name="game_collection_title">Collection</string>
+    <string name="game_collection_back_description">Back</string>
+    <string name="game_collection_loading">Loading games…</string>
+    <string name="game_collection_error_message">Could not read your collection.</string>
+    <string name="game_collection_retry_button_label">Retry</string>
+
     <string name="collection_filters_description">Filters</string>
     <!-- Announced by accessibility services for the badge with the number of active filters -->
     <plurals name="collection_filters_active_description">
@@ -122,6 +128,12 @@
     <string name="collection_filters_title">Filters</string>
     <string name="collection_filters_status_title">Status</string>
     <string name="collection_filters_completion_title">Completion</string>
+
+    <!-- Announced by accessibility services for each initial of the collection's index -->
+    <string name="collection_index_jump_label">Jump to %1$s</string>
+    <string name="collection_empty">Your collection has no games yet.</string>
+    <string name="collection_no_matches">No games match the current search and filters.</string>
+    <string name="collection_clear_filters_label">Clear all</string>
 
     <!-- How far the user went in a game, whatever they are currently doing with it -->
     <string name="completion_not_finished">Not finished</string>

@@ -47,6 +47,7 @@ class PlatformCollectionScreenTest {
     private fun setScreenContent(
         repository: PlatformCollectionRepository = ScriptedPlatformCollectionRepository(),
         onAddPlatform: () -> Unit = {},
+        onPlatformSelected: (Platform) -> Unit = {},
         onBack: () -> Unit = {}
     ) {
         composeTestRule.setContent {
@@ -56,6 +57,7 @@ class PlatformCollectionScreenTest {
                 PlatformCollectionScreen(
                     viewModel = viewModel,
                     onAddPlatform = onAddPlatform,
+                    onPlatformSelected = onPlatformSelected,
                     onBack = onBack
                 )
             }
@@ -121,6 +123,19 @@ class PlatformCollectionScreenTest {
         )
 
         composeTestRule.onNodeWithText(SWITCH.name.value).assertIsDisplayed()
+    }
+
+    @Test
+    fun selecting_a_platform_triggers_onPlatformSelected_with_it() {
+        val selected = mutableListOf<Platform>()
+        setScreenContent(
+            repository = ScriptedPlatformCollectionRepository(initialPlatforms = listOf(SWITCH)),
+            onPlatformSelected = { selected += it }
+        )
+
+        composeTestRule.onNodeWithText(SWITCH.name.value).performClick()
+
+        assertEquals(listOf(SWITCH), selected)
     }
 
     // Errors

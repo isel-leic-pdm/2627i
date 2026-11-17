@@ -34,6 +34,7 @@ import isel.dei.pdm.demos.gamevault.ui.common.AddStatus
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -151,10 +152,17 @@ class SearchForGamesViewModel(
     private data class ItemKey(val gameId: Long, val platformId: Long)
 
     /**
-     * The requests to read the platforms: incremented to read them again, after reading them
-     * failed.
+     * What causes the platforms to be read: the start of their observation, whether the first or a
+     * restart (e.g. when the app returns from the background), or the user retrying after reading
+     * them failed.
      */
-    private val platformsReadAttempt = MutableStateFlow(0)
+    private enum class Trigger { Start, Retry }
+
+    /**
+     * The triggers of the reading of the platforms. Not replayed, so that restarting the
+     * observation is not taken for a retry.
+     */
+    private val platformsReadTriggers = MutableSharedFlow<Trigger>(extraBufferCapacity = 1)
 
     /**
      * The platforms of the user's collection games can be searched for (see
@@ -163,11 +171,14 @@ class SearchForGamesViewModel(
      * them observed on configuration changes, and adding up both timeouts would make the
      * observation last longer than intended.
      */
-    private val platforms: StateFlow<PlatformsRead> = platformsReadAttempt
-        .flatMapLatest {
+    private val platforms: StateFlow<PlatformsRead> = platformsReadTriggers
+        .onStart { emit(Trigger.Start) }
+        .flatMapLatest { trigger ->
             platformRepo.platforms
                 .map<List<Platform>, PlatformsRead> { PlatformsRead.Read(it.distinctGamePlatforms()) }
-                .onStart { emit(PlatformsRead.Reading) }
+                // On start, the platforms are already being read, or keep their last outcome if
+                // observation is being restarted
+                .onStart { if (trigger == Trigger.Retry) emit(PlatformsRead.Reading) }
                 .catch { error ->
                     if (error is PersistenceException) emit(PlatformsRead.Failed(error)) else throw error
                 }
@@ -318,7 +329,7 @@ class SearchForGamesViewModel(
      */
     fun onRetry() {
         when {
-            platforms.value is PlatformsRead.Failed -> platformsReadAttempt.update { it + 1 }
+            platforms.value is PlatformsRead.Failed -> platformsReadTriggers.tryEmit(Trigger.Retry)
             searchPhase.value is SearchPhase.Failed ->
                 _request.update { it?.copy(attempt = it.attempt + 1) }
         }
