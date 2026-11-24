@@ -10,22 +10,21 @@ import isel.dei.pdm.demos.gamevault.domain.NonBlankString
  * The details belong to the game, not to its collection entries: a game owned on several
  * platforms has a single set of details. They are either copied from the search service when the
  * game is added, as a convenience, or inserted by the user. Either way, they are the vault's, and
- * the user may edit them.
+ * the user may edit them. They are information about the game only: the user's notes about their
+ * play are the collection entry's (see [CollectionEntry.notes]).
  *
  * @property game The game these details refer to.
  * @property description A summary or description of the game, if available.
  * @property developers The developers of the game, in the order they are to be displayed.
  * @property publishers The publishers of the game, in the order they are to be displayed.
  * @property genres The genres of the game, in the order they are to be displayed.
- * @property notes The user's personal notes about the game, if any.
  */
 data class GameDetails(
     val game: Game,
     val description: NonBlankString? = null,
     val developers: List<NonBlankString> = emptyList(),
     val publishers: List<NonBlankString> = emptyList(),
-    val genres: List<NonBlankString> = emptyList(),
-    val notes: NonBlankString? = null
+    val genres: List<NonBlankString> = emptyList()
 ) {
     companion object {
         /**
@@ -47,15 +46,13 @@ data class GameDetails(
             description: String? = null,
             developers: List<String> = emptyList(),
             publishers: List<String> = emptyList(),
-            genres: List<String> = emptyList(),
-            notes: String? = null
+            genres: List<String> = emptyList()
         ): GameDetails = GameDetails(
             game = game,
             description = description?.let { NonBlankString(it) },
             developers = developers.map { NonBlankString(it) },
             publishers = publishers.map { NonBlankString(it) },
-            genres = genres.map { NonBlankString(it) },
-            notes = notes?.let { NonBlankString(it) }
+            genres = genres.map { NonBlankString(it) }
         )
     }
 }
@@ -68,18 +65,16 @@ data class GameDetails(
  * @property developers The developers of the game, in the order they are to be displayed.
  * @property publishers The publishers of the game, in the order they are to be displayed.
  * @property genres The genres of the game, in the order they are to be displayed.
- * @property notes The user's personal notes about the game, if any.
  */
 data class NewGameDetails(
     val description: NonBlankString? = null,
     val developers: List<NonBlankString> = emptyList(),
     val publishers: List<NonBlankString> = emptyList(),
-    val genres: List<NonBlankString> = emptyList(),
-    val notes: NonBlankString? = null
+    val genres: List<NonBlankString> = emptyList()
 ) {
     /**
      * The details of the given [game], once it was added to the vault.
      */
     fun toGameDetails(game: Game): GameDetails =
-        GameDetails(game, description, developers, publishers, genres, notes)
+        GameDetails(game, description, developers, publishers, genres)
 }

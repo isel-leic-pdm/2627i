@@ -43,7 +43,7 @@ class CollectionEntryTests {
     // Construction
 
     @Test
-    fun `CollectionEntry has default play status and no active session by default`() {
+    fun `CollectionEntry has default play status, no active session and no notes by default`() {
         // Act
         val entry = CollectionEntry(game, setOf(platform))
 
@@ -51,6 +51,7 @@ class CollectionEntryTests {
         assertEquals(PlayStatus(), entry.playStatus)
         assertNull(entry.sessionStartTime)
         assertFalse(entry.isSessionActive)
+        assertNull(entry.notes)
     }
 
     @Test
@@ -127,6 +128,28 @@ class CollectionEntryTests {
 
         // Assert
         assertEquals(entry, updated)
+    }
+
+    // What the play status allows, depending on the session
+
+    @Test
+    fun `canLeavePlaying holds only without an active session`() {
+        assertTrue(entry().canLeavePlaying)
+        assertFalse(entryInSession().canLeavePlaying)
+    }
+
+    @Test
+    fun `canBeFinished holds without an active session`() {
+        assertTrue(entry().canBeFinished)
+        assertTrue(entry(state = State.FINISHED, completedRuns = listOf(firstRun)).canBeFinished)
+    }
+
+    @Test
+    fun `canBeFinished holds during a session only if the game was already finished`() {
+        assertFalse(entryInSession().canBeFinished)
+        assertTrue(
+            entry(completedRuns = listOf(firstRun), sessionStartTime = sessionStart).canBeFinished
+        )
     }
 
     // Play status operations: each one updates the play status only

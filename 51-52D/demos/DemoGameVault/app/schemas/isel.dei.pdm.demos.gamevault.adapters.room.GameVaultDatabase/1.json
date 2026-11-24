@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "fb07c2d0181b6936c52a307c78f14be3",
+    "identityHash": "dbaf10ed381fc02452124e6e5018b846",
     "entities": [
       {
         "tableName": "platforms",
@@ -65,7 +65,7 @@
       },
       {
         "tableName": "games",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL COLLATE NOCASE, `release_date` TEXT, `cover_uri` TEXT, `thumbnail_uri` TEXT, `state` TEXT NOT NULL, `time_spent_minutes` INTEGER NOT NULL, `has_platinum` INTEGER NOT NULL, `platinum_on` TEXT, `added_at` INTEGER NOT NULL, `session_start_time` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL COLLATE NOCASE, `release_date` TEXT, `cover_uri` TEXT, `thumbnail_uri` TEXT, `state` TEXT NOT NULL, `time_spent_minutes` INTEGER NOT NULL, `has_platinum` INTEGER NOT NULL, `platinum_on` TEXT, `added_at` INTEGER NOT NULL, `session_start_time` INTEGER, `notes` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -127,6 +127,11 @@
             "fieldPath": "sessionStartTime",
             "columnName": "session_start_time",
             "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -281,7 +286,7 @@
       },
       {
         "tableName": "game_details",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`game_id` INTEGER NOT NULL, `description` TEXT, `developers` TEXT NOT NULL, `publishers` TEXT NOT NULL, `genres` TEXT NOT NULL, `notes` TEXT, PRIMARY KEY(`game_id`), FOREIGN KEY(`game_id`) REFERENCES `games`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`game_id` INTEGER NOT NULL, `description` TEXT, `developers` TEXT NOT NULL, `publishers` TEXT NOT NULL, `genres` TEXT NOT NULL, PRIMARY KEY(`game_id`), FOREIGN KEY(`game_id`) REFERENCES `games`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "gameId",
@@ -311,11 +316,6 @@
             "columnName": "genres",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "notes",
-            "columnName": "notes",
-            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -341,7 +341,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fb07c2d0181b6936c52a307c78f14be3')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dbaf10ed381fc02452124e6e5018b846')"
     ]
   }
 }

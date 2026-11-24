@@ -1,12 +1,15 @@
 package isel.dei.pdm.demos.gamevault.collection.games
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.EmojiEvents
@@ -25,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -54,21 +58,67 @@ fun PlayStateChip(state: PlayStatus.State, modifier: Modifier = Modifier) {
  * A small pill signaling that the game's platinum was obtained. It is styled like [PlayStateChip],
  * so that both can be displayed side by side.
  *
+ * It is only clickable if [onClick] is provided (e.g. to edit the platinum).
+ *
  * @param modifier The modifier to be applied to the layout.
+ * @param onClick Callback invoked when the user clicks the chip, or null if it is not clickable.
+ * @param onClickLabel The description of the click's action, for accessibility services.
+ * @param enabled Whether the chip can be clicked, if clickable.
  */
 @Composable
-fun PlatinumChip(modifier: Modifier = Modifier) {
+fun PlatinumChip(
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    onClickLabel: String? = null,
+    enabled: Boolean = true
+) {
     StatusChip(
         icon = PlatinumIcon,
         label = stringResource(R.string.accomplishment_platinum),
         color = platinumColor(),
+        onClick = onClick,
+        onClickLabel = onClickLabel,
+        enabled = enabled,
         modifier = modifier.testTag(PlayStateChipTestTags.PLATINUM_CHIP)
     )
 }
 
 /**
+ * A small outlined pill offering to register the platinum, while it has not been obtained. It
+ * is the counterpart of [PlatinumChip], which replaces it once the platinum is registered.
+ *
+ * @param onClick Callback invoked when the user clicks the chip.
+ * @param modifier The modifier to be applied to the layout.
+ * @param onClickLabel The description of the click's action, for accessibility services.
+ * @param enabled Whether the chip can be clicked.
+ */
+@Composable
+fun AddPlatinumChip(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    onClickLabel: String? = null,
+    enabled: Boolean = true
+) {
+    val color = MaterialTheme.colorScheme.onSurfaceVariant
+    StatusChip(
+        icon = Icons.Filled.Add,
+        label = stringResource(R.string.accomplishment_platinum),
+        color = color,
+        containerColor = Color.Transparent,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        onClick = onClick,
+        onClickLabel = onClickLabel,
+        enabled = enabled,
+        modifier = modifier.testTag(PlayStateChipTestTags.ADD_PLATINUM_CHIP)
+    )
+}
+
+/**
  * The pill shared by the status chips: an icon and a label, both tinted with the given [color],
- * on top of a translucent version of it.
+ * on top of a [containerColor] (by default, a translucent version of [color]).
+ *
+ * It is only clickable if [onClick] is provided. When it is clickable but not [enabled], its
+ * content is dimmed, as Material's disabled components are.
  */
 @Composable
 private fun StatusChip(
@@ -76,19 +126,36 @@ private fun StatusChip(
     label: String,
     color: Color,
     modifier: Modifier = Modifier,
+    containerColor: Color = color.copy(alpha = 0.12f),
+    border: BorderStroke? = null,
+    onClick: (() -> Unit)? = null,
+    onClickLabel: String? = null,
+    enabled: Boolean = true,
     iconSize: Dp = 16.dp,
     labelStyle: TextStyle = MaterialTheme.typography.labelSmall,
 ) {
+    val isDisabled = onClick != null && !enabled
     Surface(
         shape = MaterialTheme.shapes.medium,
-        color = color.copy(alpha = 0.12f),
-        contentColor = color,
+        color = containerColor,
+        contentColor = if (isDisabled) color.copy(alpha = DISABLED_CONTENT_ALPHA) else color,
+        border = border,
         modifier = modifier
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            modifier = Modifier
+                .then(
+                    if (onClick == null) Modifier
+                    else Modifier.clickable(
+                        enabled = enabled,
+                        onClickLabel = onClickLabel,
+                        role = Role.Button,
+                        onClick = onClick
+                    )
+                )
+                .padding(horizontal = 8.dp, vertical = 4.dp)
         ) {
             Icon(
                 imageVector = icon,
@@ -103,6 +170,11 @@ private fun StatusChip(
         }
     }
 }
+
+/**
+ * The opacity of the content of disabled chips, as in Material's disabled components.
+ */
+private const val DISABLED_CONTENT_ALPHA = 0.38f
 
 /**
  * The icon used to signal the platinum.
@@ -161,6 +233,7 @@ fun PlayStatus.State.color(): Color =
 object PlayStateChipTestTags {
     const val CHIP = "PlayStateChip"
     const val PLATINUM_CHIP = "PlatinumChip"
+    const val ADD_PLATINUM_CHIP = "AddPlatinumChip"
 }
 
 @Suppress("Unused")
@@ -176,6 +249,7 @@ class PlayStateChipPreviews {
             ) {
                 PlayStatus.State.entries.forEach { PlayStateChip(state = it) }
                 PlatinumChip()
+                AddPlatinumChip(onClick = {})
             }
         }
     }

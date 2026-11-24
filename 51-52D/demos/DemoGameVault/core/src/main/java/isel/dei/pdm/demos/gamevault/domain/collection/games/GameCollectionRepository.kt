@@ -146,7 +146,8 @@ interface GameCollectionRepository {
     suspend fun updateGame(game: Game): Boolean
 
     /**
-     * Updates the details of the given game (e.g. after the user edited their notes).
+     * Updates the details of the given game (e.g. after the user edited its description). The
+     * user's notes are the entry's, so they are updated through [updateEntry] instead.
      * @param details The updated details, identified by their game's identifier.
      * @return Whether the details were updated (false if the game is not in the collection).
      * @throws PersistenceException If the details cannot be stored.

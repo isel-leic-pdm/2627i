@@ -227,7 +227,10 @@ class SearchForPlatformViewModel(
                 _searchState.value = Search(query, isIndicatorVisible = true)
             }
             val outcome = try {
-                Results(query, searchService.search(query).map { PlatformSearchItemUiState(it) })
+                Results(
+                    query,
+                    searchService.search(query).map { PlatformSearchItemUiState(it) }
+                )
             } catch (e: SearchServiceException) {
                 Error(query, e)
             }

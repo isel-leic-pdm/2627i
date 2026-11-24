@@ -1,5 +1,6 @@
 package isel.dei.pdm.demos.gamevault.domain.collection.games
 
+import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.distinctGamePlatforms
 import kotlinx.datetime.LocalDate
@@ -25,6 +26,9 @@ import kotlin.time.Instant
  * ending it adds the elapsed time to the time spent playing. Only the total is kept. Play time
  * may also be added directly (e.g. if the user forgot to start a session).
  *
+ * The user's notes are the entry's, as they are about the user's play (e.g. where they stopped),
+ * not about the game, whose information is kept apart (see [GameDetails]).
+ *
  * @property game The catalog game entry.
  * @property platforms The platforms the game is owned on, in no particular order. There is
  * at least one, and no two of them are versions of the same platform (see [isOwnedOn]). Each one
@@ -34,13 +38,15 @@ import kotlin.time.Instant
  * @property addedAt The date the game was added to the collection.
  * @property sessionStartTime The time when the current play session started, or null if no
  * session is active. While a session is active, the game is in the PLAYING state.
+ * @property notes The user's personal notes about their play (e.g. where they stopped), if any.
  */
 data class CollectionEntry(
     val game: Game,
     val platforms: Set<Platform>,
     val playStatus: PlayStatus = PlayStatus(),
     val addedAt: Instant = Clock.System.now(),
-    val sessionStartTime: Instant? = null
+    val sessionStartTime: Instant? = null,
+    val notes: NonBlankString? = null
 ) {
     init {
         require(platforms.isNotEmpty()) { "The game must be owned on at least one platform" }
@@ -57,6 +63,23 @@ data class CollectionEntry(
      */
     val isSessionActive: Boolean
         get() = sessionStartTime != null
+
+    /**
+     * Whether the game can leave the PLAYING state, which it cannot while a play session is
+     * active (it must be ended first). Other states can always be set as long as this holds,
+     * subject to the play status requirements (see [PlayStatus.updateState]).
+     */
+    val canLeavePlaying: Boolean
+        get() = !isSessionActive
+
+    /**
+     * Whether the game can be finished, i.e. whether a completed run or the platinum (which
+     * implies one) can be registered. The first completed run makes the game FINISHED, so it
+     * cannot be registered while a play session is active (it must be ended first). Once finished,
+     * the game can be replayed, so further runs can always be registered.
+     */
+    val canBeFinished: Boolean
+        get() = !isSessionActive || playStatus.isFinished
 
     /**
      * Checks whether the game is owned on the given platform, regardless of its version (see
@@ -88,7 +111,7 @@ data class CollectionEntry(
      * requirements (see [PlayStatus.updateState]).
      */
     fun updateStatus(newState: PlayStatus.State): CollectionEntry {
-        check(!isSessionActive || newState == PlayStatus.State.PLAYING) {
+        check(canLeavePlaying || newState == PlayStatus.State.PLAYING) {
             "The game cannot leave the PLAYING state while a play session is active"
         }
         return copy(playStatus = playStatus.updateState(newState))
@@ -119,12 +142,11 @@ data class CollectionEntry(
     }
 
     /**
-     * Checks that the game is not about to be finished for the first time while a session is
-     * active: the first completed run makes it FINISHED, so the session must be ended first.
+     * Checks that the game can be finished (see [canBeFinished]).
      * @throws IllegalStateException If no run was completed yet and a session is active.
      */
     private fun checkNotFinishingDuringSession() {
-        check(!isSessionActive || playStatus.isFinished) {
+        check(canBeFinished) {
             "The game cannot be finished for the first time while a play session is active"
         }
     }

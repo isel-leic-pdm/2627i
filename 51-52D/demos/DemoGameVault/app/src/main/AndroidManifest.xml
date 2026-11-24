@@ -32,6 +32,7 @@
         <activity android:name=".search.games.SearchForGamesActivity" android:exported="true" />
         <activity android:name=".collection.platforms.PlatformCollectionActivity" android:exported="true" />
         <activity android:name=".collection.games.GameCollectionActivity" android:exported="true" />
+        <activity android:name=".collection.games.details.GameDetailsActivity" android:exported="false" />
     </application>
 
 </manifest>

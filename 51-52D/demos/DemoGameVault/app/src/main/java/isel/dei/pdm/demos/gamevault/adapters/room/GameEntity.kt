@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.collection.games.Accomplishment
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionEntry
 import isel.dei.pdm.demos.gamevault.domain.collection.games.Game
@@ -18,7 +19,7 @@ import kotlin.time.Instant
 
 /**
  * The database representation of a game in the user's collection, along with its collection
- * entry's scalar information (play state, time spent, platinum, session).
+ * entry's scalar information (play state, time spent, platinum, session, notes).
  *
  * The collection has exactly one entry per game, and removing the entry removes the game, so both
  * are stored in the same row: the one-to-one relation is enforced by the schema itself, and the
@@ -50,6 +51,7 @@ import kotlin.time.Instant
  * @property addedAt The instant the game was added to the collection.
  * @property sessionStartTime The instant the active play session started, or null if no session
  * is active.
+ * @property notes The user's personal notes about their play, if any.
  */
 @Entity(
     tableName = "games",
@@ -83,7 +85,8 @@ data class GameEntity(
     @ColumnInfo(name = "added_at")
     val addedAt: Instant,
     @ColumnInfo(name = "session_start_time")
-    val sessionStartTime: Instant?
+    val sessionStartTime: Instant?,
+    val notes: String?
 )
 
 /**
@@ -102,7 +105,8 @@ fun NewGame.toEntity(playStatus: PlayStatus, addedAt: Instant): GameEntity = Gam
     hasPlatinum = playStatus.platinum != null,
     platinumOn = playStatus.platinum?.achievedOn,
     addedAt = addedAt,
-    sessionStartTime = null
+    sessionStartTime = null,
+    notes = null
 )
 
 /**
@@ -120,7 +124,8 @@ fun CollectionEntry.toEntity(): GameEntity = GameEntity(
     hasPlatinum = playStatus.platinum != null,
     platinumOn = playStatus.platinum?.achievedOn,
     addedAt = addedAt,
-    sessionStartTime = sessionStartTime
+    sessionStartTime = sessionStartTime,
+    notes = notes?.value
 )
 
 /**
@@ -155,7 +160,8 @@ fun GameEntity.toCollectionEntry(
         platinum = toPlatinum()
     ),
     addedAt = addedAt,
-    sessionStartTime = sessionStartTime
+    sessionStartTime = sessionStartTime,
+    notes = notes?.let { NonBlankString(it) }
 )
 
 /**

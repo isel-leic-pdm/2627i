@@ -177,8 +177,7 @@ class FakeGameCollectionRepository(
             description = details.description,
             developers = details.developers,
             publishers = details.publishers,
-            genres = details.genres,
-            notes = details.notes
+            genres = details.genres
         )
         collection.value += gameId to stored.copy(details = newDetails)
         return true

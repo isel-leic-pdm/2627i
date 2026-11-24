@@ -18,6 +18,14 @@ data class PlayTime(val hours: Int = 0, val minutes: Int = 0) {
     }
 
     /**
+     * Whether no time at all was recorded. It typically means that the play time is unknown
+     * (e.g. for a game finished before the user adopted the app), rather than that the game was
+     * not played.
+     */
+    val isNotRecorded: Boolean
+        get() = hours == 0 && minutes == 0
+
+    /**
      * Converts this play time to a [Duration].
      */
     fun toDuration(): Duration = hours.hours + minutes.minutes

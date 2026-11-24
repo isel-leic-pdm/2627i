@@ -11,6 +11,7 @@ import isel.dei.pdm.demos.gamevault.collection.games.GameCollectionViewModel.Com
 import isel.dei.pdm.demos.gamevault.collection.games.GameCollectionViewModel.Companion.NAME_KEY
 import isel.dei.pdm.demos.gamevault.collection.games.GameCollectionViewModel.Companion.PLATFORM_KEY
 import isel.dei.pdm.demos.gamevault.collection.games.GameCollectionViewModel.Companion.STATE_KEY
+import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsActivity
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionQuery
 import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
@@ -46,7 +47,8 @@ class GameCollectionActivity : ComponentActivity() {
                 DemoGameVaultTheme {
                     GameCollectionScreen(
                         viewModel = viewModel,
-                        onBack = { finish() }
+                        onBack = { finish() },
+                        onGameSelected = { GameDetailsActivity.navigate(this, it.gameId) }
                     )
                 }
             }

@@ -116,20 +116,24 @@ internal fun gameDetailsQuery(gameId: Long): String =
     """.trimIndent()
 
 /**
+ * The fields of IGDB's platforms holding the names a platform is known by.
+ */
+private val PLATFORM_NAME_FIELDS = listOf("name", "abbreviation", "alternative_name")
+
+/**
  * The Apicalypse condition that matches the games released for any of the given platforms: those
  * with a platform whose name, abbreviation or alternative name is equal, ignoring case, to the
- * name or abbreviation of one of the given platforms.
+ * name or abbreviation of one of the given platforms (see [PlatformCriterion.matches]).
  */
-private fun platformsCondition(platforms: List<PlatformCriterion>): String =
-    platforms
-        .flatMap { listOf(it.name.value, it.abbreviation.value) }
-        .map { it.trim().escapeForApicalypse() }
+private fun platformsCondition(platforms: List<PlatformCriterion>): String {
+    val names = platforms
+        .flatMap { listOf(it.name, it.abbreviation) }
+        .map { it.value.trim().escapeForApicalypse() }
         .distinct()
-        .flatMap { platformName ->
-            listOf("name", "abbreviation", "alternative_name")
-                .map { field -> """platforms.$field ~ "$platformName"""" }
-        }
+    return names
+        .flatMap { name -> PLATFORM_NAME_FIELDS.map { field -> """platforms.$field ~ "$name"""" } }
         .joinToString(" | ")
+}
 
 /**
  * Escapes the characters that have a special meaning inside Apicalypse strings, so that the

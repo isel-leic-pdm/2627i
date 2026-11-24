@@ -29,7 +29,6 @@ import kotlinx.serialization.json.Json
  * @property developers The developers of the game, in the order they are to be displayed.
  * @property publishers The publishers of the game, in the order they are to be displayed.
  * @property genres The genres of the game, in the order they are to be displayed.
- * @property notes The user's personal notes about the game, if any.
  */
 @Entity(
     tableName = "game_details",
@@ -50,8 +49,7 @@ data class GameDetailsEntity(
     val description: String?,
     val developers: List<String>,
     val publishers: List<String>,
-    val genres: List<String>,
-    val notes: String?
+    val genres: List<String>
 )
 
 /**
@@ -63,8 +61,7 @@ fun NewGameDetails.toEntity(gameId: Long): GameDetailsEntity = GameDetailsEntity
     description = description?.value,
     developers = developers.map { it.value },
     publishers = publishers.map { it.value },
-    genres = genres.map { it.value },
-    notes = notes?.value
+    genres = genres.map { it.value }
 )
 
 /**
@@ -75,8 +72,7 @@ fun GameDetails.toEntity(): GameDetailsEntity = GameDetailsEntity(
     description = description?.value,
     developers = developers.map { it.value },
     publishers = publishers.map { it.value },
-    genres = genres.map { it.value },
-    notes = notes?.value
+    genres = genres.map { it.value }
 )
 
 /**
@@ -91,8 +87,7 @@ fun GameDetailsEntity.toGameDetails(game: Game): GameDetails {
         description = description?.let { NonBlankString(it) },
         developers = developers.map { NonBlankString(it) },
         publishers = publishers.map { NonBlankString(it) },
-        genres = genres.map { NonBlankString(it) },
-        notes = notes?.let { NonBlankString(it) }
+        genres = genres.map { NonBlankString(it) }
     )
 }
 

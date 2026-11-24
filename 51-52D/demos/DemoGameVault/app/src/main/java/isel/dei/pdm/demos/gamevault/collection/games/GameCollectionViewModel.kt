@@ -81,6 +81,7 @@ class GameCollectionViewModel(
      * identified by its identifier, as the platforms are not known when the criteria are
      * restored (see [queryOf]).
      */
+    // TODO: Make this Parcelable
     private data class Criteria(
         val state: PlayStatus.State? = null,
         val completion: Completion? = null,

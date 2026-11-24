@@ -116,6 +116,39 @@
     <string name="game_collection_error_message">Could not read your collection.</string>
     <string name="game_collection_retry_button_label">Retry</string>
 
+    <string name="game_details_title">Game Details</string>
+    <string name="game_details_loading">Loading game details…</string>
+    <string name="game_details_error_message">Could not read the game.</string>
+    <string name="game_details_retry_button_label">Retry</string>
+    <string name="game_details_back_description">Back</string>
+    <string name="game_details_remove_description">Remove from collection</string>
+    <string name="game_details_play_status_label">Play Status</string>
+    <string name="game_details_play_status_edit_description">Change play status</string>
+    <string name="game_details_play_time_label">Play Time</string>
+    <string name="game_details_play_time_edit_description">Edit play time</string>
+    <string name="game_details_play_time_hours">%1$d h</string>
+    <string name="game_details_play_time_minutes">%1$d min</string>
+    <!-- Displayed instead of the play time when there is none, as it was typically not recorded -->
+    <string name="game_details_play_time_not_recorded">Not recorded</string>
+    <string name="game_details_play_time_hours_and_minutes">%1$d h %2$d min</string>
+    <string name="game_details_completed_runs_label">Completed Runs</string>
+    <string name="game_details_completed_runs_add_description">Add completed run</string>
+    <string name="game_details_platinum_add_description">Register platinum</string>
+    <string name="game_details_platinum_edit_description">Edit platinum</string>
+    <string name="game_details_released">Released: %1$s</string>
+    <string name="game_details_added_on">Added on: %1$s</string>
+    <string name="game_details_start_playing">Start Playing</string>
+    <string name="game_details_stop_playing">Stop Playing</string>
+    <string name="game_details_playing_for">Playing for %1$s</string>
+    <string name="game_details_session_just_started">Just started</string>
+    <string name="game_details_history_title">History</string>
+    <string name="game_details_history_run">Run %1$d</string>
+    <string name="game_details_history_date_unknown">Date unknown</string>
+    <string name="game_details_history_empty">No completed runs yet</string>
+    <string name="game_details_notes_title">Notes</string>
+    <string name="game_details_notes_edit_description">Edit notes</string>
+    <string name="game_details_notes_empty">Add notes about your playthrough</string>
+
     <string name="collection_filters_description">Filters</string>
     <!-- Announced by accessibility services for the badge with the number of active filters -->
     <plurals name="collection_filters_active_description">

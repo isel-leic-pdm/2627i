@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import isel.dei.pdm.demos.gamevault.DependenciesContainer
 import isel.dei.pdm.demos.gamevault.collection.games.GameCollectionActivity
+import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsActivity
 import isel.dei.pdm.demos.gamevault.collection.games.filters.toQuery
 import isel.dei.pdm.demos.gamevault.collection.platforms.PlatformCollectionActivity
 import isel.dei.pdm.demos.gamevault.search.games.SearchForGamesActivity
@@ -39,6 +40,7 @@ class HomeActivity : ComponentActivity() {
                     onOpenSettings = { SettingsActivity.navigate(this) },
                     onOpenPlatforms = { PlatformCollectionActivity.navigate(this) },
                     onAddGame = { SearchForGamesActivity.navigate(this) },
+                    onGameSelected = { GameDetailsActivity.navigate(this, it.gameId) },
                     onFilterSelected = { GameCollectionActivity.navigate(this, it.toQuery()) },
                     onBrowseAll = { GameCollectionActivity.navigate(this) }
                 )

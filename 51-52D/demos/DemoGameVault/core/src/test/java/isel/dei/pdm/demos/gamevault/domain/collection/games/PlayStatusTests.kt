@@ -64,6 +64,17 @@ class PlayStatusTests {
     }
 
     @Test
+    fun `PlayTime is not recorded when zero`() {
+        assertTrue(PlayTime().isNotRecorded)
+    }
+
+    @Test
+    fun `PlayTime is recorded when it has hours or minutes`() {
+        assertFalse(PlayTime(hours = 1).isNotRecorded)
+        assertFalse(PlayTime(minutes = 1).isNotRecorded)
+    }
+
+    @Test
     fun `PlayTime converts to the corresponding duration`() {
         assertEquals(42.hours + 10.minutes, PlayTime(42, 10).toDuration())
     }

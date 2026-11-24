@@ -19,8 +19,7 @@ class GameDetailsTests {
             description = "An action RPG set in the Lands Between",
             developers = listOf("FromSoftware"),
             publishers = listOf("Bandai Namco", "FromSoftware"),
-            genres = listOf("Action", "RPG"),
-            notes = "Lent the disc to João"
+            genres = listOf("Action", "RPG")
         )
 
         // Assert
@@ -29,8 +28,7 @@ class GameDetailsTests {
             description = NonBlankString("An action RPG set in the Lands Between"),
             developers = listOf(NonBlankString("FromSoftware")),
             publishers = listOf(NonBlankString("Bandai Namco"), NonBlankString("FromSoftware")),
-            genres = listOf(NonBlankString("Action"), NonBlankString("RPG")),
-            notes = NonBlankString("Lent the disc to João")
+            genres = listOf(NonBlankString("Action"), NonBlankString("RPG"))
         )
         assertEquals(expected, details)
     }
@@ -47,17 +45,10 @@ class GameDetailsTests {
         }
     }
 
-    @Test
-    fun `of throws IllegalArgumentException when notes are blank`() {
-        assertFailsWith<IllegalArgumentException> {
-            GameDetails.of(game, notes = "   ")
-        }
-    }
-
     // NewGameDetails
 
     @Test
-    fun `NewGameDetails has no details nor notes by default`() {
+    fun `NewGameDetails has no details by default`() {
         assertEquals(GameDetails(game), NewGameDetails().toGameDetails(game))
     }
 
@@ -68,8 +59,7 @@ class GameDetailsTests {
             description = NonBlankString("An action RPG"),
             developers = listOf(NonBlankString("FromSoftware")),
             publishers = listOf(NonBlankString("Bandai Namco")),
-            genres = listOf(NonBlankString("RPG")),
-            notes = NonBlankString("Try a magic build")
+            genres = listOf(NonBlankString("RPG"))
         )
 
         // Act
@@ -81,8 +71,7 @@ class GameDetailsTests {
             description = newDetails.description,
             developers = newDetails.developers,
             publishers = newDetails.publishers,
-            genres = newDetails.genres,
-            notes = newDetails.notes
+            genres = newDetails.genres
         )
         assertEquals(expected, details)
     }
