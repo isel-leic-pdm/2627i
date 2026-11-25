@@ -38,7 +38,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.first
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -94,7 +96,9 @@ class GameDetailsScreenTest {
                 GameDetailsScreen(
                     viewModel = viewModel,
                     onBack = onBack,
-                    onGameNotFound = { notFoundReports++ }
+                    onGameNotFound = { notFoundReports++ },
+                    // Without preconditions (e.g. permissions), which are up to the activity
+                    onStartSession = viewModel::onStartSession
                 )
             }
         }
@@ -206,6 +210,24 @@ class GameDetailsScreenTest {
     }
 
     @Test
+    fun the_stop_dialog_of_a_session_stopped_elsewhere_is_not_displayed_for_the_next_one() {
+        val repository = FakeGameCollectionRepository(listOf(entryInSession(72.minutes)))
+        setScreenContent(gameRepository = repository)
+        composeTestRule.onNodeWithTag(PlaySessionBarTestTags.STOP_BUTTON).performClick()
+        composeTestRule.onNodeWithTag(StopSessionDialogTestTags.DIALOG).assertIsDisplayed()
+
+        // On the main thread, as the fake repository expects (its operations do not suspend)
+        composeTestRule.runOnUiThread {
+            runBlocking { repository.updateEntry(ELDEN_RING.id) { it.cancelSession() } }
+        }
+        composeTestRule.onNodeWithTag(StopSessionDialogTestTags.DIALOG).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(PlaySessionBarTestTags.START_BUTTON).performClick()
+
+        composeTestRule.onNodeWithTag(PlaySessionBarTestTags.STOP_BUTTON).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(StopSessionDialogTestTags.DIALOG).assertDoesNotExist()
+    }
+
+    @Test
     fun stopping_a_short_session_asks_whether_to_register_it() {
         setScreenContent(
             gameRepository = FakeGameCollectionRepository(listOf(entryInSession(2.minutes)))
@@ -220,10 +242,8 @@ class GameDetailsScreenTest {
     @Test
     fun going_back_during_a_session_asks_to_stop_it_and_leaves_once_stopped() {
         var backReports = 0
-        setScreenContent(
-            gameRepository = FakeGameCollectionRepository(listOf(entryInSession(72.minutes))),
-            onBack = { backReports++ }
-        )
+        val repository = FakeGameCollectionRepository(listOf(entryInSession(72.minutes)))
+        setScreenContent(gameRepository = repository, onBack = { backReports++ })
 
         composeTestRule.onNodeWithTag(BACK_BUTTON).performClick()
         composeTestRule
@@ -235,7 +255,10 @@ class GameDetailsScreenTest {
         composeTestRule.waitForIdle()
 
         assertEquals(1, backReports)
-        composeTestRule.onNodeWithTag(PlaySessionBarTestTags.START_BUTTON).assertIsDisplayed()
+        // While closing, the screen has nothing left to display
+        composeTestRule.onNodeWithTag(GameDetailsScreenViewTestTags.LOADING).assertIsDisplayed()
+        val stored = runBlocking { repository.observeEntry(ELDEN_RING.id).first() }
+        assertFalse(checkNotNull(stored).isSessionActive)
     }
 
     @Test
@@ -275,7 +298,7 @@ class GameDetailsScreenTest {
         composeTestRule.onNodeWithTag(PlaySessionBarTestTags.START_BUTTON).performClick()
 
         composeTestRule
-            .onNodeWithText(context.getString(R.string.game_details_session_failure))
+            .onNodeWithText(context.getString(R.string.game_details_start_session_failure))
             .assertIsDisplayed()
         composeTestRule.onNodeWithTag(PlaySessionBarTestTags.START_BUTTON).assertIsDisplayed()
     }

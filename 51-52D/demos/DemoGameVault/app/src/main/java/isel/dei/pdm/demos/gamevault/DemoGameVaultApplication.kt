@@ -18,6 +18,7 @@ import isel.dei.pdm.demos.gamevault.adapters.images.HttpImageSource
 import isel.dei.pdm.demos.gamevault.adapters.images.SchemeImageSource
 import isel.dei.pdm.demos.gamevault.adapters.images.cachingImageLoader
 import isel.dei.pdm.demos.gamevault.adapters.images.createImageHttpClient
+import isel.dei.pdm.demos.gamevault.adapters.notifications.AndroidPlaySessionNotifier
 import isel.dei.pdm.demos.gamevault.adapters.room.GameVaultDatabase
 import isel.dei.pdm.demos.gamevault.adapters.room.RoomGameCollectionRepository
 import isel.dei.pdm.demos.gamevault.adapters.room.RoomPlatformCollectionRepository
@@ -27,6 +28,7 @@ import isel.dei.pdm.demos.gamevault.domain.search.CredentialsRepository
 import isel.dei.pdm.demos.gamevault.domain.search.games.GameSearchService
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformSearchService
 import isel.dei.pdm.demos.gamevault.images.ImageLoader
+import isel.dei.pdm.demos.gamevault.sessions.PlaySessionNotifier
 import java.io.File
 
 /**
@@ -125,5 +127,9 @@ class DemoGameVaultApplication : DependenciesContainer, Application() {
 
     override val gameCollectionRepository: GameCollectionRepository by lazy {
         RoomGameCollectionRepository(database = database)
+    }
+
+    override val playSessionNotifier: PlaySessionNotifier by lazy {
+        AndroidPlaySessionNotifier(context = this)
     }
 }

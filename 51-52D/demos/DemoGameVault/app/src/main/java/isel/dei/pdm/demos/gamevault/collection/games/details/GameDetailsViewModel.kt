@@ -7,10 +7,10 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsScreenState.Closed
 import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsScreenState.Displaying
 import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsScreenState.Error
 import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsScreenState.Loading
-import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsScreenState.NotFound
 import isel.dei.pdm.demos.gamevault.domain.PersistenceException
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionEntry
 import isel.dei.pdm.demos.gamevault.domain.collection.games.GameCollectionRepository
@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -42,7 +43,8 @@ import kotlin.time.Duration.Companion.seconds
  * [GAME_ID_KEY] (e.g. passed by the screens that navigate to it). Its entry, which holds all that
  * the screen displays, the user's notes included, is observed, so that the screen reflects every
  * change to it (e.g. made through this screen). If the game is not in the collection (e.g. it was
- * just removed), the screen moves to [NotFound].
+ * just removed), the screen is [Closed], as it also is once the user leaves it (see
+ * [onStopSession]), so that closing the screen is signalled in a single way.
  *
  * While a play session is active, the time elapsed since it started is kept up to date: it is
  * recomputed whenever a whole minute elapses, as it is displayed in whole minutes (see
@@ -83,7 +85,13 @@ class GameDetailsViewModel(
     private val triggers = MutableSharedFlow<Trigger>(extraBufferCapacity = 1)
 
     /**
-     * The state of the screen.
+     * Whether the user left the screen, once its play session was stopped (see [onStopSession]).
+     * Declared before [state], which depends on it.
+     */
+    private val hasLeft = MutableStateFlow(false)
+
+    /**
+     * The state of the screen. Once the user leaves it, it is [Closed], whatever the game's state.
      */
     val state: StateFlow<GameDetailsScreenState> = triggers
         .onStart { emit(Trigger.Start) }
@@ -93,6 +101,9 @@ class GameDetailsViewModel(
                 // is being restarted
                 .onStart { if (trigger == Trigger.Retry) emit(Loading) }
                 .catch { if (it is PersistenceException) emit(Error(it)) else throw it }
+        }
+        .combine(hasLeft) { observed, hasLeft ->
+            if (hasLeft) Closed(Closed.Reason.LEFT) else observed
         }
         .stateIn(
             scope = viewModelScope,
@@ -111,13 +122,13 @@ class GameDetailsViewModel(
             triggers.tryEmit(Trigger.Retry)
     }
 
-    private val _actionFailure = MutableStateFlow<PersistenceException?>(null)
+    private val _actionFailure = MutableStateFlow<GameActionFailure?>(null)
 
     /**
      * The failure of the last action on the game (e.g. starting a session), to be shown to the
      * user, or null if there is none to show. Once shown, [onActionFailureShown] must be invoked.
      */
-    val actionFailure: StateFlow<PersistenceException?> = _actionFailure.asStateFlow()
+    val actionFailure: StateFlow<GameActionFailure?> = _actionFailure.asStateFlow()
 
     /**
      * Implementation of the state transition that results from the action failure having been
@@ -126,15 +137,6 @@ class GameDetailsViewModel(
     fun onActionFailureShown() {
         _actionFailure.value = null
     }
-
-    private val _isReadyToLeave = MutableStateFlow(false)
-
-    /**
-     * Whether the screen can be left, as asked by the user, once the active session was stopped
-     * (see [onStopSession]). The session must be stopped before the screen is left, as it is
-     * bound to the screen.
-     */
-    val isReadyToLeave: StateFlow<Boolean> = _isReadyToLeave.asStateFlow()
 
     /**
      * Starts a play session of the game, now. The screen reflects it once stored, as the game is
@@ -149,13 +151,13 @@ class GameDetailsViewModel(
         viewModelScope.launch {
             try {
                 // The remaining outcomes require no action: if the game is not in the collection,
-                // the screen moves to NotFound, and the session of another game cannot be active,
+                // the screen is closed, and the session of another game cannot be active,
                 // as the screen cannot be left without stopping it (see onStopSession).
                 // DRAFT: Sessions left active otherwise (e.g. if the app is left through the home
                 // button) are yet to be dealt with.
                 gameRepo.startSession(gameId, clock.now())
             } catch (e: PersistenceException) {
-                _actionFailure.value = e
+                _actionFailure.value = GameActionFailure(GameActionFailure.Action.START_SESSION, e)
             }
         }
     }
@@ -164,8 +166,8 @@ class GameDetailsViewModel(
      * Stops the active play session, now, either registering it (i.e. adding the elapsed time to
      * the time spent playing) or discarding it (e.g. if short, see [Displaying.isSessionShort]).
      * The screen reflects it once stored, as the game is observed. If [leave] is true, the screen
-     * becomes [isReadyToLeave] once the session is stopped. If stopping it fails, the failure is
-     * published in [actionFailure], and the screen is not left.
+     * is [Closed] once the session is stopped, as the session is bound to the screen. If stopping
+     * it fails, the failure is published in [actionFailure], and the screen is not left.
      * If the current state is not [Displaying], or no session is active, no action is taken. It
      * relies on [state] being collected, which is the case when invoked from the UI.
      * @param register Whether the session is registered, or discarded.
@@ -181,9 +183,9 @@ class GameDetailsViewModel(
                     if (register) it.endSessionNow() else it.cancelSession()
                 }
                 if (leave)
-                    _isReadyToLeave.value = true
+                    hasLeft.value = true
             } catch (e: PersistenceException) {
-                _actionFailure.value = e
+                _actionFailure.value = GameActionFailure(GameActionFailure.Action.STOP_SESSION, e)
             }
         }
     }
@@ -199,12 +201,12 @@ class GameDetailsViewModel(
 
     /**
      * The states of the screen while observing the game: [Displaying] it, with the time elapsed
-     * since its session started, if any, or [NotFound] if it is not in the collection. Whenever
+     * since its session started, if any, or [Closed] if it is not in the collection. Whenever
      * the entry changes, the elapsed time is recomputed from it.
      */
     private fun observeGame(): Flow<GameDetailsScreenState> =
         gameRepo.observeEntry(gameId).flatMapLatest { entry ->
-            if (entry == null) flowOf(NotFound)
+            if (entry == null) flowOf(Closed(Closed.Reason.GAME_NOT_FOUND))
             else displaying(entry)
         }
 

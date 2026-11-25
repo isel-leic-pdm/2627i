@@ -3,6 +3,7 @@ package isel.dei.pdm.demos.gamevault.collection.games.details
 import androidx.lifecycle.SavedStateHandle
 import isel.dei.pdm.demos.gamevault.MainDispatcherRule
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeGameCollectionRepository
+import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsScreenState.Closed
 import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsScreenState.Displaying
 import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsViewModel.Companion.GAME_ID_KEY
 import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsViewModel.Companion.STOP_TIMEOUT
@@ -21,6 +22,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -36,6 +38,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -163,7 +166,7 @@ class GameDetailsViewModelTest {
     }
 
     @Test
-    fun game_not_in_the_collection_is_not_found() = runTest {
+    fun game_not_in_the_collection_closes_the_screen() = runTest {
         // Arrange
         val viewModel = viewModel(gameRepo = FakeGameCollectionRepository())
 
@@ -171,11 +174,11 @@ class GameDetailsViewModelTest {
         collectStates(viewModel)
 
         // Assert
-        assertSame(GameDetailsScreenState.NotFound, viewModel.state.value)
+        assertEquals(Closed(Closed.Reason.GAME_NOT_FOUND), viewModel.state.value)
     }
 
     @Test
-    fun removing_the_game_moves_to_not_found() = runTest {
+    fun removing_the_game_closes_the_screen() = runTest {
         // Arrange
         val repository = FakeGameCollectionRepository(listOf(entry()))
         val viewModel = viewModel(gameRepo = repository)
@@ -185,7 +188,7 @@ class GameDetailsViewModelTest {
         repository.remove(game.id)
 
         // Assert
-        assertSame(GameDetailsScreenState.NotFound, viewModel.state.value)
+        assertEquals(Closed(Closed.Reason.GAME_NOT_FOUND), viewModel.state.value)
     }
 
     // Session elapsed time
@@ -349,7 +352,9 @@ class GameDetailsViewModelTest {
         viewModel.onStartSession()
 
         // Assert
-        assertEquals(repository.failure.message, viewModel.actionFailure.value?.message)
+        val failure = assertNotNull(viewModel.actionFailure.value)
+        assertEquals(GameActionFailure.Action.START_SESSION, failure.action)
+        assertEquals(repository.failure.message, failure.error.message)
         assertNull(viewModel.displayed.entry.sessionStartTime)
     }
 
@@ -369,7 +374,6 @@ class GameDetailsViewModelTest {
         // Assert
         assertNull(viewModel.displayed.sessionElapsedTime)
         assertEquals(PlayTime(11, 12), viewModel.displayed.entry.playStatus.timeSpent)
-        assertFalse(viewModel.isReadyToLeave.value)
     }
 
     @Test
@@ -405,7 +409,7 @@ class GameDetailsViewModelTest {
     }
 
     @Test
-    fun stopping_the_session_to_leave_makes_the_screen_ready_to_leave() = runTest {
+    fun stopping_the_session_to_leave_closes_the_screen() = runTest {
         // Arrange
         val sessionStart = testStart - 72.minutes
         val repository = FakeGameCollectionRepository(listOf(entry(sessionStartTime = sessionStart)))
@@ -416,8 +420,8 @@ class GameDetailsViewModelTest {
         viewModel.onStopSession(register = true, leave = true)
 
         // Assert
-        assertTrue(viewModel.isReadyToLeave.value)
-        assertEquals(PlayTime(11, 12), viewModel.displayed.entry.playStatus.timeSpent)
+        assertEquals(Closed(Closed.Reason.LEFT), viewModel.state.value)
+        assertEquals(PlayTime(11, 12), repository.observeEntry(game.id).first()?.playStatus?.timeSpent)
     }
 
     @Test
@@ -430,7 +434,7 @@ class GameDetailsViewModelTest {
         viewModel.onStopSession(register = true, leave = true)
 
         // Assert
-        assertFalse(viewModel.isReadyToLeave.value)
+        assertIs<Displaying>(viewModel.state.value)
     }
 
     @Test
@@ -446,8 +450,9 @@ class GameDetailsViewModelTest {
         viewModel.onStopSession(register = true, leave = true)
 
         // Assert
-        assertEquals(repository.failure.message, viewModel.actionFailure.value?.message)
-        assertFalse(viewModel.isReadyToLeave.value)
+        val failure = assertNotNull(viewModel.actionFailure.value)
+        assertEquals(GameActionFailure.Action.STOP_SESSION, failure.action)
+        assertEquals(repository.failure.message, failure.error.message)
         assertEquals(sessionStart, viewModel.displayed.entry.sessionStartTime)
     }
 

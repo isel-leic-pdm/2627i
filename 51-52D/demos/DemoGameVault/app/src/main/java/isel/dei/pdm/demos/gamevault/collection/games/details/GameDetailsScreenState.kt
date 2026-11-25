@@ -33,13 +33,35 @@ sealed class GameDetailsScreenState {
     ) : GameDetailsScreenState()
 
     /**
-     * When the game is not in the collection (e.g. it was just removed from it).
+     * When the screen is to be closed, as there is nothing left to do in it. It is final.
+     * @property reason Why the screen is to be closed.
      */
-    data object NotFound : GameDetailsScreenState()
+    data class Closed(val reason: Reason) : GameDetailsScreenState() {
+        enum class Reason {
+            /**
+             * The game is not in the collection (e.g. it was just removed from it).
+             */
+            GAME_NOT_FOUND,
+
+            /**
+             * The user left the screen, once its play session was stopped.
+             */
+            LEFT
+        }
+    }
 
     /**
      * When the game could not be read.
      * @property error The error that occurred.
      */
     data class Error(val error: PersistenceException) : GameDetailsScreenState()
+}
+
+/**
+ * The failure of an action on the game, to be shown to the user.
+ * @property action The action that failed.
+ * @property error The error that occurred.
+ */
+data class GameActionFailure(val action: Action, val error: PersistenceException) {
+    enum class Action { START_SESSION, STOP_SESSION }
 }

@@ -7,6 +7,7 @@ import isel.dei.pdm.demos.gamevault.domain.search.games.GameSearchService
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformSearchService
 import isel.dei.pdm.demos.gamevault.images.ImageStore
 import isel.dei.pdm.demos.gamevault.images.ImageLoader
+import isel.dei.pdm.demos.gamevault.sessions.PlaySessionNotifier
 import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
 
 /**
@@ -48,4 +49,9 @@ interface DependenciesContainer {
      * The store of the local copies of the collection's images.
      */
     val imageStore: ImageStore
+
+    /**
+     * The notifier that shows the active play session while the user is not looking at the app.
+     */
+    val playSessionNotifier: PlaySessionNotifier
 }

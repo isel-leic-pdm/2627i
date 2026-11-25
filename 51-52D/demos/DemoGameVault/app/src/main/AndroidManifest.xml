@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- To show the active play session (see AndroidPlaySessionNotifier) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".DemoGameVaultApplication"
@@ -17,7 +19,6 @@
         <activity
             android:name=".home.HomeActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.DemoGameVault"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>

@@ -141,7 +141,8 @@
     <string name="game_details_stop_playing">Stop Playing</string>
     <string name="game_details_playing_for">Playing for %1$s</string>
     <string name="game_details_session_just_started">Just started</string>
-    <string name="game_details_session_failure">Could not update the play session.</string>
+    <string name="game_details_start_session_failure">Could not start the play session.</string>
+    <string name="game_details_stop_session_failure">Could not stop the play session.</string>
     <string name="game_details_stop_dialog_title">Stop playing?</string>
     <string name="game_details_stop_dialog_short_title">Register this session?</string>
     <string name="game_details_stop_dialog_leave_title">Leave and stop playing?</string>
@@ -155,6 +156,10 @@
     <string name="game_details_stop_dialog_stop_and_leave">Stop and leave</string>
     <string name="game_details_stop_dialog_discard">Discard</string>
     <string name="game_details_stop_dialog_register">Register</string>
+
+    <string name="play_session_channel_name">Play session</string>
+    <string name="play_session_channel_description">Shows the active play session, and for how long you have been playing.</string>
+    <string name="play_session_notification_text">Play session in progress</string>
     <string name="game_details_history_title">History</string>
     <string name="game_details_history_run">Run %1$d</string>
     <string name="game_details_history_date_unknown">Date unknown</string>
