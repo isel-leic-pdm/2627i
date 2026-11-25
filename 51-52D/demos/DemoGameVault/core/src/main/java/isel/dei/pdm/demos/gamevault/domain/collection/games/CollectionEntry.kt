@@ -6,6 +6,7 @@ import isel.dei.pdm.demos.gamevault.domain.collection.platforms.distinctGamePlat
 import kotlinx.datetime.LocalDate
 import kotlin.time.Clock
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
 /**
@@ -187,6 +188,18 @@ data class CollectionEntry(
         return now - start
     }
 
+    /**
+     * Whether the active session is short, i.e. whether less than [SHORT_SESSION] elapsed since it
+     * started. Short sessions may not be worth registering (e.g. if started by mistake), so the
+     * user may be asked whether to register them when ending them (see [endSession] and
+     * [cancelSession]).
+     * @param now The current time.
+     * @throws IllegalStateException If no session is active.
+     * @throws IllegalArgumentException If [now] is before the session's start.
+     */
+    fun isShortSession(now: Instant): Boolean =
+        sessionElapsedTime(now) < SHORT_SESSION
+
     // Ending and cancelling sessions are tolerant: if no session is active (e.g. it was already
     // ended), they have no effect, instead of failing. Repeating them is therefore harmless, and
     // the elapsed time is never added twice.
@@ -227,4 +240,11 @@ data class CollectionEntry(
     fun cancelSession(): CollectionEntry =
         if (!isSessionActive) this
         else copy(sessionStartTime = null)
+
+    companion object {
+        /**
+         * The duration below which sessions are short (see [isShortSession]).
+         */
+        val SHORT_SESSION: Duration = 5.minutes
+    }
 }

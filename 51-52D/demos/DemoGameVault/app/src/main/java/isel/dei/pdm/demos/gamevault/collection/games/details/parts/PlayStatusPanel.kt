@@ -26,9 +26,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import isel.dei.pdm.demos.gamevault.R
-import isel.dei.pdm.demos.gamevault.collection.games.AddPlatinumChip
-import isel.dei.pdm.demos.gamevault.collection.games.PlatinumChip
-import isel.dei.pdm.demos.gamevault.collection.games.PlayStateChip
+import isel.dei.pdm.demos.gamevault.collection.games.parts.AddPlatinumChip
+import isel.dei.pdm.demos.gamevault.collection.games.parts.PlatinumChip
+import isel.dei.pdm.demos.gamevault.collection.games.parts.PlayStateChip
 import isel.dei.pdm.demos.gamevault.domain.collection.games.Accomplishment
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayTime
@@ -79,7 +79,7 @@ fun PlayStatusPanel(
     isRegisterPlatinumEnabled: Boolean = true
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
     ) {
         PlayStatusRow(
@@ -152,7 +152,7 @@ fun PlayStatusPanel(
 @Composable
 fun PlayStatusPanelPlaceholder(modifier: Modifier = Modifier) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
     ) {
         PlayStatusRow(
@@ -227,7 +227,7 @@ private fun PlayStatusRow(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
             modifier = Modifier.weight(1f)
         ) {
             Text(

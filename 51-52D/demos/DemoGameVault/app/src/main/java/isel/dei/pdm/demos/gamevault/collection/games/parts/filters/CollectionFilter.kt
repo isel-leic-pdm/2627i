@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.collection.games.filters
+package isel.dei.pdm.demos.gamevault.collection.games.parts.filters
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
@@ -11,13 +11,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import isel.dei.pdm.demos.gamevault.R
-import isel.dei.pdm.demos.gamevault.collection.games.CollectionItemView
-import isel.dei.pdm.demos.gamevault.collection.games.PlatinumIcon
-import isel.dei.pdm.demos.gamevault.collection.games.PlayStateChip
-import isel.dei.pdm.demos.gamevault.collection.games.color
-import isel.dei.pdm.demos.gamevault.collection.games.icon
-import isel.dei.pdm.demos.gamevault.collection.games.labelResId
-import isel.dei.pdm.demos.gamevault.collection.games.platinumColor
+import isel.dei.pdm.demos.gamevault.collection.games.parts.CollectionItemView
+import isel.dei.pdm.demos.gamevault.collection.games.parts.PlatinumIcon
+import isel.dei.pdm.demos.gamevault.collection.games.parts.PlayStateChip
+import isel.dei.pdm.demos.gamevault.collection.games.parts.color
+import isel.dei.pdm.demos.gamevault.collection.games.parts.icon
+import isel.dei.pdm.demos.gamevault.collection.games.parts.labelResId
+import isel.dei.pdm.demos.gamevault.collection.games.parts.platinumColor
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionQuery
 import isel.dei.pdm.demos.gamevault.domain.collection.games.Completion
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus

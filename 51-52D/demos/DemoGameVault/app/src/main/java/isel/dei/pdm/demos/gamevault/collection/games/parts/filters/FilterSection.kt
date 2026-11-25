@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.collection.games.filters
+package isel.dei.pdm.demos.gamevault.collection.games.parts.filters
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,8 +21,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import isel.dei.pdm.demos.gamevault.R
-import isel.dei.pdm.demos.gamevault.collection.games.icon
-import isel.dei.pdm.demos.gamevault.collection.games.labelResId
+import isel.dei.pdm.demos.gamevault.collection.games.parts.icon
+import isel.dei.pdm.demos.gamevault.collection.games.parts.labelResId
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme

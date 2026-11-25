@@ -20,10 +20,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import isel.dei.pdm.demos.gamevault.R
-import isel.dei.pdm.demos.gamevault.collection.games.PlatinumIcon
-import isel.dei.pdm.demos.gamevault.collection.games.color
-import isel.dei.pdm.demos.gamevault.collection.games.icon
-import isel.dei.pdm.demos.gamevault.collection.games.platinumColor
+import isel.dei.pdm.demos.gamevault.collection.games.parts.PlatinumIcon
+import isel.dei.pdm.demos.gamevault.collection.games.parts.color
+import isel.dei.pdm.demos.gamevault.collection.games.parts.icon
+import isel.dei.pdm.demos.gamevault.collection.games.parts.platinumColor
 import isel.dei.pdm.demos.gamevault.domain.collection.games.Accomplishment
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.ui.common.TextPlaceholder

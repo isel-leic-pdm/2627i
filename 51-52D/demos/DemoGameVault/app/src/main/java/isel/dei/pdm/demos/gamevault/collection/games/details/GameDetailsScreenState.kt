@@ -22,10 +22,14 @@ sealed class GameDetailsScreenState {
      * @property entry The game's entry in the collection, with the user's notes.
      * @property sessionElapsedTime The time elapsed since the active play session started, or null
      * if no session is active. While a session is active, it is kept up to date.
+     * @property isSessionShort Whether the active play session, if any, is short (see
+     * [CollectionEntry.isShortSession]), in which case the user is asked whether to register it
+     * when stopping it. Kept up to date along with [sessionElapsedTime].
      */
     data class Displaying(
         val entry: CollectionEntry,
-        val sessionElapsedTime: Duration?
+        val sessionElapsedTime: Duration?,
+        val isSessionShort: Boolean = false
     ) : GameDetailsScreenState()
 
     /**

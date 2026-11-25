@@ -17,9 +17,9 @@ import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeGameCollectionRepository
 import isel.dei.pdm.demos.gamevault.collection.games.GameCollectionScreenTestTags.SCREEN_TAG
 import isel.dei.pdm.demos.gamevault.collection.games.GameCollectionScreenViewTestTags.BACK_BUTTON
 import isel.dei.pdm.demos.gamevault.collection.games.GameCollectionViewModel.Companion.STATE_KEY
-import isel.dei.pdm.demos.gamevault.collection.games.filters.ActiveFiltersRowTestTags
-import isel.dei.pdm.demos.gamevault.collection.games.filters.FiltersButtonTestTags
-import isel.dei.pdm.demos.gamevault.collection.games.filters.FiltersSheetContentTestTags
+import isel.dei.pdm.demos.gamevault.collection.games.parts.filters.ActiveFiltersRowTestTags
+import isel.dei.pdm.demos.gamevault.collection.games.parts.filters.FiltersButtonTestTags
+import isel.dei.pdm.demos.gamevault.collection.games.parts.filters.FiltersSheetContentTestTags
 import isel.dei.pdm.demos.gamevault.domain.LimitedResult
 import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionEntry

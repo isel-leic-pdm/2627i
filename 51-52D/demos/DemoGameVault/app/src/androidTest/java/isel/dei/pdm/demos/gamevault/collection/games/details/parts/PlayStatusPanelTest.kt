@@ -15,7 +15,7 @@ import androidx.compose.ui.test.onChild
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import isel.dei.pdm.demos.gamevault.collection.games.PlayStateChipTestTags
+import isel.dei.pdm.demos.gamevault.collection.games.parts.PlayStateChipTestTags
 import isel.dei.pdm.demos.gamevault.domain.collection.games.Accomplishment
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayTime

@@ -11,13 +11,13 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
-import isel.dei.pdm.demos.gamevault.collection.games.PlayStateChipTestTags
 import isel.dei.pdm.demos.gamevault.collection.games.details.parts.GameDatesRowTestTags
 import isel.dei.pdm.demos.gamevault.collection.games.details.parts.GameDetailsHeaderTestTags
 import isel.dei.pdm.demos.gamevault.collection.games.details.parts.GameHistoryTestTags
 import isel.dei.pdm.demos.gamevault.collection.games.details.parts.GameNotesTestTags
 import isel.dei.pdm.demos.gamevault.collection.games.details.parts.PlaySessionBarTestTags
 import isel.dei.pdm.demos.gamevault.collection.games.details.parts.PlayStatusPanelTestTags
+import isel.dei.pdm.demos.gamevault.collection.games.parts.PlayStateChipTestTags
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.collection.games.Accomplishment
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionEntry

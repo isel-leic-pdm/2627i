@@ -14,6 +14,7 @@ import isel.dei.pdm.demos.gamevault.domain.collection.games.GameCollectionReposi
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus.State
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayTime
+import isel.dei.pdm.demos.gamevault.domain.collection.games.StartSessionResult
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -26,6 +27,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -277,6 +279,194 @@ class GameDetailsViewModelTest {
         assertEquals(Duration.ZERO, viewModel.displayed.sessionElapsedTime)
     }
 
+    @Test
+    fun the_session_is_short_until_the_short_session_duration_elapses() = runTest {
+        // Arrange - The session started 4 min 30 s ago
+        val sessionStart = testStart - CollectionEntry.SHORT_SESSION + 30.seconds
+        val repository = FakeGameCollectionRepository(listOf(entry(sessionStartTime = sessionStart)))
+        val viewModel = viewModel(gameRepo = repository)
+        collectStates(viewModel)
+
+        // Act & Assert
+        assertTrue(viewModel.displayed.isSessionShort)
+        advanceTimeBy(30.seconds + 1.milliseconds)
+        assertFalse(viewModel.displayed.isSessionShort)
+    }
+
+    @Test
+    fun without_an_active_session_it_is_not_short() = runTest {
+        // Arrange
+        val viewModel = viewModel()
+
+        // Act
+        collectStates(viewModel)
+
+        // Assert
+        assertFalse(viewModel.displayed.isSessionShort)
+    }
+
+    // Starting sessions
+
+    @Test
+    fun starting_a_session_starts_it_now() = runTest {
+        // Arrange
+        val viewModel = viewModel()
+        collectStates(viewModel)
+
+        // Act
+        viewModel.onStartSession()
+
+        // Assert
+        assertEquals(testStart, viewModel.displayed.entry.sessionStartTime)
+        assertEquals(Duration.ZERO, viewModel.displayed.sessionElapsedTime)
+    }
+
+    @Test
+    fun starting_a_session_while_one_is_active_is_ignored() = runTest {
+        // Arrange
+        val sessionStart = testStart - 10.minutes
+        val repository = FakeGameCollectionRepository(listOf(entry(sessionStartTime = sessionStart)))
+        val viewModel = viewModel(gameRepo = repository)
+        collectStates(viewModel)
+
+        // Act
+        viewModel.onStartSession()
+
+        // Assert
+        assertEquals(sessionStart, viewModel.displayed.entry.sessionStartTime)
+        assertNull(viewModel.actionFailure.value)
+    }
+
+    @Test
+    fun failure_to_start_a_session_is_published() = runTest {
+        // Arrange
+        val repository = ControlledRepository(listOf(entry()))
+        val viewModel = viewModel(gameRepo = repository)
+        collectStates(viewModel)
+        repository.failsChanges = true
+
+        // Act
+        viewModel.onStartSession()
+
+        // Assert
+        assertEquals(repository.failure.message, viewModel.actionFailure.value?.message)
+        assertNull(viewModel.displayed.entry.sessionStartTime)
+    }
+
+    // Stopping sessions
+
+    @Test
+    fun stopping_and_registering_the_session_adds_the_elapsed_time() = runTest {
+        // Arrange
+        val sessionStart = testStart - 72.minutes
+        val repository = FakeGameCollectionRepository(listOf(entry(sessionStartTime = sessionStart)))
+        val viewModel = viewModel(gameRepo = repository)
+        collectStates(viewModel)
+
+        // Act
+        viewModel.onStopSession(register = true)
+
+        // Assert
+        assertNull(viewModel.displayed.sessionElapsedTime)
+        assertEquals(PlayTime(11, 12), viewModel.displayed.entry.playStatus.timeSpent)
+        assertFalse(viewModel.isReadyToLeave.value)
+    }
+
+    @Test
+    fun stopping_and_discarding_the_session_adds_no_time() = runTest {
+        // Arrange
+        val sessionStart = testStart - 3.minutes
+        val repository = FakeGameCollectionRepository(listOf(entry(sessionStartTime = sessionStart)))
+        val viewModel = viewModel(gameRepo = repository)
+        collectStates(viewModel)
+
+        // Act
+        viewModel.onStopSession(register = false)
+
+        // Assert
+        assertNull(viewModel.displayed.sessionElapsedTime)
+        assertEquals(PlayTime(10, 0), viewModel.displayed.entry.playStatus.timeSpent)
+    }
+
+    @Test
+    fun stopping_a_session_starting_after_the_clock_adds_no_time() = runTest {
+        // Arrange - e.g. the device's clock was set back after the session started
+        val sessionStart = testStart + 10.minutes
+        val repository = FakeGameCollectionRepository(listOf(entry(sessionStartTime = sessionStart)))
+        val viewModel = viewModel(gameRepo = repository)
+        collectStates(viewModel)
+
+        // Act
+        viewModel.onStopSession(register = true)
+
+        // Assert
+        assertNull(viewModel.displayed.sessionElapsedTime)
+        assertEquals(PlayTime(10, 0), viewModel.displayed.entry.playStatus.timeSpent)
+    }
+
+    @Test
+    fun stopping_the_session_to_leave_makes_the_screen_ready_to_leave() = runTest {
+        // Arrange
+        val sessionStart = testStart - 72.minutes
+        val repository = FakeGameCollectionRepository(listOf(entry(sessionStartTime = sessionStart)))
+        val viewModel = viewModel(gameRepo = repository)
+        collectStates(viewModel)
+
+        // Act
+        viewModel.onStopSession(register = true, leave = true)
+
+        // Assert
+        assertTrue(viewModel.isReadyToLeave.value)
+        assertEquals(PlayTime(11, 12), viewModel.displayed.entry.playStatus.timeSpent)
+    }
+
+    @Test
+    fun stopping_without_an_active_session_is_ignored() = runTest {
+        // Arrange
+        val viewModel = viewModel()
+        collectStates(viewModel)
+
+        // Act
+        viewModel.onStopSession(register = true, leave = true)
+
+        // Assert
+        assertFalse(viewModel.isReadyToLeave.value)
+    }
+
+    @Test
+    fun failure_to_stop_the_session_is_published_and_the_screen_is_not_left() = runTest {
+        // Arrange
+        val sessionStart = testStart - 72.minutes
+        val repository = ControlledRepository(listOf(entry(sessionStartTime = sessionStart)))
+        val viewModel = viewModel(gameRepo = repository)
+        collectStates(viewModel)
+        repository.failsChanges = true
+
+        // Act
+        viewModel.onStopSession(register = true, leave = true)
+
+        // Assert
+        assertEquals(repository.failure.message, viewModel.actionFailure.value?.message)
+        assertFalse(viewModel.isReadyToLeave.value)
+        assertEquals(sessionStart, viewModel.displayed.entry.sessionStartTime)
+    }
+
+    @Test
+    fun the_action_failure_is_cleared_once_shown() = runTest {
+        // Arrange
+        val repository = ControlledRepository(listOf(entry()))
+        val viewModel = viewModel(gameRepo = repository)
+        collectStates(viewModel)
+        repository.failsChanges = true
+        viewModel.onStartSession()
+
+        // Act
+        viewModel.onActionFailureShown()
+
+        // Assert
+        assertNull(viewModel.actionFailure.value)
+    }
+
     // Observation lifecycle
 
     @Test
@@ -369,6 +559,22 @@ private class ControlledRepository(
 
     var entryObservations = 0
         private set
+
+    /**
+     * Whether changing the entries fails.
+     */
+    var failsChanges = false
+
+    override suspend fun updateEntry(
+        gameId: Long,
+        change: (CollectionEntry) -> CollectionEntry
+    ): CollectionEntry? =
+        if (failsChanges) throw failure
+        else delegate.updateEntry(gameId, change)
+
+    override suspend fun startSession(gameId: Long, now: Instant): StartSessionResult =
+        if (failsChanges) throw failure
+        else delegate.startSession(gameId, now)
 
     override fun observeEntry(gameId: Long): Flow<CollectionEntry?> = flow {
         entryObservations++

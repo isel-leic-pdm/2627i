@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.collection.games.filters
+package isel.dei.pdm.demos.gamevault.collection.games.parts.filters
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,7 +17,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import isel.dei.pdm.demos.gamevault.collection.games.icon
+import isel.dei.pdm.demos.gamevault.collection.games.parts.icon
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 import org.junit.Assert.assertEquals

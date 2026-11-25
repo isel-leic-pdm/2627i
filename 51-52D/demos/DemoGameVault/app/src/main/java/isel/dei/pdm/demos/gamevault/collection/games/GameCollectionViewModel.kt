@@ -46,7 +46,8 @@ import kotlin.time.Duration.Companion.seconds
  * where the screen's initial query is also expected to be found (e.g. passed by the screens that
  * navigate to it, such as the home screen's shortcuts), under the keys defined in the companion
  * object. The initial (i.e. [CollectionQuery.initial]) is not a criterion of this screen, which
- * navigates the listing by initial instead (see [InitialsIndex]).
+ * navigates the listing by initial instead (see
+ * [isel.dei.pdm.demos.gamevault.collection.games.parts.InitialsIndex]).
  *
  * The query's platform is preserved by its identifier, and resolved among the platforms of the
  * collection, which are observed. As filtering by a platform includes all its versions, it is

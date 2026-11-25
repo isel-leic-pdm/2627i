@@ -14,9 +14,9 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.platform.app.InstrumentationRegistry
 import isel.dei.pdm.demos.gamevault.R
-import isel.dei.pdm.demos.gamevault.collection.games.filters.ActiveFiltersRowTestTags
-import isel.dei.pdm.demos.gamevault.collection.games.filters.FilterSectionTestTags
-import isel.dei.pdm.demos.gamevault.collection.games.filters.FiltersSheetContentTestTags
+import isel.dei.pdm.demos.gamevault.collection.games.parts.filters.ActiveFiltersRowTestTags
+import isel.dei.pdm.demos.gamevault.collection.games.parts.filters.FilterSectionTestTags
+import isel.dei.pdm.demos.gamevault.collection.games.parts.filters.FiltersSheetContentTestTags
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionItem
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionQuery

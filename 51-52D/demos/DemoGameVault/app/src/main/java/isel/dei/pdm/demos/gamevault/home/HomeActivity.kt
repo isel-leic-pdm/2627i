@@ -8,7 +8,7 @@ import androidx.activity.viewModels
 import isel.dei.pdm.demos.gamevault.DependenciesContainer
 import isel.dei.pdm.demos.gamevault.collection.games.GameCollectionActivity
 import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsActivity
-import isel.dei.pdm.demos.gamevault.collection.games.filters.toQuery
+import isel.dei.pdm.demos.gamevault.collection.games.parts.filters.toQuery
 import isel.dei.pdm.demos.gamevault.collection.platforms.PlatformCollectionActivity
 import isel.dei.pdm.demos.gamevault.search.games.SearchForGamesActivity
 import isel.dei.pdm.demos.gamevault.settings.SettingsActivity

@@ -270,7 +270,7 @@ private fun GameDetailsLayout(
             ) {
                 cover(
                     Modifier
-                        .weight(0.45f)
+                        .weight(0.50f)
                         .aspectRatio(COVER_ASPECT_RATIO)
                         .clip(RoundedCornerShape(12.dp))
                 )

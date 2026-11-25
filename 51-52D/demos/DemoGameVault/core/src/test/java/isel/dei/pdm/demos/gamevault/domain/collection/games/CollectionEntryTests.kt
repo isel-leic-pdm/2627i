@@ -13,6 +13,7 @@ import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 class CollectionEntryTests {
@@ -315,6 +316,36 @@ class CollectionEntryTests {
     fun `sessionElapsedTime before the session started is rejected`() {
         assertFailsWith<IllegalArgumentException> {
             entryInSession().sessionElapsedTime(sessionStart - 1.minutes)
+        }
+    }
+
+    // Short sessions
+
+    @Test
+    fun `isShortSession holds while less than SHORT_SESSION elapsed`() {
+        val entry = entryInSession()
+        assertTrue(entry.isShortSession(sessionStart))
+        assertTrue(entry.isShortSession(sessionStart + CollectionEntry.SHORT_SESSION - 1.seconds))
+    }
+
+    @Test
+    fun `isShortSession does not hold once SHORT_SESSION elapsed`() {
+        val entry = entryInSession()
+        assertFalse(entry.isShortSession(sessionStart + CollectionEntry.SHORT_SESSION))
+        assertFalse(entry.isShortSession(sessionStart + 2.hours))
+    }
+
+    @Test
+    fun `isShortSession without active session is rejected`() {
+        assertFailsWith<IllegalStateException> {
+            entry().isShortSession(sessionStart)
+        }
+    }
+
+    @Test
+    fun `isShortSession before the session started is rejected`() {
+        assertFailsWith<IllegalArgumentException> {
+            entryInSession().isShortSession(sessionStart - 1.minutes)
         }
     }
 

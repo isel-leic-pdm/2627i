@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.collection.games
+package isel.dei.pdm.demos.gamevault.collection.games.parts
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -39,6 +39,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import isel.dei.pdm.demos.gamevault.R
+import isel.dei.pdm.demos.gamevault.collection.games.CollectionSection
+import isel.dei.pdm.demos.gamevault.collection.games.shouldShowInitialsIndex
+import isel.dei.pdm.demos.gamevault.collection.games.toSections
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionItem
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus

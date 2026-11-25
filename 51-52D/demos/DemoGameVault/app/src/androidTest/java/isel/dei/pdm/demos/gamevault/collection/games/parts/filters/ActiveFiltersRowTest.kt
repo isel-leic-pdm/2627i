@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.collection.games.filters
+package isel.dei.pdm.demos.gamevault.collection.games.parts.filters
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.collection.games
+package isel.dei.pdm.demos.gamevault.collection.games.parts
 
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown

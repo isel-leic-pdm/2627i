@@ -22,7 +22,7 @@ import isel.dei.pdm.demos.gamevault.R
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeGameCollectionRepository
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakePlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.collection.games.GameCollectionScreenTestTags.SCREEN_TAG
-import isel.dei.pdm.demos.gamevault.collection.games.filters.activeFilters
+import isel.dei.pdm.demos.gamevault.collection.games.parts.filters.activeFilters
 import isel.dei.pdm.demos.gamevault.domain.PersistenceException
 import isel.dei.pdm.demos.gamevault.domain.RecoverablePersistenceException
 import isel.dei.pdm.demos.gamevault.domain.UnrecoverablePersistenceException

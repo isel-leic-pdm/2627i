@@ -1,4 +1,4 @@
-package isel.dei.pdm.demos.gamevault.collection.games
+package isel.dei.pdm.demos.gamevault.collection.games.parts
 
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
@@ -9,6 +9,7 @@ import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import isel.dei.pdm.demos.gamevault.collection.games.toSections
 import isel.dei.pdm.demos.gamevault.domain.NonBlankString
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionItem
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus

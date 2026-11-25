@@ -43,11 +43,11 @@ import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayStatus
 import isel.dei.pdm.demos.gamevault.domain.collection.games.PlayTime
 import isel.dei.pdm.demos.gamevault.domain.collection.games.toItem
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.Platform
-import isel.dei.pdm.demos.gamevault.collection.games.filters.CollectionFilter
-import isel.dei.pdm.demos.gamevault.collection.games.filters.icon
-import isel.dei.pdm.demos.gamevault.collection.games.filters.iconColor
-import isel.dei.pdm.demos.gamevault.collection.games.filters.label
-import isel.dei.pdm.demos.gamevault.collection.games.icon
+import isel.dei.pdm.demos.gamevault.collection.games.parts.filters.CollectionFilter
+import isel.dei.pdm.demos.gamevault.collection.games.parts.filters.icon
+import isel.dei.pdm.demos.gamevault.collection.games.parts.filters.iconColor
+import isel.dei.pdm.demos.gamevault.collection.games.parts.filters.label
+import isel.dei.pdm.demos.gamevault.collection.games.parts.icon
 import isel.dei.pdm.demos.gamevault.ui.theme.DemoGameVaultTheme
 import isel.dei.pdm.demos.gamevault.domain.Year
 import kotlinx.datetime.LocalDate
