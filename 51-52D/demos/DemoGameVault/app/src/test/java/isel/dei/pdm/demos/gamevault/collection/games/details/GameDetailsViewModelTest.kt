@@ -3,6 +3,7 @@ package isel.dei.pdm.demos.gamevault.collection.games.details
 import androidx.lifecycle.SavedStateHandle
 import isel.dei.pdm.demos.gamevault.MainDispatcherRule
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeGameCollectionRepository
+import isel.dei.pdm.demos.gamevault.adapters.fakes.FakePlaySessionReminders
 import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsScreenState.Closed
 import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsScreenState.Displaying
 import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsViewModel.Companion.GAME_ID_KEY
@@ -82,10 +83,12 @@ class GameDetailsViewModelTest {
         override fun now(): Instant = testStart + testScheduler.currentTime.milliseconds
     }
 
+    private val reminders = FakePlaySessionReminders()
+
     private fun TestScope.viewModel(
         gameRepo: GameCollectionRepository = FakeGameCollectionRepository(listOf(entry())),
         savedStateHandle: SavedStateHandle = SavedStateHandle(mapOf(GAME_ID_KEY to game.id))
-    ) = GameDetailsViewModel(gameRepo, savedStateHandle, virtualClock())
+    ) = GameDetailsViewModel(gameRepo, savedStateHandle, reminders, virtualClock())
 
     /**
      * Collects the states published by the view model until the test ends, as the UI does. The
@@ -325,6 +328,19 @@ class GameDetailsViewModelTest {
     }
 
     @Test
+    fun starting_a_session_schedules_its_reminder() = runTest {
+        // Arrange
+        val viewModel = viewModel()
+        collectStates(viewModel)
+
+        // Act
+        viewModel.onStartSession()
+
+        // Assert
+        assertEquals(testStart, reminders.scheduled?.sessionStartTime)
+    }
+
+    @Test
     fun starting_a_session_while_one_is_active_is_ignored() = runTest {
         // Arrange
         val sessionStart = testStart - 10.minutes
@@ -356,6 +372,7 @@ class GameDetailsViewModelTest {
         assertEquals(GameActionFailure.Action.START_SESSION, failure.action)
         assertEquals(repository.failure.message, failure.error.message)
         assertNull(viewModel.displayed.entry.sessionStartTime)
+        assertNull(reminders.scheduled)
     }
 
     // Stopping sessions
@@ -374,6 +391,20 @@ class GameDetailsViewModelTest {
         // Assert
         assertNull(viewModel.displayed.sessionElapsedTime)
         assertEquals(PlayTime(11, 12), viewModel.displayed.entry.playStatus.timeSpent)
+    }
+
+    @Test
+    fun stopping_the_session_cancels_its_reminder() = runTest {
+        // Arrange
+        val viewModel = viewModel()
+        collectStates(viewModel)
+        viewModel.onStartSession()
+
+        // Act
+        viewModel.onStopSession(register = false)
+
+        // Assert
+        assertNull(reminders.scheduled)
     }
 
     @Test

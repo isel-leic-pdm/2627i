@@ -24,6 +24,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import isel.dei.pdm.demos.gamevault.R
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeGameCollectionRepository
+import isel.dei.pdm.demos.gamevault.adapters.fakes.FakePlaySessionReminders
 import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsScreenState.Closed
 import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsScreenState.Displaying
 import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsScreenTestTags.SCREEN_TAG
@@ -256,7 +257,8 @@ class GameDetailsScreenPreviews {
                     gameRepo = FakeGameCollectionRepository(HomeScreenSampleData.entries),
                     savedStateHandle = SavedStateHandle(
                         mapOf(GameDetailsViewModel.GAME_ID_KEY to entry.game.id)
-                    )
+                    ),
+                    reminders = FakePlaySessionReminders()
                 ),
                 onBack = { },
                 onGameNotFound = { },

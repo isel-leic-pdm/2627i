@@ -4,9 +4,11 @@ import android.Manifest
 import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
+import android.os.Build
 import android.os.SystemClock
 import android.service.notification.StatusBarNotification
 import androidx.test.platform.app.InstrumentationRegistry
+import isel.dei.pdm.demos.gamevault.R
 import isel.dei.pdm.demos.gamevault.adapters.notifications.AndroidPlaySessionNotifier.Companion.CHANNEL_ID
 import isel.dei.pdm.demos.gamevault.adapters.notifications.AndroidPlaySessionNotifier.Companion.NOTIFICATION_ID
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionEntry
@@ -17,8 +19,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Test
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
 /**
@@ -39,6 +44,11 @@ class AndroidPlaySessionNotifierTest {
     private fun entryInSession(game: Game = eldenRing) =
         CollectionEntry(game = game, platforms = setOf(ps5)).startSession(sessionStart)
 
+    /**
+     * The current time, according to the notifier. By default, the session is not long.
+     */
+    private var now = sessionStart + 10.minutes
+
     private lateinit var notifier: AndroidPlaySessionNotifier
 
     @Before
@@ -47,7 +57,12 @@ class AndroidPlaySessionNotifierTest {
             context.packageName,
             Manifest.permission.POST_NOTIFICATIONS
         )
-        notifier = AndroidPlaySessionNotifier(context)
+        notifier = AndroidPlaySessionNotifier(
+            context = context,
+            clock = object : Clock {
+                override fun now(): Instant = this@AndroidPlaySessionNotifierTest.now
+            }
+        )
     }
 
     @After
@@ -82,6 +97,9 @@ class AndroidPlaySessionNotifierTest {
     private val StatusBarNotification?.title: String?
         get() = this?.notification?.extras?.getString(Notification.EXTRA_TITLE)
 
+    private val StatusBarNotification?.text: String?
+        get() = this?.notification?.extras?.getCharSequence(Notification.EXTRA_TEXT)?.toString()
+
     @Test
     fun the_channel_is_created_with_low_importance() {
         val channel = manager.getNotificationChannel(CHANNEL_ID)
@@ -100,6 +118,48 @@ class AndroidPlaySessionNotifierTest {
         assertEquals(sessionStart.toEpochMilliseconds(), notification.`when`)
         assertTrue((notification.flags and Notification.FLAG_ONGOING_EVENT) != 0)
         assertNotNull(notification.contentIntent)
+    }
+
+    @Test
+    fun the_session_is_shown_as_in_progress_while_not_long() {
+        notifier.showSession(entryInSession())
+
+        val posted = awaitPosted { it != null }
+        assertEquals(context.getString(R.string.play_session_notification_text), posted.text)
+    }
+
+    @Test
+    fun a_long_session_is_shown_asking_whether_the_user_is_still_playing() {
+        now = sessionStart + CollectionEntry.LONG_SESSION
+
+        notifier.showSession(entryInSession())
+
+        val posted = awaitPosted { it != null }
+        val expected = context.getString(
+            R.string.play_session_notification_long_text,
+            CollectionEntry.LONG_SESSION.inWholeHours
+        )
+        assertEquals(expected, posted.text)
+    }
+
+    @Test
+    fun the_session_is_requested_to_be_promoted_to_a_live_update() {
+        // Live Updates exist since Android 16
+        assumeTrue(Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA)
+
+        notifier.showSession(entryInSession())
+
+        val notification = checkNotNull(awaitPosted { it != null }).notification
+        assertTrue(notification.extras.getBoolean(Notification.EXTRA_REQUEST_PROMOTED_ONGOING))
+    }
+
+    @Test
+    fun the_session_reports_its_dismissal() {
+        // So that its reminder is cancelled (see PlaySessionDismissedReceiver)
+        notifier.showSession(entryInSession())
+
+        val notification = checkNotNull(awaitPosted { it != null }).notification
+        assertNotNull(notification.deleteIntent)
     }
 
     @Test

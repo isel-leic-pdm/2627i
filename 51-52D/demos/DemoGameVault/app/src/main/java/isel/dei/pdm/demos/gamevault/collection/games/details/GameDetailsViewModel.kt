@@ -14,6 +14,8 @@ import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsScreenSt
 import isel.dei.pdm.demos.gamevault.domain.PersistenceException
 import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionEntry
 import isel.dei.pdm.demos.gamevault.domain.collection.games.GameCollectionRepository
+import isel.dei.pdm.demos.gamevault.domain.collection.games.StartSessionResult
+import isel.dei.pdm.demos.gamevault.sessions.PlaySessionReminders
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -57,6 +59,8 @@ import kotlin.time.Duration.Companion.seconds
  *
  * @param gameRepo The repository where the user's collection of games is stored.
  * @param savedStateHandle The handle from which the game's identifier is read.
+ * @param reminders The scheduler of the reminders of the sessions, which become due once they
+ * are long (e.g. if forgotten).
  * @param clock The clock used to compute the time elapsed since the session started.
  * @throws IllegalStateException If the game's identifier is not in the [savedStateHandle].
  */
@@ -64,6 +68,7 @@ import kotlin.time.Duration.Companion.seconds
 class GameDetailsViewModel(
     private val gameRepo: GameCollectionRepository,
     savedStateHandle: SavedStateHandle,
+    private val reminders: PlaySessionReminders,
     private val clock: Clock = Clock.System
 ) : ViewModel() {
 
@@ -139,8 +144,9 @@ class GameDetailsViewModel(
     }
 
     /**
-     * Starts a play session of the game, now. The screen reflects it once stored, as the game is
-     * observed. If starting it fails, the failure is published in [actionFailure].
+     * Starts a play session of the game, now, and schedules its reminder. The screen reflects it
+     * once stored, as the game is observed. If starting it fails, the failure is published in
+     * [actionFailure].
      * If the current state is not [Displaying], or a session is already active, no action is
      * taken. It relies on [state] being collected, which is the case when invoked from the UI.
      */
@@ -153,9 +159,9 @@ class GameDetailsViewModel(
                 // The remaining outcomes require no action: if the game is not in the collection,
                 // the screen is closed, and the session of another game cannot be active,
                 // as the screen cannot be left without stopping it (see onStopSession).
-                // DRAFT: Sessions left active otherwise (e.g. if the app is left through the home
-                // button) are yet to be dealt with.
-                gameRepo.startSession(gameId, clock.now())
+                val result = gameRepo.startSession(gameId, clock.now())
+                if (result is StartSessionResult.Started)
+                    reminders.schedule(result.entry)
             } catch (e: PersistenceException) {
                 _actionFailure.value = GameActionFailure(GameActionFailure.Action.START_SESSION, e)
             }
@@ -164,7 +170,8 @@ class GameDetailsViewModel(
 
     /**
      * Stops the active play session, now, either registering it (i.e. adding the elapsed time to
-     * the time spent playing) or discarding it (e.g. if short, see [Displaying.isSessionShort]).
+     * the time spent playing) or discarding it (e.g. if short, see [Displaying.isSessionShort]),
+     * and cancels its reminder.
      * The screen reflects it once stored, as the game is observed. If [leave] is true, the screen
      * is [Closed] once the session is stopped, as the session is bound to the screen. If stopping
      * it fails, the failure is published in [actionFailure], and the screen is not left.
@@ -182,6 +189,7 @@ class GameDetailsViewModel(
                 gameRepo.updateEntry(gameId) {
                     if (register) it.endSessionNow() else it.cancelSession()
                 }
+                reminders.cancel()
                 if (leave)
                     hasLeft.value = true
             } catch (e: PersistenceException) {
@@ -246,10 +254,13 @@ class GameDetailsViewModel(
         /**
          * Factory for creating instances of [GameDetailsViewModel] with the given dependencies.
          */
-        fun factory(gameRepository: GameCollectionRepository): ViewModelProvider.Factory =
+        fun factory(
+            gameRepository: GameCollectionRepository,
+            reminders: PlaySessionReminders
+        ): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
-                    GameDetailsViewModel(gameRepository, createSavedStateHandle())
+                    GameDetailsViewModel(gameRepository, createSavedStateHandle(), reminders)
                 }
             }
     }

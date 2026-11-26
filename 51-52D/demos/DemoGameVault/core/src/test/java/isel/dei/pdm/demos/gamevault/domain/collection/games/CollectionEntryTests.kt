@@ -349,6 +349,36 @@ class CollectionEntryTests {
         }
     }
 
+    // Long sessions
+
+    @Test
+    fun `isLongSession does not hold while less than LONG_SESSION elapsed`() {
+        val entry = entryInSession()
+        assertFalse(entry.isLongSession(sessionStart))
+        assertFalse(entry.isLongSession(sessionStart + CollectionEntry.LONG_SESSION - 1.seconds))
+    }
+
+    @Test
+    fun `isLongSession holds once LONG_SESSION elapsed`() {
+        val entry = entryInSession()
+        assertTrue(entry.isLongSession(sessionStart + CollectionEntry.LONG_SESSION))
+        assertTrue(entry.isLongSession(sessionStart + 10.hours))
+    }
+
+    @Test
+    fun `isLongSession without active session is rejected`() {
+        assertFailsWith<IllegalStateException> {
+            entry().isLongSession(sessionStart)
+        }
+    }
+
+    @Test
+    fun `isLongSession before the session started is rejected`() {
+        assertFailsWith<IllegalArgumentException> {
+            entryInSession().isLongSession(sessionStart - 1.minutes)
+        }
+    }
+
     // Ending sessions
 
     @Test

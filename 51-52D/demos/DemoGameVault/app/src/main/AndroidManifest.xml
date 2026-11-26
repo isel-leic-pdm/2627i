@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- To show the active play session (see AndroidPlaySessionNotifier) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- To show the active play session as a Live Update (e.g. in a status bar chip), since
+         Android 16. It is granted at install time. -->
+    <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS" />
 
     <application
         android:name=".DemoGameVaultApplication"
@@ -34,6 +37,12 @@
         <activity android:name=".collection.platforms.PlatformCollectionActivity" android:exported="true" />
         <activity android:name=".collection.games.GameCollectionActivity" android:exported="true" />
         <activity android:name=".collection.games.details.GameDetailsActivity" android:exported="false" />
+
+        <!-- Records the dismissal of the play session's notification (sent by the system on
+             behalf of the app, through the notification's delete intent) -->
+        <receiver
+            android:name=".adapters.notifications.PlaySessionDismissedReceiver"
+            android:exported="false" />
     </application>
 
 </manifest>

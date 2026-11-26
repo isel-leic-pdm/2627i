@@ -160,6 +160,7 @@
     <string name="play_session_channel_name">Play session</string>
     <string name="play_session_channel_description">Shows the active play session, and for how long you have been playing.</string>
     <string name="play_session_notification_text">Play session in progress</string>
+    <string name="play_session_notification_long_text">Playing for over %1$d h. Still playing?</string>
     <string name="game_details_history_title">History</string>
     <string name="game_details_history_run">Run %1$d</string>
     <string name="game_details_history_date_unknown">Date unknown</string>

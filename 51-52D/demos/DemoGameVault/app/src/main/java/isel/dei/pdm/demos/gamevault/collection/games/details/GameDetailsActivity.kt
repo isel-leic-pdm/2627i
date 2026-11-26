@@ -39,7 +39,10 @@ class GameDetailsActivity : ComponentActivity() {
      * [androidx.lifecycle.SavedStateHandle] is initialized with.
      */
     private val viewModel: GameDetailsViewModel by viewModels {
-        GameDetailsViewModel.factory(gameRepository = dependencies.gameCollectionRepository)
+        GameDetailsViewModel.factory(
+            gameRepository = dependencies.gameCollectionRepository,
+            reminders = dependencies.playSessionReminders
+        )
     }
 
     /**

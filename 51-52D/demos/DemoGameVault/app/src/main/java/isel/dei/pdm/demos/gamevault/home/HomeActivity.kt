@@ -33,6 +33,12 @@ class HomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        lifecycle.addObserver(
+            ActiveSessionRedirectObserver(
+                repository = dependencies.gameCollectionRepository,
+                onActiveSession = { GameDetailsActivity.navigate(this, it.game.id) }
+            )
+        )
         setContent {
             DemoGameVaultTheme {
                 HomeScreen(

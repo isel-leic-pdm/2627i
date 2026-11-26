@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
+import androidx.work.WorkManager
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import isel.dei.pdm.demos.gamevault.adapters.datastore.DataStoreCredentialsRepository
@@ -22,6 +23,7 @@ import isel.dei.pdm.demos.gamevault.adapters.notifications.AndroidPlaySessionNot
 import isel.dei.pdm.demos.gamevault.adapters.room.GameVaultDatabase
 import isel.dei.pdm.demos.gamevault.adapters.room.RoomGameCollectionRepository
 import isel.dei.pdm.demos.gamevault.adapters.room.RoomPlatformCollectionRepository
+import isel.dei.pdm.demos.gamevault.adapters.work.WorkManagerPlaySessionReminders
 import isel.dei.pdm.demos.gamevault.domain.collection.games.GameCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.collection.platforms.PlatformCollectionRepository
 import isel.dei.pdm.demos.gamevault.domain.search.CredentialsRepository
@@ -29,6 +31,7 @@ import isel.dei.pdm.demos.gamevault.domain.search.games.GameSearchService
 import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformSearchService
 import isel.dei.pdm.demos.gamevault.images.ImageLoader
 import isel.dei.pdm.demos.gamevault.sessions.PlaySessionNotifier
+import isel.dei.pdm.demos.gamevault.sessions.PlaySessionReminders
 import java.io.File
 
 /**
@@ -131,5 +134,12 @@ class DemoGameVaultApplication : DependenciesContainer, Application() {
 
     override val playSessionNotifier: PlaySessionNotifier by lazy {
         AndroidPlaySessionNotifier(context = this)
+    }
+
+    override val playSessionReminders: PlaySessionReminders by lazy {
+        WorkManagerPlaySessionReminders(
+            workManager = WorkManager.getInstance(this),
+            notifier = playSessionNotifier
+        )
     }
 }

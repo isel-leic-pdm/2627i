@@ -8,6 +8,7 @@ import isel.dei.pdm.demos.gamevault.domain.search.platforms.PlatformSearchServic
 import isel.dei.pdm.demos.gamevault.images.ImageStore
 import isel.dei.pdm.demos.gamevault.images.ImageLoader
 import isel.dei.pdm.demos.gamevault.sessions.PlaySessionNotifier
+import isel.dei.pdm.demos.gamevault.sessions.PlaySessionReminders
 import isel.dei.pdm.demos.gamevault.ui.common.LocalImageLoader
 
 /**
@@ -54,4 +55,9 @@ interface DependenciesContainer {
      * The notifier that shows the active play session while the user is not looking at the app.
      */
     val playSessionNotifier: PlaySessionNotifier
+
+    /**
+     * The scheduler of the reminders of long play sessions.
+     */
+    val playSessionReminders: PlaySessionReminders
 }

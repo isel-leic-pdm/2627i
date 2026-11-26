@@ -10,7 +10,9 @@ import isel.dei.pdm.demos.gamevault.domain.collection.games.CollectionEntry
  * Sessions are bound to the game details screen: they are started and stopped there, and the
  * screen cannot be left while one is active. So, the session is shown while the screen is not
  * visible, and hidden while it is, as the screen displays it itself (see
- * [isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsActivity]).
+ * [isel.dei.pdm.demos.gamevault.collection.games.details.PlaySessionNotificationObserver]).
+ * Long sessions (see [CollectionEntry.isLongSession]) are shown as such, as they may have been
+ * forgotten, and the user is reminded of them (see [PlaySessionReminders]).
  *
  * The contract does not depend on Android types, so that it can be moved to a shared module if
  * the app ever becomes multiplatform.

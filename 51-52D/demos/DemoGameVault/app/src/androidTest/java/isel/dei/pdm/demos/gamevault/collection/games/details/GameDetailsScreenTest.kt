@@ -14,6 +14,7 @@ import androidx.test.espresso.Espresso
 import androidx.test.platform.app.InstrumentationRegistry
 import isel.dei.pdm.demos.gamevault.R
 import isel.dei.pdm.demos.gamevault.adapters.fakes.FakeGameCollectionRepository
+import isel.dei.pdm.demos.gamevault.adapters.fakes.FakePlaySessionReminders
 import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsScreenTestTags.SCREEN_TAG
 import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsScreenViewTestTags.BACK_BUTTON
 import isel.dei.pdm.demos.gamevault.collection.games.details.GameDetailsScreenViewTestTags.REMOVE_BUTTON
@@ -89,7 +90,8 @@ class GameDetailsScreenTest {
             val viewModel = remember {
                 GameDetailsViewModel(
                     gameRepo = gameRepository,
-                    savedStateHandle = SavedStateHandle(mapOf(GAME_ID_KEY to gameId))
+                    savedStateHandle = SavedStateHandle(mapOf(GAME_ID_KEY to gameId)),
+                    reminders = FakePlaySessionReminders()
                 )
             }
             DemoGameVaultTheme {
